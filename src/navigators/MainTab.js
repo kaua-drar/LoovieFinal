@@ -34,7 +34,7 @@ export default function MainTab() {
         onLayout={onLayoutRootView}
         initialRouteName="HomeTab"
         screenOptions={({ route }) => ({
-          swipeEnabled: false,
+          swipeEnabled: true,
           tabBarOptions: {
             showIcon: true,
             showLabel: false,

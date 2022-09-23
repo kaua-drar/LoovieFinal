@@ -60,7 +60,7 @@ export function HomeStack() {
           headerShown: route.name === "SearchFilter" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 95,
+            height: 75,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {
@@ -255,7 +255,7 @@ export function EmCartazStack() {
           headerShown: route.name === "SearchFilter" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 95,
+            height: 75,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {
@@ -432,7 +432,7 @@ export function ProfileStack() {
           headerShown: route.name === "ProfileScreen" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 95,
+            height: 75,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {

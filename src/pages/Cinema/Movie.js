@@ -489,13 +489,13 @@ const styles = StyleSheet.create({
   note: {
     color: '#FFF',
     fontFamily: 'Lato-Bold',
-    fontSize: 45
+    fontSize: 30
   },
   noteof: {
     color: '#FFF',
     fontFamily: 'Lato-Regular',
     fontSize: 20,
-    marginBottom: 6
+    marginBottom: 1.5
   },
   video: {
     alignSelf: "center",
