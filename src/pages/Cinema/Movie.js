@@ -217,6 +217,7 @@ export default function Movie({ navigation, route }) {
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
+    "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
   });
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {

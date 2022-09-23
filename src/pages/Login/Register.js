@@ -35,10 +35,10 @@ const Register = ({navigation, route, props}) => {
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <KeyboardAvoidingView style={{ alignItems: "center", flex: 1, justifyContent: 'center',}}>
         <LoovieLogo
-            width={160}
-            height={160}
+            width={140}
+            height={140}
             fill='#9D0208'
-            style={{marginBottom: 20, marginTop: 30}}
+            style={{marginBottom: 20, marginTop: 20}}
         />
         <TextInput
           placeholder="Usuário"
@@ -65,11 +65,8 @@ const Register = ({navigation, route, props}) => {
           placeholderTextColor="#8F8F8F"
           style={styles.input}
         />
-        <TouchableOpacity style={{ marginVertical: 5 }}>
-          <Text style={styles.text}>Esqueceu sua senha?</Text>
-        </TouchableOpacity>
         <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Entrar</Text>
+          <Text style={styles.buttonText}>Cadastrar</Text>
         </TouchableOpacity>
         <View style={{flex: 1, justifyContent: 'flex-end', marginBottom: 30}}>
           <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => navigation.navigate("Login")}>
@@ -107,7 +104,7 @@ const styles = StyleSheet.create({
   fontSize: 15
   },
   input: {
-  height: 50,
+  height: 45,
   width: 300,
   marginVertical: 10,
   backgroundColor: '#1f1f1f',

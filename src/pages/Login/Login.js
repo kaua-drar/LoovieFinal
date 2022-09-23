@@ -35,8 +35,8 @@ const Login = ({navigation, route, props}) => {
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <KeyboardAvoidingView style={{ alignItems: "center", flex: 1, justifyContent: 'center',}}>
       <LoovieLogo
-        width={160}
-        height={160}
+        width={140}
+        height={140}
         fill='#9D0208'
         style={{marginBottom: 20, marginTop: 130}}
       />
@@ -53,7 +53,7 @@ const Login = ({navigation, route, props}) => {
         <TouchableOpacity style={{ marginVertical: 5 }}>
           <Text style={styles.text}>Esqueceu sua senha?</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("MainTab")}>
           <Text style={styles.buttonText}>Entrar</Text>
         </TouchableOpacity>
         <View style={{flex: 1, justifyContent: 'flex-end', marginBottom: 30}}>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
   button: {
   width: 200,
-  height: 50,
+  height: 45,
   backgroundColor: '#0f0c0c',
   borderColor:'#8f8f8f',
   borderWidth: 1,

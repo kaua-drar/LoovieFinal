@@ -55,7 +55,7 @@ export default function ProfileScreen() {
         <View onLayout={onLayoutRootView} style={styles.content}>
           <View style={styles.profile}>
               <TouchableOpacity onPress={toggleModal} style={{alignSelf: 'flex-end', margin: 10}}>
-                <Feather name="settings" size={27.5} color="black" />
+                <Feather name="settings" size={27.5} color="white" />
               </TouchableOpacity>
               
               <Image
@@ -67,7 +67,7 @@ export default function ProfileScreen() {
               
           </View>
           <View style={styles.body}>
-            <Text style={{color: '#FFF', fontSize: 20, fontFamily: 'Lato-Regular', marginBottom: 35}}>@Drar</Text>
+            <Text style={{color: '#FFF', fontSize: 20, fontFamily: 'Lato-Regular', marginBottom: 25}}>@Drar</Text>
             
             <View style={styles.itemArea}>
               <Text style={styles.itemText}>Gêneros favoritos{' >'}</Text>
@@ -161,14 +161,14 @@ const styles = StyleSheet.create({
   },
   profile: {
     width: Dimensions.get('window').width,
-    height: 200,
+    height: 180,
     backgroundColor: '#9D0208',
     alignItems: 'center',
-    marginBottom: 120
+    marginBottom: 110
   },
   profileImage: {
     position: 'relative',
-    bottom: -50,
+    bottom: -30,
     width: 200,
     height: 200,
     borderRadius: 100,
