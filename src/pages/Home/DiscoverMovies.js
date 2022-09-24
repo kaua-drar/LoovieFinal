@@ -73,7 +73,7 @@ export default function TabHomeScreen({ navigation, route }) {
         for (const obj of json.results) {
           if (obj.poster_path != null) {
             obj.poster_path =
-              Constants.URL.IMAGE_URL_ORIGINAL + obj.poster_path;
+              Constants.URL.IMAGE_URL_W185 + obj.poster_path;
           }
         }
         setDiscover(json);

@@ -242,7 +242,7 @@ export default function TabHomeScreen({ navigation, route }) {
                         key={index}
                         width={(Dimensions.get("window").width * 114) / 392.72}
                         source={{
-                        uri: `${Constants.URL.IMAGE_URL_ORIGINAL}${media.poster_path}`
+                        uri: `${Constants.URL.IMAGE_URL_W185}${media.poster_path}`
                         }}
                         style={styles.mediaPoster}
                       />

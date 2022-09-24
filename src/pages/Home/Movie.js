@@ -294,7 +294,7 @@ export default function Media({ navigation, route }) {
                 <Image
                   width={(Dimensions.get("window").width * 170) / 392.72}
                   source={{
-                    uri: `${Constants.URL.IMAGE_URL_ORIGINAL}${details.poster_path}`,
+                    uri: `${Constants.URL.IMAGE_URL_W500}${details.poster_path}`,
                   }}
                   style={styles.mediaPoster}
                   resizeMode="cover"

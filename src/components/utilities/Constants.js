@@ -4,6 +4,7 @@ module.exports = {
     BASE_URL: "https://api.themoviedb.org/3/",
     IMAGE_URL_ORIGINAL: "https://image.tmdb.org/t/p/original",
     IMAGE_URL_W185: "http://image.tmdb.org/t/p/w185",
+    IMAGE_URL_W500: "http://image.tmdb.org/t/p/w500",
     IMAGE_URL_W780: "http://image.tmdb.org/t/p/w780",
     TRENDING_URL: "https://api.themoviedb.org/3/trending/all/week",
     TRENDING_MOVIES_URL: "https://api.themoviedb.org/3/trending/movie/day",

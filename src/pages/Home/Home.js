@@ -51,11 +51,11 @@ export default function TabHomeScreen({ navigation }) {
         for (const obj of jsonTrending.results) {
           if (obj.backdrop_path != null) {
             obj.backdrop_path =
-              Constants.URL.IMAGE_URL_ORIGINAL + obj.backdrop_path;
+              Constants.URL.IMAGE_URL_W780 + obj.backdrop_path;
           }
           if (obj.poster_path != null) {
             obj.poster_path =
-              Constants.URL.IMAGE_URL_ORIGINAL + obj.poster_path;
+              Constants.URL.IMAGE_URL_W185 + obj.poster_path;
           }
         }
         setTrending(jsonTrending);

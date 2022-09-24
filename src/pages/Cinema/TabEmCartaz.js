@@ -42,14 +42,6 @@ export default function TabEmCartaz({ navigation, route }) {
   }, [fontsLoaded]);
 
 
-  const alt = () => {
-    if (error) {
-      return (
-          <Text style={{color: '#FFF', fontFamily: 'Lato-Regular', fontSize: 15}}>Imagem não carregada</Text>
-      );
-    }
-  }
-
   useEffect(() => {
     const requestMovies = async () => {
       setLoading(true);
@@ -167,9 +159,7 @@ export default function TabEmCartaz({ navigation, route }) {
                       source={{
                         uri: movie.images[0].url,
                       }}
-                      background={"#474747"}
-                      style={styles.moviePoster}
-                      onError={alt()}
+                      style={[styles.moviePoster]}
                       />
                     </TouchableOpacity>
                   );

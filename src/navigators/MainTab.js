@@ -95,7 +95,6 @@ export default function MainTab() {
         })}
       >
         <Tab.Screen name="CinemaTab" component={EmCartazStack} options={()=>({
-          lazy: true,
           lazyPlaceholder: () => (
             <View style={styles.loadingArea}>
               <ActivityIndicator size="large" color="#FFF" />
@@ -106,7 +105,6 @@ export default function MainTab() {
         <Tab.Screen name="HomeTab" component={HomeStack} />
         <Tab.Screen name="ProfileTab" component={ProfileStack} 
         options={()=>({
-          lazy: true
         })}/>
       </Tab.Navigator>
     );
