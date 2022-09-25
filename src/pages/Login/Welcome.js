@@ -1,4 +1,4 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {
   StyleSheet,
   Text,
@@ -14,12 +14,29 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { connect } from "react-redux";
 import { createStackNavigator } from "@react-navigation/stack";
+import { getAuth } from 'firebase/auth';
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../../../firebase-config';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 
 export default function Welcome({ navigation, route, props }){
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  useEffect(() => {
+    const unsubscribed = auth.onAuthStateChanged(user => {
+      if (user) {
+        navigation.navigate("MainTab");
+      }
+    })
+
+    unsubscribed();
+  }, [])
+
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
   });

@@ -12,6 +12,8 @@ import {
   Dimensions
 } from "react-native";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, updateCurrentUser, confirmPasswordReset } from 'firebase/auth';
+import { getFirestore } from "firebase/firestore";
+import { collection, doc, setDoc } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -36,8 +38,26 @@ const Register = ({navigation, route, props}) => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+
+  useEffect(() => {
+    setUsername('');
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    const unsubscribed = auth.onAuthStateChanged(user => {
+      if (user) {
+        navigation.navigate("Preloader");
+      }
+    })
+
+    return unsubscribed
+  }, [])
+
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  const db = getFirestore(app);
+
 
   const handleCreateAccount = () => {
     Keyboard.dismiss();
@@ -94,13 +114,17 @@ const Register = ({navigation, route, props}) => {
     }
     else if (regexUser.test(username) == true && regexPassword.test(password) == true && password == confirmPassword && username.length > 3 && username.length < 21 && password.length > 5 && password.length < 21) {
       createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(async (userCredential) => {
+        const uid = userCredential.user.uid;
+        console.log(uid);
+        const usersRef = collection(db, "users");
+
+        await setDoc(doc(usersRef, uid), {
+        username: username });
+
         console.log('Account created!');
         const user = userCredential.user;
-        user.displayName = username;
-        user.providerData[0].displayName = username
         console.log(user);
-        navigation.navigate("MainTab");
       })
       .catch(error => {
         console.log(error.code);
@@ -138,12 +162,14 @@ const Register = ({navigation, route, props}) => {
             style={{marginBottom: 20, marginTop: 40}}
         />
         <TextInput
+          value={username}
           placeholder="Usuário"
           placeholderTextColor="#8F8F8F"
           style={styles.input}
           onChangeText={(text) => setUsername(text)}
         />
         <TextInput
+          value={email}
           placeholder="E-mail"
           placeholderTextColor="#8F8F8F"
           style={styles.input}
@@ -151,6 +177,7 @@ const Register = ({navigation, route, props}) => {
         />
         <View style={styles.passwordInputArea}>
           <TextInput
+            value={password}
             placeholder="Senha"
             placeholderTextColor="#8F8F8F"
             style={styles.passwordInput}
@@ -164,6 +191,7 @@ const Register = ({navigation, route, props}) => {
         </View>
         <View style={styles.passwordInputArea}>
           <TextInput
+            value={confirmPassword}
             placeholder="Confirmar Senha"
             placeholderTextColor="#8F8F8F"
             style={styles.passwordInput}
@@ -180,7 +208,7 @@ const Register = ({navigation, route, props}) => {
         </TouchableOpacity>
         {errorMessage}
         <View style={{flex: 1, justifyContent: 'flex-end'}}>
-          <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => navigation.navigate("Login")}>
+          <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => sla()}>
             <Text Text style={styles.text}>Já possui uma conta? </Text>
             <Text Text style={[styles.text, {borderBottomWidth: 1, borderColor: '#9D0208'}]}>Entre</Text>
             <Text Text style={styles.text}>.</Text>

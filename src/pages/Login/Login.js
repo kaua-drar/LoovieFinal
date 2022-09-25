@@ -11,7 +11,7 @@ import {
   Keyboard,
   Dimensions
 } from "react-native";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, updateCurrentUser, confirmPasswordReset } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, updateCurrentUser, confirmPasswordReset, updatePhoneNumber } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -27,7 +27,6 @@ SplashScreen.preventAutoHideAsync();
 
 const Login = ({navigation, route, props}) => {
 
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -36,25 +35,33 @@ const Login = ({navigation, route, props}) => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
+  useEffect(() => {
+    setEmail('');
+    setPassword('');
+    const unsubscribed = auth.onAuthStateChanged(user => {
+      if (user) {
+        navigation.navigate("MainTab");
+      }
+    })
+
+    return unsubscribed
+  }, [])
+
   const handleSignIn = () => {
     Keyboard.dismiss();
 
     let regexUser = /^(?=.*[a-z])[-.\\a-zA-Z0-9]{4,20}$/;
     let regexPassword = /^(?=.*[0-9])(?=.*[a-zA-Z])[-_@!#$%^&*()/\\a-zA-Z0-9]{6,20}$/;
     
-
-    console.log(username.length);
     console.log(password.length);
-    console.log(regexUser.test(username));
     console.log(regexPassword.test(password));
 
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log('Signed in!');
         const user = userCredential.user;
-        console.log(user);
         setErrorMessage(null);
-        navigation.navigate("MainTab");
+        console.log(user);
       })
       .catch(error => {
         console.log(error.code);
@@ -66,7 +73,6 @@ const Login = ({navigation, route, props}) => {
         )
       })
   }
-
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
@@ -84,13 +90,14 @@ const Login = ({navigation, route, props}) => {
   return (
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <KeyboardAvoidingView style={{ alignItems: "center", flex: 1, justifyContent: 'flex-start',}}>
-      <LoovieLogo
-        width={140}
-        height={140}
-        fill='#9D0208'
-        style={{marginBottom: 20, marginTop: 100}}
-      />
-      <TextInput
+        <LoovieLogo
+          width={140}
+          height={140}
+          fill='#9D0208'
+          style={{marginBottom: 20, marginTop: 100}}
+        />
+        <TextInput
+          value={email}
           placeholder="E-mail"
           placeholderTextColor="#8F8F8F"
           style={styles.input}
@@ -98,6 +105,7 @@ const Login = ({navigation, route, props}) => {
         />
         <View style={styles.passwordInputArea}>
           <TextInput
+            value={password}
             placeholder="Senha"
             placeholderTextColor="#8F8F8F"
             style={styles.passwordInput}
