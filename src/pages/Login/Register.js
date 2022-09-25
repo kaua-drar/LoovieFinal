@@ -46,7 +46,7 @@ const Register = ({navigation, route, props}) => {
     setConfirmPassword('');
     const unsubscribed = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.navigate("Preloader");
+        navigation.navigate("ChooseGenres");
       }
     })
 

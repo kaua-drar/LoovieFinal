@@ -40,7 +40,7 @@ const Login = ({navigation, route, props}) => {
     setPassword('');
     const unsubscribed = auth.onAuthStateChanged(user => {
       if (user) {
-        navigation.navigate("MainTab");
+        navigation.navigate("ChooseGenres");
       }
     })
 
