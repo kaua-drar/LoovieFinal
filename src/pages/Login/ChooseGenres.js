@@ -29,7 +29,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Constants from "../../components/utilities/Constants";
 import Image from "react-native-scalable-image";
 import { getAuth } from 'firebase/auth';
-import { collection, doc, getDoc, getDocs, getFirestore } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 
@@ -62,14 +62,29 @@ const ProfileScreen = ({navigation, route, props}) => {
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
   });
 
-  const toggleChip = (index) => {
-    let selecteds = [...genres]
-    selecteds[index].selected = !selecteds[index].selected;
-    setGenres(selecteds);
-    console.log(genres[index]);
+  const toggleChip = (index, selected) => {
+    if(selected == true) {
+      let selecteds = [...genres]
+      selecteds[index].selected = !selecteds[index].selected;
+      setGenres(selecteds);
+      console.log(genres[index]);
+    }
+    const selectedGenres = [];
+    genres.map((genre)=>{
+      if(genre.selected == true) {
+        selectedGenres.push(genre)
+      }
+    });
+    console.log(selectedGenres.length)
+    if(selected == false && selectedGenres.length < 5) {
+      let selecteds = [...genres]
+      selecteds[index].selected = !selecteds[index].selected;
+      setGenres(selecteds);
+      console.log(genres[index]);
+    }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let selectedGenres = [];
     genres.map((genre)=>{
       if(genre.selected == true) {
@@ -77,6 +92,17 @@ const ProfileScreen = ({navigation, route, props}) => {
       }
     });
     console.log(selectedGenres);
+    if(selectedGenres.length == 0) {
+      setModalVisible(true);
+    }
+    else {
+      await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
+        favoriteGenres: selectedGenres })
+      .catch(error => console.log(error.code))
+      .finally(()=>{
+        navigation.navigate("MainTab")
+      })
+    }
   }
 
   const app = initializeApp(firebaseConfig);
@@ -88,7 +114,7 @@ const ProfileScreen = ({navigation, route, props}) => {
 
     setGenres([]);
     docsSnap.forEach(doc => {
-      setGenres(old => [...old, {id: doc.id, genreName: doc.data().name, backdrop_path: doc.data().backdrop_path, poster_path: doc.data().poster_path, selected: false}].sort(function(a,b) {
+      setGenres(old => [...old, {id: doc.id, genreName: doc.data().name, backdrop_path: doc.data().backdrop_path, selected: false}].sort(function(a,b) {
         let x = a.genreName.toUpperCase(),
         y = b.genreName.toUpperCase();
   
@@ -153,7 +179,7 @@ const ProfileScreen = ({navigation, route, props}) => {
               <View style={styles.results}>
                 {genres.map((genre, index) => {
                   return(
-                    <GenreItem key={genre.id} selected={genre.selected} onPress={() => toggleChip(index)}>
+                    <GenreItem key={genre.id} selected={genre.selected} onPress={() => toggleChip(index, genre.selected)}>
                       <ExpoFastImage
                         source={{
                           uri: `${Constants.URL.IMAGE_URL_W780}${genre.backdrop_path}`,
@@ -181,7 +207,15 @@ const ProfileScreen = ({navigation, route, props}) => {
             <Modal isVisible={isModalVisible} onSwipeComplete={() => setModalVisible(false)} swipeDirection="down" onSwipeThreshold={500} onBackdropPress={toggleModal}>
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
+                  <TouchableOpacity style={{position:'relative', top: (Dimensions.get("window").width * -35) / 392.72, right: (Dimensions.get("window").width * -115) / 392.72}} onPress={() => setModalVisible(false)}>
+                    <AntDesign name="closecircle" size={40} color="white"/>
+                  </TouchableOpacity>
                   
+                
+                  <Text style={styles.errorMessage}>Escolha pelo menos um gênero.</Text>
+                  <TouchableOpacity style={styles.closeModal} onPress={() => setModalVisible(false)}>
+                    <Text style={styles.closeModalText}>OK</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             </Modal>
@@ -194,18 +228,43 @@ const ProfileScreen = ({navigation, route, props}) => {
 }
 
 const styles = StyleSheet.create({
+  errorMessage: {
+    color: '#FFF',
+    fontFamily: 'Lato-Regular',
+    fontSize: 20,
+    textAlign: 'center',
+    marginBottom: (Dimensions.get("window").width * 35) / 392.72,
+  },
+  closeModal: {
+    height: (Dimensions.get("window").width * 60) / 392.72,
+    width: (Dimensions.get("window").width * 120) / 392.72,
+    backgroundColor: '#FFF',
+    borderColor: '#0F0C0C',
+    borderWidth: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+    marginBottom: (Dimensions.get("window").width * 10) / 392.72,
+  },
+  closeModalText: {
+    color: '#0F0C0C',
+    fontSize: 20,
+    fontFamily: 'Lato-Bold'
+  },
   modalArea: {
     flex: 1,
-    justifyContent: 'flex-end',
-    width: Dimensions.get("window").width
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height
   },
   modalContent: {
     paddingHorizontal: 15,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    height: 460,
-    width: Dimensions.get("window").width,
+    borderRadius: 25,
+    height: (Dimensions.get("window").width * 250) / 392.72,
+    width: (Dimensions.get("window").width * 250) / 392.72,
     backgroundColor: '#292929',
+    justifyContent: 'space-around',
     alignItems: 'center',
     paddingTop: 15
   },
@@ -222,7 +281,7 @@ const styles = StyleSheet.create({
     borderWidth: 4,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 10
+    borderRadius: 15
   },
   footer: {
     height: (Dimensions.get("window").width * 0) / 392.72,

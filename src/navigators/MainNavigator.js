@@ -11,6 +11,7 @@ import Login from '../pages/Login/Login';
 import Register from '../pages/Login/Register';
 import Preloader from '../pages/Login/Preloader';
 import ChooseGenres from '../pages/Login/ChooseGenres';
+import DeleteAccountConfirm from "../pages/Login/DeleteAccountConfirm";
 
 const Stack = createStackNavigator();
 
@@ -32,6 +33,7 @@ export default function MainNavigator() {
       <Stack.Screen name="MainTab" component={MainTab}/>
       <Stack.Screen name="Preloader" component={Preloader}/>
       <Stack.Screen name="ChooseGenres" component={ChooseGenres}/>
+      <Stack.Screen name="DeleteAccountConfirm" component={DeleteAccountConfirm}/>
     </Stack.Navigator>
   );
 }

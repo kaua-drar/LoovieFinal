@@ -16,7 +16,8 @@ import { FontAwesome5 } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import LoovieLogo from "../icons/LoovieLogo.svg";
-import { SimpleLineIcons } from '@expo/vector-icons';
+import { SimpleLineIcons } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
 
 import Home from "../pages/Home/Home";
 import SearchFilter from "../pages/Home/SearchFilter";
@@ -27,17 +28,21 @@ import DiscoverSeries from "../pages/Home/DiscoverSeries";
 import Multisearch from "../pages/Home/Multisearch";
 
 import TabEmCartaz from "../pages/Cinema/TabEmCartaz";
-import HomeEmCartaz from "../pages/Cinema/Home";
+import HomeEmCartaz from "../pages/Cinema/HomeEmCartaz";
 import MovieEmCartaz from "../pages/Cinema/Movie";
 
 import ProfileScreen from "../pages/Profile/ProfileScreen";
+import Settings from "../pages/Profile/Settings";
+import ChangePassword from "../pages/Profile/ChangePassword";
+import ChangeEmail from "../pages/Profile/ChangeEmail";
+import DeleteAccount from "../pages/Profile/DeleteAccount";
+import EditProfile from "../pages/Profile/EditProfile";
 
 const Stack = createStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
 
 export function HomeStack() {
-
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
   });
@@ -145,7 +150,7 @@ export function HomeStack() {
         <Stack.Screen
           name="SearchFilter"
           component={SearchFilter}
-          options={({route, navigation}) => ({
+          options={({ route, navigation }) => ({
             headerTitle: "Filtros",
             headerShown: true,
             headerRight: () => null,
@@ -250,7 +255,7 @@ export function EmCartazStack() {
     return (
       <Stack.Navigator
         showLabel="false"
-        initialRouteName="Home"
+        initialRouteName="HomeEmCartaz"
         screenOptions={({ route, navigation }) => ({
           headerShown: route.name === "SearchFilter" ? false : true,
           headerStyle: {
@@ -277,14 +282,14 @@ export function EmCartazStack() {
                   flexDirection: "row",
                   alignItems: "center",
                   padding: 5,
-                  marginLeft: route.name == "Home" ? 22.5 : 2.5,
+                  marginLeft: route.name == "HomeEmCartaz" ? 22.5 : 2.5,
                 }}
                 onPress={() =>
-                  route.name === "Home" ? null : navigation.goBack()
+                  route.name === "HomeEmCartaz" ? null : navigation.goBack()
                 }
                 activeOpacity={0.8}
                 underlayColor="#ba5256"
-                disabled={route.name === "Home" ? true : false}
+                disabled={route.name === "HomeEmCartaz" ? true : false}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Ionicons
@@ -292,7 +297,7 @@ export function EmCartazStack() {
                     size={20}
                     color="#FFF"
                     style={{
-                      display: route.name === "Home" ? "none" : "flex",
+                      display: route.name === "HomeEmCartaz" ? "none" : "flex",
                     }}
                   />
                   <LoovieLogo
@@ -335,8 +340,11 @@ export function EmCartazStack() {
           ...TransitionPresets.ModalPresentationIOS,
         })}
       >
-        <Stack.Screen name="Home" component={HomeEmCartaz} />
-        <Stack.Screen name="EmCartaz" component={TabEmCartaz} options={({navigation, route}, props ) => ({
+        <Stack.Screen name="HomeEmCartaz" component={HomeEmCartaz} />
+        <Stack.Screen
+          name="EmCartaz"
+          component={TabEmCartaz}
+          options={({ navigation, route }, props) => ({
             gestureEnabled: false,
             gestureDirection: "vertical",
             ...TransitionPresets.ModalSlideFromBottomIOS,
@@ -357,7 +365,7 @@ export function EmCartazStack() {
                     padding: 5,
                     marginLeft: 2.5,
                   }}
-                  onPress={() => navigation.navigate("Home")}
+                  onPress={() => navigation.navigate("HomeEmCartaz")}
                   activeOpacity={0.8}
                   underlayColor="#ba5256"
                   disabled={false}
@@ -397,14 +405,18 @@ export function EmCartazStack() {
                 </Text>
               </View>
             ),
-          })}/>
-          <Stack.Screen name="Movie" component={MovieEmCartaz} 
-          options={()=>({
+          })}
+        />
+        <Stack.Screen
+          name="Movie"
+          component={MovieEmCartaz}
+          options={() => ({
             gestureEnabled: false,
             gestureDirection: "vertical",
             ...TransitionPresets.ModalSlideFromBottomIOS,
             gestureVelocityImpact: 1,
-          })}/>
+          })}
+        />
       </Stack.Navigator>
     );
   }
@@ -450,7 +462,207 @@ export function ProfileStack() {
           ),
         })}
       >
-        <Stack.Screen name="ProfileScreen" component={ProfileScreen}/>
+        <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
+          options={({ navigation, route }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+            headerTitle: "Configurações",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <AntDesign
+                  name="close"
+                  size={32}
+                  color="#FFF"
+                  style={{
+                    display: "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePassword}
+          options={({ navigation, route }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+            headerTitle: "Alterar Senha",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <AntDesign
+                  name="close"
+                  size={32}
+                  color="#FFF"
+                  style={{
+                    display: "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="ChangeEmail"
+          component={ChangeEmail}
+          options={({ navigation, route }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+            headerTitle: "Alterar E-mail",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <AntDesign
+                  name="close"
+                  size={32}
+                  color="#FFF"
+                  style={{
+                    display: "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="DeleteAccount"
+          component={DeleteAccount}
+          options={({ navigation, route }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+            headerTitle: "Excluir Conta",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <AntDesign
+                  name="close"
+                  size={32}
+                  color="#FFF"
+                  style={{
+                    display: "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+          options={({ navigation, route }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+            headerTitle: "Excluir Conta",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <AntDesign
+                  name="close"
+                  size={32}
+                  color="#FFF"
+                  style={{
+                    display: "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
       </Stack.Navigator>
     );
   }

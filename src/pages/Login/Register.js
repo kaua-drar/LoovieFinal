@@ -11,9 +11,8 @@ import {
   Keyboard,
   Dimensions
 } from "react-native";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, updateCurrentUser, confirmPasswordReset } from 'firebase/auth';
-import { getFirestore } from "firebase/firestore";
-import { collection, doc, setDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, } from 'firebase/auth';
+import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -133,7 +132,7 @@ const Register = ({navigation, route, props}) => {
           <Foundation name="alert" size={24} color="#9D0208"/>
           <Text style={styles.errorMessage}>{error.code === "auth/account-exists-with-different-credential" || error.code === "auth/email-already-exists" || error.code === "auth/email-already-in-use" ? "E-mail já associado a outra conta." : error.code === "auth/invalid-display-name" ? "Nome de usuário inválido." : error.code === "auth/invalid-email-verified" || error.code === "auth/invalid-email" ? "E-mail inválido" : error.code === "auth/invalid-password" ? "A senha precisa ter pelo menos 6 caracteres." : null}</Text>
         </View>
-        )
+        );
       })
       setErrorMessage(null);
     }
@@ -208,7 +207,7 @@ const Register = ({navigation, route, props}) => {
         </TouchableOpacity>
         {errorMessage}
         <View style={{flex: 1, justifyContent: 'flex-end'}}>
-          <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => sla()}>
+          <TouchableOpacity style={{ flexDirection: 'row' }} onPress={() => navigation.navigate("Login")}>
             <Text Text style={styles.text}>Já possui uma conta? </Text>
             <Text Text style={[styles.text, {borderBottomWidth: 1, borderColor: '#9D0208'}]}>Entre</Text>
             <Text Text style={styles.text}>.</Text>

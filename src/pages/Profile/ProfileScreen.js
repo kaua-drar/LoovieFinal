@@ -43,6 +43,7 @@ const ProfileScreen = ({navigation, route, props}) => {
   };
   
   const handleSignOut = () => {
+    toggleModal();
     auth
     .signOut()
     .then(() => {
@@ -116,7 +117,7 @@ const ProfileScreen = ({navigation, route, props}) => {
                 
             </View>
             <View style={styles.body}>
-              <Text style={{color: '#FFF', fontSize: 20, fontFamily: 'Lato-Regular', marginBottom: 25}}>{username}</Text>
+              <Text style={{color: '#FFF', fontSize: 20, fontFamily: 'Lato-Regular', marginBottom: 25}}>@{username}</Text>
               
               <View style={styles.itemArea}>
                 <Text style={styles.itemText}>Gêneros favoritos{' >'}</Text>
@@ -137,11 +138,13 @@ const ProfileScreen = ({navigation, route, props}) => {
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
                   <View style={styles.barra}></View>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity style={styles.button} onPress={() => {setModalVisible(false);
+                  navigation.navigate("EditProfile");}}>
                     <FontAwesome5 name="edit" size={27.5} color="white" />
                     <Text style={styles.buttonText}>Configuração de Perfil</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity style={styles.button} onPress={() => {setModalVisible(false);
+                  navigation.navigate("Settings");}}>
                     <Feather name="settings" size={27.5} color="white" />
                     <Text style={styles.buttonText}>Configuração Geral</Text>
                   </TouchableOpacity>
@@ -171,6 +174,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    height: Dimensions.get("window").height
   },
   loadingText: {
     color: "#FFF",

@@ -14,7 +14,7 @@ const Tab = createMaterialTopTabNavigator();
 
 SplashScreen.preventAutoHideAsync();
 
-export default function MainTab() {
+export default function MainTab({route}) {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
   });
@@ -25,16 +25,24 @@ export default function MainTab() {
     }
   }, [fontsLoaded]);
 
+  const isTabBarVisible = (route) => {
+    const routeName = route.state ? route.state.routes[route.state.index]?.name : (route.params ? route.params.screen : 'HOME');
+
+    return[
+      'DeleteAccountConfirm'
+    ].includes(routeName);
+  };
+
   if (!fontsLoaded) {
     return null;
   } else {
     return (
       <Tab.Navigator
         tabBarPosition="bottom"
-        onLayout={onLayoutRootView}
+        onLayout={console.log(isTabBarVisible(route))}
         initialRouteName="HomeTab"
         screenOptions={({ route }) => ({
-          swipeEnabled: true,
+          swipeEnabled: isTabBarVisible(route),
           tabBarOptions: {
             showIcon: true,
             showLabel: false,

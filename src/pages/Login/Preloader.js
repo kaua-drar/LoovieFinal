@@ -29,7 +29,7 @@ export default function Preloader( {navigation} ) {
     useEffect(() => {
         const unsubscribed = auth.onAuthStateChanged(user => {
         if (user) {
-            navigation.navigate("ChooseGenres");
+            navigation.navigate("MainTab");
         }
         else {
             navigation.navigate("Welcome");

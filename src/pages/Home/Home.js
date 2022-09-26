@@ -16,6 +16,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import Image from "react-native-scalable-image";
+import ExpoFastImage from 'expo-fast-image';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
@@ -136,10 +137,9 @@ export default function TabHomeScreen({ navigation }) {
                         navigation.navigate(media.media_type === "movie" ? "Movie" : "Serie", { mediaId: media.id, mediaType: media.media_type })
                       }
                     >
-                      <Image
-                        width={(Dimensions.get("window").width * 114) / 392.72}
+                      <ExpoFastImage
                         source={{
-                          uri: `${media.poster_path}`,
+                        uri: `${media.poster_path}`
                         }}
                         style={styles.moviePoster}
                         resizeMode="cover"
@@ -151,15 +151,12 @@ export default function TabHomeScreen({ navigation }) {
             </ScrollView>
             <Text style={[styles.title, { marginTop: 20 }]}>Em Alta</Text>
             <View style={[styles.movieItem, { marginBottom: 100 }]}>
-              <Image
-                source={{
-                  uri: `${
-                    trending.results.sort(
-                      (a, b) => b.popularity - a.popularity
-                    )[0].backdrop_path
-                  }`,
+              <ExpoFastImage
+              source={{
+                uri: `${trending.results.sort(
+                  (a, b) => b.popularity - a.popularity
+                )[0].backdrop_path}`
                 }}
-                width={(Dimensions.get("window").width * 362) / 392.72}
                 style={styles.movieBackdrop}
                 resizeMode="cover"
               />
@@ -204,10 +201,14 @@ const styles = StyleSheet.create({
     marginHorizontal: (Dimensions.get("window").width * 5) / 392.72,
   },
   moviePoster: {
+    width: (Dimensions.get("window").width * 114) / 392.72,
+    height: (Dimensions.get("window").width * 171) / 392.72,
     borderRadius:
       (Dimensions.get("window").height / Dimensions.get("window").width) * 6,
   },
   movieBackdrop: {
+    width:(Dimensions.get("window").width * 362) / 392.72,
+    height: (Dimensions.get("window").width * 203.62) / 392.72,
     borderRadius:
       (Dimensions.get("window").height / Dimensions.get("window").width) * 6,
   },
