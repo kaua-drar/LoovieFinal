@@ -12,9 +12,11 @@ import {
   Button,
   Dimensions,
   ScrollView,
-  StatusBar
+  StatusBar,
+  RefreshControl
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Constants from "../../components/utilities/Constants";
 import styled from "styled-components/native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -25,7 +27,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import { collection, doc, getDoc, getFirestore, getDocs, query, where } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 import ExpoFastImage from 'expo-fast-image';
@@ -38,6 +40,9 @@ const ProfileScreen = ({navigation, route, props}) => {
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState('');
+  const [favoriteGenres, setFavoriteGenres] = useState([]);
+  const [folders, setFolders] = useState([]);
+  const [refreshing, setRefreshing] = useState(true);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -62,6 +67,8 @@ const ProfileScreen = ({navigation, route, props}) => {
   const db = getFirestore(app);
 
   const sla = async () => {
+    setLoading(true);
+    setRefreshing(true);
     const docRef = doc(db, "users", auth.currentUser.uid);
     const docSnap = await getDoc(docRef);
 
@@ -73,6 +80,53 @@ const ProfileScreen = ({navigation, route, props}) => {
       console.log("No such document!");
       setUsername("");
     }
+
+    const docRefGenre = doc(db, "users", auth.currentUser.uid);
+    const docSnapGenre = await getDoc(docRefGenre);
+
+    if (docSnapGenre.exists()) {
+      
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+      setFavoriteGenres("");
+    }
+    const data = docSnapGenre.data();
+    setFavoriteGenres(data.favoriteGenres);
+
+    const q = query(
+      collection(db, "folders"),
+      where("userId", "==", auth.currentUser.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    setFolders([]);
+    querySnapshot.forEach((doc) => {
+      setFolders((old) =>
+        [
+          ...old,
+          {
+            folderId: doc.id,
+            userId: doc.data().userId,
+            name: doc.data().name,
+            posterPath: doc.data().medias[0].posterPath,
+          },
+        ].sort(function (a, b) {
+          let x = a.name.toUpperCase(),
+            y = b.name.toUpperCase();
+
+          return x == y ? 0 : x > y ? 1 : -1;
+        })
+      );
+    });
+    
+    auth.currentUser.reload();
+
+    console.log(favoriteGenres);
+    console.log(folders);
+
+    setRefreshing(false);
     setLoading(false);
   }
 
@@ -95,7 +149,10 @@ const ProfileScreen = ({navigation, route, props}) => {
       <ScrollView style={styles.container}>
         <StatusBar
         animated={true}
-        backgroundColor="#9D0208"/>
+        backgroundColor="#9D0208"
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={sla} />
+        }/>
         {loading &&(
           <View style={styles.loadingArea}>
             <ActivityIndicator size="large" color="#FFF" />
@@ -123,14 +180,35 @@ const ProfileScreen = ({navigation, route, props}) => {
               <View style={styles.itemArea}>
                 <Text style={styles.itemText}>Gêneros favoritos{' >'}</Text>
                 <View style={styles.itens}>
-                  <ScrollView></ScrollView>
+                  <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
+                    {favoriteGenres.map((genre) => {
+                      return(
+                        <TouchableOpacity style={{alignItems: 'center'}}>
+                          <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W300}${genre.backdrop_path}`}} style={{width: 100, height: 100, borderRadius: 50, marginHorizontal: 5}}/>
+                          <Text style={[styles.itemText, {fontSize: 14, marginLeft: 0, marginBottom: 0, maxWidth: 100, textAlign: 'center'}]}>{genre.genreName}</Text>
+                        </TouchableOpacity>
+                        
+                      )
+                    })}
+                  </ScrollView>
                 </View>
               </View>
+
 
               <View style={[styles.itemArea, {marginTop: 35, marginBottom: 50}]}>
                 <Text style={styles.itemText}>Minha biblioteca{' >'}</Text>
                 <View style={styles.itens}>
-                  <ScrollView></ScrollView>
+                  <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
+                    {folders.map((folder) => {
+                      return(
+                        <TouchableOpacity style={{alignItems: 'center'}}>
+                          <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W300}${folder.posterPath}`}} style={{width: 100, height: 100, borderRadius: 50, marginHorizontal: 5}}/>
+                          <Text style={[styles.itemText, {fontSize: 14, marginLeft: 0, marginBottom: 0, maxWidth: 100, textAlign: 'center'}]}>{folder.name}</Text>
+                        </TouchableOpacity>
+                        
+                      )
+                    })}
+                  </ScrollView>
                 </View>
               </View>
             </View>
@@ -197,10 +275,13 @@ const styles = StyleSheet.create({
   },
   itens: {
     flex: 1,
-    height: 110,
+    height: 150,
     backgroundColor: '#292929',
     marginHorizontal: '2%',
-    borderRadius: 5
+    borderRadius: 5,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 5
   },
   itemArea: {
     width: Dimensions.get('window').width,
@@ -223,6 +304,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     justifyContent: 'flex-start',
+    marginBottom: 50
   },
   profile: {
     width: Dimensions.get('window').width,

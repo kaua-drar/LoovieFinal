@@ -18,6 +18,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
+import ExpoFastImage from 'expo-fast-image';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
@@ -238,9 +239,8 @@ export default function TabHomeScreen({ navigation, route }) {
                 if(media.poster_path != null && (media.title || media.name)) {
                   return (
                     <TouchableOpacity onPress={()=>navigation.navigate(media.media_type === "movie" ? "Movie" : media.media_type === "tv" ? "Serie" : null, {mediaId: media.id})} key={index} style={styles.mediaItem}>
-                      <Image
+                      <ExpoFastImage
                         key={index}
-                        width={(Dimensions.get("window").width * 114) / 392.72}
                         source={{
                         uri: `${Constants.URL.IMAGE_URL_W185}${media.poster_path}`
                         }}
@@ -306,6 +306,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   mediaPoster: {
+    width: (Dimensions.get("window").width * 114) / 392.72,
+    height: (Dimensions.get("window").width * 171) / 392.72,
     borderRadius:
       (Dimensions.get("window").height / Dimensions.get("window").width) * 6,
     margin: (Dimensions.get("window").width * 5) / 392.72,

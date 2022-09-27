@@ -34,21 +34,8 @@ export default function TabEmCartaz({ navigation, route }) {
   const [ufSelected, setUfSelected] = useState("");
   const [citySelected, setCitySelected] = useState("");
   const [citiesNotDone, setCitiesNotDone] = useState([]);
-  const [theatersNotDone, setTheatersNotDone] = useState([]);
   const [uf, setUf] = useState([]);
   const [cities, setCities] = useState([]);
-  const [theaters, setTheaters] = useState([]);
-  let data = [
-    {
-      value: "Banana",
-    },
-    {
-      value: "Mango",
-    },
-    {
-      value: "Pear",
-    },
-  ];
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),

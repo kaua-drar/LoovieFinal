@@ -37,7 +37,6 @@ import ChangePassword from "../pages/Profile/ChangePassword";
 import ChangeEmail from "../pages/Profile/ChangeEmail";
 import DeleteAccount from "../pages/Profile/DeleteAccount";
 import EditProfile from "../pages/Profile/EditProfile";
-import Teste from "../pages/Profile/Teste";
 
 const Stack = createStackNavigator();
 
@@ -636,46 +635,6 @@ export function ProfileStack() {
             ...TransitionPresets.ModalSlideFromBottomIOS,
             gestureVelocityImpact: 1,
             headerTitle: "Configurações",
-            headerShown: true,
-            headerRight: () => null,
-            headerTitleAlign: "center",
-            headerLeft: () => (
-              <TouchableHighlight
-                style={{
-                  borderRadius: 40,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  padding: 5,
-                  marginLeft: 22.5,
-                }}
-                onPress={() =>
-                  route.name === "Home" ? null : navigation.goBack()
-                }
-                activeOpacity={0.8}
-                underlayColor="#ba5256"
-                disabled={route.name === "Home" ? true : false}
-              >
-                <AntDesign
-                  name="close"
-                  size={32}
-                  color="#FFF"
-                  style={{
-                    display: "flex",
-                  }}
-                />
-              </TouchableHighlight>
-            ),
-          })}
-        />
-        <Stack.Screen
-          name="Teste"
-          component={Teste}
-          options={({ navigation, route }) => ({
-            gestureEnabled: false,
-            gestureDirection: "vertical",
-            ...TransitionPresets.ModalSlideFromBottomIOS,
-            gestureVelocityImpact: 1,
-            headerTitle: "Excluir Conta",
             headerShown: true,
             headerRight: () => null,
             headerTitleAlign: "center",

@@ -15,6 +15,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Image from "react-native-scalable-image";
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
+import ExpoFastImage from 'expo-fast-image';
 
 SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
@@ -245,9 +246,8 @@ export default function TabHomeScreen({ navigation, route }) {
               if(media.poster_path != null) {
                 return (
                   <TouchableOpacity onPress={()=>navigation.navigate("Serie", {mediaId: media.id})} key={index} style={styles.mediaItem}>
-                      <Image
+                      <ExpoFastImage
                       key={index}
-                      width={(Dimensions.get("window").width * 114) / 392.72}
                       source={{
                       uri: `${media.poster_path}`
                       }}
@@ -289,6 +289,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   mediaPoster: {
+    width: (Dimensions.get("window").width * 114) / 392.72,
+    height: (Dimensions.get("window").width * 171) / 392.72,
     borderRadius:
       (Dimensions.get("window").height / Dimensions.get("window").width) * 6,
     margin: (Dimensions.get("window").width * 5) / 392.72,

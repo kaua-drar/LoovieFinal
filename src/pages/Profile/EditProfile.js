@@ -41,7 +41,7 @@ SplashScreen.preventAutoHideAsync();
 
 const EditProfile = ({ navigation, route, props }) => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [username, setUsername] = useState("OOOOOOIIIIII");
+  const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
@@ -81,7 +81,7 @@ const EditProfile = ({ navigation, route, props }) => {
       setErrorMessage(
         <View style={styles.errorMessageArea}>
           <MaterialIcons name={"check"} size={24} color="#FFF" />
-          <Text style={styles.errorMessage}>Imagem de perfil alterada!</Text>
+          <Text style={styles.errorMessage}>Imagem de perfil alterada! Reinicie o aplicativo para aplicá-la.</Text>
         </View>
       );
     } else if ((username.length < 4 || username.length > 20 ) && regexUser.test(username) == false) {
@@ -101,8 +101,8 @@ const EditProfile = ({ navigation, route, props }) => {
       changeUsername();
       setErrorMessage(
         <View style={styles.errorMessageArea}>
-          <Foundation name="alert" size={24} color="#9D0208" />
-          <Text style={styles.errorMessage}>Nome de usuário alterado.</Text>
+          <MaterialIcons name={"check"} size={24} color="#FFF" />
+          <Text style={styles.errorMessage}>Nome de usuário alterado! Reinicie o aplicativo para aplicá-lo.</Text>
         </View>
       );
     } else if (
@@ -129,7 +129,7 @@ const EditProfile = ({ navigation, route, props }) => {
       setErrorMessage(
         <View style={styles.errorMessageArea}>
           <MaterialIcons name={"check"} size={24} color="#FFF" />
-          <Text style={styles.errorMessage}>Alterações salvas!</Text>
+          <Text style={styles.errorMessage}>Alterações salvas! Reinicie o aplicativo para aplicá-las.</Text>
         </View>
       );
     }
@@ -199,7 +199,7 @@ const EditProfile = ({ navigation, route, props }) => {
               <ExpoFastImage
                 style={styles.userImage}
                 source={{
-                  uri: "https://pbs.twimg.com/profile_images/1560255496715632643/oZr-_U7g_400x400.jpg",
+                  uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
                 }}
                 resizeMode="cover"
               ></ExpoFastImage>
