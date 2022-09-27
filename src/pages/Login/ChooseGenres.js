@@ -173,7 +173,7 @@ const ProfileScreen = ({navigation, route, props}) => {
                   fill='#9D0208'
                   style={{marginBottom: 20, marginTop: 20}}
                 />
-                <Text style={styles.title}>Olá, {username}!</Text>
+                <Text style={styles.title}>Olá, {auth.currentUser.displayName}!</Text>
                 <Text style={styles.text}>Escolha gêneros que goste de assistir. Isso vai nos ajudar a recomendar algo que você goste.</Text>
               </View>
               <View style={styles.results}>

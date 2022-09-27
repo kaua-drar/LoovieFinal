@@ -9,8 +9,9 @@ import {
   ScrollView,
   Keyboard,
   Platform,
+  Image,
 } from "react-native";
-import ImagePicker from 'react-native-image-crop-picker';
+import * as ImagePicker from "expo-image-picker";
 import { connect } from "react-redux";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
@@ -19,8 +20,15 @@ import {
   updateEmail,
   reauthenticateWithCredential,
   EmailAuthProvider,
+  updateProfile,
 } from "firebase/auth";
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getFirestore,
+  updateDoc,
+} from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { Entypo } from "@expo/vector-icons";
@@ -33,34 +41,140 @@ SplashScreen.preventAutoHideAsync();
 
 const EditProfile = ({ navigation, route, props }) => {
   const [errorMessage, setErrorMessage] = useState("");
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState("OOOOOOIIIIII");
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
+  const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
   });
 
-  const choosePhotoFromLibrary = () => {
-    ImagePicker.openPicker({
-      width: 300,
-      height: 300,
-      cropping: true,
-      compressImageQuality: 0.7,
-    }).then((image) => {
-      console.log(image);
-      const imageUri = Platform.OS === 'ios' ? image.sourceURL : image.path;
-      setImage(imageUri);
-      this.bs.current.snapTo(1);
-    });
-  };
-
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    async () => {
+      const galleryStatus =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setHasGalleryPermission = galleryStatus == "granted";
+    };
+  }, []);
+
+  const handleSubmit = async () => {
+    Keyboard.dismiss();
+
+    let regexUser = /^(?=.*[a-z])[-.\\a-zA-Z0-9]{4,20}$/;
+
+    console.log(username.length);
+    console.log(regexUser.test(username));
+
+    if (
+      username.length == 0 &&
+      image != null &&
+      image != undefined &&
+      image != ""
+    ) {
+      changeImage();
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <MaterialIcons name={"check"} size={24} color="#FFF" />
+          <Text style={styles.errorMessage}>Imagem de perfil alterada!</Text>
+        </View>
+      );
+    } else if ((username.length < 4 || username.length > 20 ) && regexUser.test(username) == false) {
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <Foundation name="alert" size={24} color="#9D0208" />
+          <Text style={styles.errorMessage}>
+            O nome de usuário precisa ter entre 4 e 20 caracteres.
+          </Text>
+        </View>
+      );
+    } else if (
+      username.length > 3 &&
+      username.length < 21 &&
+      (image == null || image == undefined || image == "")
+    ) {
+      changeUsername();
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <Foundation name="alert" size={24} color="#9D0208" />
+          <Text style={styles.errorMessage}>Nome de usuário alterado.</Text>
+        </View>
+      );
+    } else if (
+      username.length > 3 &&
+      username.length < 21 &&
+      regexUser.test(username) == false
+    ) {
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <Foundation name="alert" size={24} color="#9D0208" />
+          <Text style={styles.errorMessage}>Nome de Usuário inválido.</Text>
+        </View>
+      );
+    } else if (
+      regexUser.test(username) == true &&
+      username.length > 3 &&
+      username.length < 21 &&
+      image != null &&
+      image != undefined &&
+      image != ""
+    ) {
+      changeImage();
+      changeUsername();
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <MaterialIcons name={"check"} size={24} color="#FFF" />
+          <Text style={styles.errorMessage}>Alterações salvas!</Text>
+        </View>
+      );
+    }
+  };
+
+  const changeImage = async () => {
+    await updateProfile(auth.currentUser, { photoURL: image })
+      .then(async () => {
+        console.log("imagem foi");
+      })
+      .catch((error) => {
+        console.log("imagem nao foi: ", error.code);
+      });
+  };
+
+  const changeUsername = async () => {
+    await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
+      username: username,
+    })
+      .then(() => {
+        console.log("username foi");
+      })
+      .catch((error) => console.log("username não foi: ", error.code));
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImage(result.uri);
+    }
+
+    console.log(image);
+  };
+
+  if (hasGalleryPermission === false) {
+    return <Text>No acess to Internal Storage</Text>;
+  }
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
@@ -68,7 +182,7 @@ const EditProfile = ({ navigation, route, props }) => {
     }
   }, [fontsLoaded]);
 
-  if (!fontsLoaded && loading == false) {
+  if (!fontsLoaded) {
     return null;
   } else {
     return (
@@ -77,12 +191,11 @@ const EditProfile = ({ navigation, route, props }) => {
         onLayout={onLayoutRootView}
         alignItems="center"
       >
+        <ExpoFastImage source={{ uri: image }} style={{ flex: 1 / 2 }} />
         <View style={styles.content}>
           <Text style={styles.title}>Editar Perfil</Text>
-          <TouchableOpacity style={styles.userArea} onPress={()=>choosePhotoFromLibrary()}>
-            <View
-              style={{ height: 50, alignItems: "center" }}
-            >
+          <TouchableOpacity style={styles.userArea} onPress={() => pickImage()}>
+            <View style={{ height: 50, alignItems: "center" }}>
               <ExpoFastImage
                 style={styles.userImage}
                 source={{
@@ -114,10 +227,12 @@ const EditProfile = ({ navigation, route, props }) => {
             </View>
           </View>
 
+          {errorMessage}
+
           <View style={styles.submitArea}>
             <TouchableOpacity
               style={styles.submitButton}
-              onPress={()=>choosePhotoFromLibrary()}
+              onPress={() => handleSubmit()}
             >
               <Text style={styles.submitText}>Salvar</Text>
             </TouchableOpacity>
@@ -183,6 +298,7 @@ const styles = StyleSheet.create({
     fontStyle: "Lato-Regular",
     marginLeft: 5,
     textAlign: "center",
+    width: (Dimensions.get("window").width * 250) / 392.72,
   },
   passwordForgot: {
     color: "#8F8F8F",

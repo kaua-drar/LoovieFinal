@@ -28,6 +28,7 @@ import { getAuth } from 'firebase/auth';
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
+import ExpoFastImage from 'expo-fast-image';
 
 
 SplashScreen.preventAutoHideAsync();
@@ -108,10 +109,10 @@ const ProfileScreen = ({navigation, route, props}) => {
                   <Feather name="settings" size={27.5} color="white" />
                 </TouchableOpacity>
                 
-                <Image
+                <ExpoFastImage
                 style={styles.profileImage}
                 source={{
-                  uri: "https://pbs.twimg.com/profile_images/1560255496715632643/oZr-_U7g_400x400.jpg",
+                  uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
                 }}
                 />
                 
