@@ -15,12 +15,10 @@ import Image from "react-native-scalable-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import { AntDesign } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 export default function TabEmCartaz({ navigation, route }) {
@@ -41,12 +39,6 @@ export default function TabEmCartaz({ navigation, route }) {
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
   });
-
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const requestMovies = async () => {
     setShowUfDropdown(false);
@@ -177,7 +169,6 @@ export default function TabEmCartaz({ navigation, route }) {
   } else {
     return (
       <View
-        onLayout={onLayoutRootView}
         style={styles.container}
         alignItems="center"
       >

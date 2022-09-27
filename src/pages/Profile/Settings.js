@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { getAuth, verifyPasswordResetCode } from "firebase/auth";
 import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
@@ -16,9 +15,8 @@ import { firebaseConfig } from "../../../firebase-config";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
-SplashScreen.preventAutoHideAsync();
 
-const Settings = ({ navigation, route, props }) => {
+export default function Settings({ navigation, route, props }) {
   const [isModalVisible, setModalVisible] = useState(false);
 
   const [fontsLoaded] = useFonts({
@@ -29,17 +27,12 @@ const Settings = ({ navigation, route, props }) => {
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   } else {
     return (
-      <View style={styles.container} onLayout={onLayoutRootView}>
+      <View style={styles.container}>
         <Text style={styles.title}>Gerais</Text>
         <View style={styles.changesArea}>
           <Text style={styles.changeTitle}>E-mail</Text>
@@ -132,17 +125,3 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 });
-
-const mapStateToProps = (state) => {
-  return {
-    name: state.userReducer.name,
-    email: state.userReducer.email,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setName: (name) => dispatch({ type: "SET_NAME", payload: { name } }),
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(Settings);

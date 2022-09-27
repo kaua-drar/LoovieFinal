@@ -10,14 +10,12 @@ import {
 } from "react-native";
 import Constants from "../../components/utilities/Constants";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import Image from "react-native-scalable-image";
 import { AntDesign } from '@expo/vector-icons';
 import { Ionicons } from '@expo/vector-icons';
 import ExpoFastImage from 'expo-fast-image';
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 export default function TabHomeScreen({ navigation, route }) {
@@ -35,11 +33,7 @@ export default function TabHomeScreen({ navigation, route }) {
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
   });
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
+
 
   const requests = async (page) => {
     setLoaded(false);
@@ -202,7 +196,6 @@ export default function TabHomeScreen({ navigation, route }) {
       <ScrollView
         style={styles.container}
         alignItems="center"
-        onLayout={onLayoutRootView}
         justifyContent={loading || !loaded ? "center" : "flex-start"}
       >
             {loading || !loaded &&(

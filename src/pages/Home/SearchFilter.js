@@ -9,12 +9,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import Constants from "../../components/utilities/Constants";
 import styled from "styled-components/native";
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 const ChipArea = styled.TouchableOpacity`
@@ -122,18 +120,12 @@ export default function SearchFilter({ navigation, route }) {
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
     "Lato-Black": require("../../../assets/fonts/Lato-Black.ttf"),
   });
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   } else {
     return (
       <ScrollView
-        onLayout={onLayoutRootView}
         style={styles.container}
         alignItems="center"
         horizontal={false}

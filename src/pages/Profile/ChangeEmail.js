@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import {
   getAuth,
   updateEmail,
@@ -25,9 +24,8 @@ import { Entypo } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
-SplashScreen.preventAutoHideAsync();
 
-const ChangeEmail = ({ navigation, route, props }) => {
+export default function ChangeEmail({ navigation, route, props }) {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
@@ -105,19 +103,12 @@ const ChangeEmail = ({ navigation, route, props }) => {
     return reauthenticateWithCredential(user, cred);
   };
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
   if (!fontsLoaded) {
     return null;
   } else {
     return (
       <ScrollView
         style={styles.container}
-        onLayout={onLayoutRootView}
         alignItems="center"
       >
         <View style={styles.content}>
@@ -264,17 +255,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-const mapStateToProps = (state) => {
-  return {
-    name: state.userReducer.name,
-    email: state.userReducer.email,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setName: (name) => dispatch({ type: "SET_NAME", payload: { name } }),
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(ChangeEmail);

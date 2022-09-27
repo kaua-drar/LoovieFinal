@@ -14,7 +14,6 @@ import Constants from "../../components/utilities/Constants";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import Image from "react-native-scalable-image";
 import ExpoFastImage from 'expo-fast-image';
@@ -33,7 +32,6 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 export default function TabHomeScreen({ navigation }) {
@@ -48,11 +46,6 @@ export default function TabHomeScreen({ navigation }) {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
   });
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
@@ -207,7 +200,6 @@ export default function TabHomeScreen({ navigation }) {
     return (
       <ScrollView
         keyboardShouldPersistTaps="handled"
-        onLayout={onLayoutRootView}
         style={styles.container}
         alignItems="center"
         horizontal={false}
@@ -260,7 +252,7 @@ export default function TabHomeScreen({ navigation }) {
                   return (
                     <TouchableOpacity
                       style={styles.movieItem}
-                      key={media.mediaType}
+                      key={index}
                       onPress={() =>
                         navigation.navigate(media.media_type === "movie" ? "Movie" : "Serie", { mediaId: media.id, mediaType: media.media_type })
                       }

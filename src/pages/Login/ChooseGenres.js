@@ -18,7 +18,6 @@ import ExpoFastImage from 'expo-fast-image';
 import { SafeAreaView } from "react-native-safe-area-context";
 import styled from "styled-components/native";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import LoovieLogo from '../../icons/LoovieLogo.svg'
 import { Feather } from '@expo/vector-icons';
 import Modal from "react-native-modal";
@@ -34,8 +33,6 @@ import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 
 
-SplashScreen.preventAutoHideAsync();
-
 const GenreItem = styled.TouchableOpacity`
   border-color: ${props=>props.selected?'#9D0208':'#0F0C0C'};
   alignItems: center;
@@ -47,7 +44,7 @@ const GenreItem = styled.TouchableOpacity`
 `;
 
 
-const ProfileScreen = ({navigation, route, props}) => {
+export default function ProfileScreen({navigation, route, props}) {
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [genres, setGenres] = useState([]);
@@ -143,19 +140,13 @@ const ProfileScreen = ({navigation, route, props}) => {
     sla();
   }, [])
 
-  
-  
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
+
 
   if (!fontsLoaded) {
     return null;
   } else {
     return (
-      <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+      <SafeAreaView style={styles.container}>
         {loading &&(
           <View style={styles.loadingArea}>
             <ActivityIndicator size="large" color="#FFF" />
@@ -173,7 +164,7 @@ const ProfileScreen = ({navigation, route, props}) => {
                   fill='#9D0208'
                   style={{marginBottom: 20, marginTop: 20}}
                 />
-                <Text style={styles.title}>Olá, {auth.currentUser.displayName}!</Text>
+                <Text style={styles.title}>Olá!</Text>
                 <Text style={styles.text}>Escolha gêneros que goste de assistir. Isso vai nos ajudar a recomendar algo que você goste.</Text>
               </View>
               <View style={styles.results}>
@@ -374,18 +365,3 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
 });
-
-const mapStateToProps = (state) => {
-  return{
-    name:state.userReducer.name,
-    email:state.userReducer.email
-  };
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return{
-    setName:(name) => dispatch({type:'SET_NAME', payload:{ name }})
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);

@@ -11,7 +11,6 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import {
   getAuth,
   updatePassword,
@@ -27,9 +26,8 @@ import { Entypo } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 
-SplashScreen.preventAutoHideAsync();
 
-const ChangePassword = ({ navigation, route, props }) => {
+export default function ChangePassword({ navigation, route, props }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -127,11 +125,6 @@ const ChangePassword = ({ navigation, route, props }) => {
     return reauthenticateWithCredential(user, cred);
   };
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
@@ -139,7 +132,6 @@ const ChangePassword = ({ navigation, route, props }) => {
     return (
       <ScrollView
         style={styles.container}
-        onLayout={onLayoutRootView}
         alignItems="center"
       >
         <View style={styles.content}>
@@ -322,17 +314,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-const mapStateToProps = (state) => {
-  return {
-    name: state.userReducer.name,
-    email: state.userReducer.email,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setName: (name) => dispatch({ type: "SET_NAME", payload: { name } }),
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(ChangePassword);

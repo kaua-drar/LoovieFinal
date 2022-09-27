@@ -14,7 +14,6 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import LoovieLogo from "../icons/LoovieLogo.svg";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -40,25 +39,18 @@ import EditProfile from "../pages/Profile/EditProfile";
 
 const Stack = createStackNavigator();
 
-SplashScreen.preventAutoHideAsync();
 
 export function HomeStack() {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   } else {
     return (
       <Stack.Navigator
-        onLayout={onLayoutRootView}
         showLabel="false"
         initialRouteName="Home"
         screenOptions={({ route, navigation }) => ({
@@ -244,11 +236,6 @@ export function EmCartazStack() {
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
@@ -429,11 +416,6 @@ export function ProfileStack() {
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;

@@ -14,7 +14,6 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { connect } from "react-redux";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import {
   getAuth,
   updateEmail,
@@ -37,9 +36,8 @@ import { MaterialIcons } from "@expo/vector-icons";
 import ExpoFastImage from "expo-fast-image";
 import { FontAwesome } from "@expo/vector-icons";
 
-SplashScreen.preventAutoHideAsync();
 
-const EditProfile = ({ navigation, route, props }) => {
+export default function EditProfile({ navigation, route, props }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
@@ -176,19 +174,12 @@ const EditProfile = ({ navigation, route, props }) => {
     return <Text>No acess to Internal Storage</Text>;
   }
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
   if (!fontsLoaded) {
     return null;
   } else {
     return (
       <ScrollView
         style={styles.container}
-        onLayout={onLayoutRootView}
         alignItems="center"
       >
         <ExpoFastImage source={{ uri: image }} style={{ flex: 1 / 2 }} />
@@ -369,17 +360,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-const mapStateToProps = (state) => {
-  return {
-    name: state.userReducer.name,
-    email: state.userReducer.email,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setName: (name) => dispatch({ type: "SET_NAME", payload: { name } }),
-  };
-};
-export default connect(mapStateToProps, mapDispatchToProps)(EditProfile);

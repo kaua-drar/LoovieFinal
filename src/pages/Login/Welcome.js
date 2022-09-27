@@ -11,14 +11,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import LoovieLogo from '../../icons/LoovieLogo.svg'
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { connect } from "react-redux";
 import { createStackNavigator } from "@react-navigation/stack";
 import { getAuth } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 
@@ -41,17 +39,12 @@ export default function Welcome({ navigation, route, props }){
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   } else {
   return (
-    <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView style={{ alignItems: "center" }}>
         <View>
           <LoovieLogo

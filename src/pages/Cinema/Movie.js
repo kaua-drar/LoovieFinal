@@ -12,7 +12,6 @@ import {
 import Constants from "../../components/utilities/Constants";
 import Image from "react-native-scalable-image";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import { Entypo } from "@expo/vector-icons";
 import ReadMore from "@fawazahmed/react-native-read-more";
@@ -20,7 +19,6 @@ import YoutubePlayer from "react-native-youtube-iframe";
 import Star from 'react-native-star-view';
 import styled from "styled-components/native";
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 
@@ -219,18 +217,12 @@ export default function Movie({ navigation, route }) {
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
   });
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   } else {
     return (
       <ScrollView
-        onLayout={onLayoutRootView}
         style={styles.container}
         alignItems="center"
         justifyContent={loading ? "center" : "flex-start"}

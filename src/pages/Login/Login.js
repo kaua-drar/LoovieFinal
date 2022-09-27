@@ -17,15 +17,12 @@ import { firebaseConfig } from '../../../firebase-config';
 import { SafeAreaView } from "react-native-safe-area-context";
 import LoovieLogo from '../../icons/LoovieLogo.svg'
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { connect } from "react-redux";
 import { Entypo } from '@expo/vector-icons';
 import { Foundation } from '@expo/vector-icons';
 
-SplashScreen.preventAutoHideAsync();
 
-
-const Login = ({navigation, route, props}) => {
+export default function Login({navigation, route, props}) {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,17 +32,6 @@ const Login = ({navigation, route, props}) => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  useEffect(() => {
-    setEmail('');
-    setPassword('');
-    const unsubscribed = auth.onAuthStateChanged(user => {
-      if (user) {
-        navigation.navigate("MainTab");
-      }
-    })
-
-    return unsubscribed
-  }, [])
 
   const handleSignIn = () => {
     Keyboard.dismiss();
@@ -62,6 +48,7 @@ const Login = ({navigation, route, props}) => {
         const user = userCredential.user;
         setErrorMessage(null);
         console.log(user);
+        navigation.navigate("MainTab");
       })
       .catch(error => {
         console.log(error.code);
@@ -78,17 +65,12 @@ const Login = ({navigation, route, props}) => {
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   } else {
   return (
-    <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+    <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView style={{ alignItems: "center", flex: 1, justifyContent: 'flex-start',}}>
         <LoovieLogo
           width={140}
@@ -214,18 +196,3 @@ const styles = StyleSheet.create({
     marginBottom: 35,
   },
 });
-
-const mapStateToProps = (state) => {
-  return{
-    name:state.userReducer.name,
-    email:state.userReducer.email
-  };
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return{
-    setName:(name) => dispatch({type:'SET_NAME', payload:{ name }})
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Login);

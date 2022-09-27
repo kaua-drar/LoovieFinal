@@ -13,10 +13,8 @@ import Image from "react-native-scalable-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 export default function TabEmCartaz({ navigation, route }) {
@@ -35,11 +33,6 @@ export default function TabEmCartaz({ navigation, route }) {
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
 
   useEffect(() => {
@@ -135,7 +128,6 @@ export default function TabEmCartaz({ navigation, route }) {
       <ScrollView
         style={styles.container}
         alignItems="center"
-        onLayout={onLayoutRootView}
         justifyContent={loading == true ? "center" : "flex-start"}
       >
         {loading && (

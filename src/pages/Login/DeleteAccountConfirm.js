@@ -12,7 +12,6 @@ import {
 } from "react-native";
 import { connect } from "react-redux";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import {
   getAuth,
   updateEmail,
@@ -30,9 +29,8 @@ import ExpoFastImage from "expo-fast-image";
 import LoovieLogo from "../../icons/LoovieLogo.svg";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-SplashScreen.preventAutoHideAsync();
 
-const DeleteAccountConfirm = ({ navigation, route, props }) => {
+export default function DeleteAccountConfirm({ navigation, route, props }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [email, setEmail] = useState("");
   const [currentPasswordVisible, setCurrentPasswordVisible] = useState(false);
@@ -110,11 +108,6 @@ const DeleteAccountConfirm = ({ navigation, route, props }) => {
     return reauthenticateWithCredential(user, cred);
   };
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded && loading == false) {
     return null;
@@ -123,7 +116,6 @@ const DeleteAccountConfirm = ({ navigation, route, props }) => {
       <ScrollView>
         <SafeAreaView
           style={styles.container}
-          onLayout={onLayoutRootView}
           alignItems="center"
         >
           {loading && (
@@ -326,20 +318,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
-const mapStateToProps = (state) => {
-  return {
-    name: state.userReducer.name,
-    email: state.userReducer.email,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setName: (name) => dispatch({ type: "SET_NAME", payload: { name } }),
-  };
-};
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(DeleteAccountConfirm);

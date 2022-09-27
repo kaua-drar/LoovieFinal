@@ -19,7 +19,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "../../components/utilities/Constants";
 import styled from "styled-components/native";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { Feather } from '@expo/vector-icons';
 import Modal from "react-native-modal";
 import { connect } from "react-redux";
@@ -33,10 +32,7 @@ import { firebaseConfig } from '../../../firebase-config';
 import ExpoFastImage from 'expo-fast-image';
 
 
-SplashScreen.preventAutoHideAsync();
-
-
-const ProfileScreen = ({navigation, route, props}) => {
+export default function ProfileScreen ({navigation, route, props}) {
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [username, setUsername] = useState('');
@@ -120,8 +116,6 @@ const ProfileScreen = ({navigation, route, props}) => {
         })
       );
     });
-    
-    auth.currentUser.reload();
 
     console.log(favoriteGenres);
     console.log(folders);
@@ -134,13 +128,6 @@ const ProfileScreen = ({navigation, route, props}) => {
     sla();
   }, [])
 
-  
-  
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
@@ -160,7 +147,7 @@ const ProfileScreen = ({navigation, route, props}) => {
           </View>
         )}
         {!loading &&(
-          <View onLayout={onLayoutRootView} style={styles.content}>
+          <View style={styles.content}>
             <View style={styles.profile}>
                 <TouchableOpacity onPress={toggleModal} style={{alignSelf: 'flex-end', margin: 10}}>
                   <Feather name="settings" size={27.5} color="white" />
@@ -181,9 +168,9 @@ const ProfileScreen = ({navigation, route, props}) => {
                 <Text style={styles.itemText}>Gêneros favoritos{' >'}</Text>
                 <View style={styles.itens}>
                   <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
-                    {favoriteGenres.map((genre) => {
+                    {favoriteGenres.map((genre, index) => {
                       return(
-                        <TouchableOpacity style={{alignItems: 'center'}}>
+                        <TouchableOpacity style={{alignItems: 'center'}} key={index}>
                           <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W300}${genre.backdrop_path}`}} style={{width: 100, height: 100, borderRadius: 50, marginHorizontal: 5}}/>
                           <Text style={[styles.itemText, {fontSize: 14, marginLeft: 0, marginBottom: 0, maxWidth: 100, textAlign: 'center'}]}>{genre.genreName}</Text>
                         </TouchableOpacity>
@@ -199,9 +186,9 @@ const ProfileScreen = ({navigation, route, props}) => {
                 <Text style={styles.itemText}>Minha biblioteca{' >'}</Text>
                 <View style={styles.itens}>
                   <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
-                    {folders.map((folder) => {
+                    {folders.map((folder, index) => {
                       return(
-                        <TouchableOpacity style={{alignItems: 'center'}}>
+                        <TouchableOpacity style={{alignItems: 'center'}} key={index}>
                           <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W300}${folder.posterPath}`}} style={{width: 100, height: 100, borderRadius: 50, marginHorizontal: 5}}/>
                           <Text style={[styles.itemText, {fontSize: 14, marginLeft: 0, marginBottom: 0, maxWidth: 100, textAlign: 'center'}]}>{folder.name}</Text>
                         </TouchableOpacity>
@@ -345,18 +332,3 @@ const styles = StyleSheet.create({
     marginBottom: 30
   }
 });
-
-const mapStateToProps = (state) => {
-  return{
-    name:state.userReducer.name,
-    email:state.userReducer.email
-  };
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return{
-    setName:(name) => dispatch({type:'SET_NAME', payload:{ name }})
-  };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);

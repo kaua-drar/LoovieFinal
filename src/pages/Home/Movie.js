@@ -13,7 +13,6 @@ import {
 import Constants from "../../components/utilities/Constants";
 import Image from "react-native-scalable-image";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import { createStackNavigator } from "@react-navigation/stack";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
@@ -37,7 +36,6 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
 
-SplashScreen.preventAutoHideAsync();
 const Stack = createStackNavigator();
 
 export default function Media({ navigation, route }) {
@@ -382,18 +380,12 @@ export default function Media({ navigation, route }) {
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
   });
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   if (!fontsLoaded) {
     return null;
   } else {
     return (
       <ScrollView
-        onLayout={onLayoutRootView}
         style={styles.container}
         alignItems="center"
         justifyContent={loading ? "center" : "flex-start"}

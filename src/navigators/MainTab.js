@@ -3,7 +3,6 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import * as SplashScreen from "expo-splash-screen";
 import LoovieLogo from '../icons/LoovieLogo.svg';
 
 import { HomeStack, EmCartazStack, ProfileStack } from "./MainStack";
@@ -12,18 +11,12 @@ import { ActivityIndicator, View, StyleSheet, Text } from "react-native";
 
 const Tab = createMaterialTopTabNavigator();
 
-SplashScreen.preventAutoHideAsync();
 
 export default function MainTab({route}) {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
 
   const isTabBarVisible = (route) => {
     const routeName = route.state ? route.state.routes[route.state.index]?.name : (route.params ? route.params.screen : 'HOME');
@@ -39,7 +32,6 @@ export default function MainTab({route}) {
     return (
       <Tab.Navigator
         tabBarPosition="bottom"
-        onLayout={onLayoutRootView}
         initialRouteName="HomeTab"
         screenOptions={({ route }) => ({
           swipeEnabled: isTabBarVisible(route),
