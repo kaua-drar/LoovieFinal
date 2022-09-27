@@ -39,7 +39,7 @@ export default function MainTab({route}) {
     return (
       <Tab.Navigator
         tabBarPosition="bottom"
-        onLayout={console.log(isTabBarVisible(route))}
+        onLayout={onLayoutRootView}
         initialRouteName="HomeTab"
         screenOptions={({ route }) => ({
           swipeEnabled: isTabBarVisible(route),
