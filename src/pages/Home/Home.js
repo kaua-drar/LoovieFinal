@@ -87,63 +87,62 @@ export default function TabHomeScreen({ navigation }) {
     const data = docSnap.data();
     const favoriteGenres = data.favoriteGenres;
 
-    let today = new Date();
-    let date = today.getFullYear()+"-"+(today.getMonth()+1).toString().padStart(2, '0')+"-"+today.getDate();
+    /*let today = new Date();
+    let date = today.getFullYear()+"-"+(today.getMonth()+1).toString().padStart(2, '0')+"-"+today.getDate();*/
     
 
-    const reqPersonal2S = await fetch(
-      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.WITH_GENRES_URL + favoriteGenres[1].id
-    );
-    const jsonPersonal2S = await reqPersonal2S.json();
-
     const reqPersonal1M = await fetch(
-      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[0].id
+      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[0].id
     );
     const jsonPersonal1M = await reqPersonal1M.json();
 
     const reqPersonal1S = await fetch(
-      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.WITH_GENRES_URL + favoriteGenres[0].id
+      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.WITH_GENRES_URL + favoriteGenres[0].id
     );
     const jsonPersonal1S = await reqPersonal1S.json();
 
 
     const reqPersonal2M = await fetch(
-      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[1].id
+      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[1].id
     );
     const jsonPersonal2M = await reqPersonal2M.json();
 
     
+    const reqPersonal2S = await fetch(
+      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.WITH_GENRES_URL + favoriteGenres[1].id
+    );
+    const jsonPersonal2S = await reqPersonal2S.json();
 
 
     const reqPersonal3M = await fetch(
-      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[2].id
+      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[2].id
     );
     const jsonPersonal3M = await reqPersonal3M.json();
 
     const reqPersonal3S = await fetch(
-      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.WITH_GENRES_URL + favoriteGenres[2].id
+      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.WITH_GENRES_URL + favoriteGenres[2].id
     );
     const jsonPersonal3S = await reqPersonal3S.json();
 
 
     const reqPersonal4M = await fetch(
-      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[3].id
+      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[3].id
     );
     const jsonPersonal4M = await reqPersonal4M.json();
 
     const reqPersonal4S = await fetch(
-      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.WITH_GENRES_URL + favoriteGenres[3].id
+      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.WITH_GENRES_URL + favoriteGenres[3].id
     );
     const jsonPersonal4S = await reqPersonal4S.json();
 
 
     const reqPersonal5M = await fetch(
-      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[4].id
+      Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_VOTE_COUNT + "1000" + Constants.URL.WITH_GENRES_URL + favoriteGenres[4].id
     );
     const jsonPersonal5M = await reqPersonal5M.json();
 
     const reqPersonal5S = await fetch(
-      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.WITH_GENRES_URL + favoriteGenres[4].id
+      Constants.URL.DISCOVER_TV_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + Constants.URL.SORT_BY_POPULARITY_URL + Constants.URL.PAGE_URL + "1" + Constants.URL.WITH_GENRES_URL + favoriteGenres[4].id
     );
     const jsonPersonal5S = await reqPersonal5S.json();
 
@@ -183,8 +182,6 @@ export default function TabHomeScreen({ navigation }) {
         setForYou(old => [...old, {mediaType: "Movie", poster_path: Constants.URL.IMAGE_URL_W185 + v.poster_path, mediaId: v.id}])
       }
     })
-    
-
 
     setRefreshing(false);
     setLoading(false);

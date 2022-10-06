@@ -56,12 +56,12 @@ export default function TabHomeScreen({ navigation, route }) {
         return i;
       });
       console.log(selectedGenres);
-      let today = new Date();
-      let date = today.getFullYear()+"-"+(today.getMonth()+1).toString().padStart(2, '0')+"-"+today.getDate();
+      /*let today = new Date();
+      let date = today.getFullYear()+"-"+(today.getMonth()+1).toString().padStart(2, '0')+"-"+today.getDate();*/
       const req = await fetch(
-        Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + sortBy + Constants.URL.PAGE_URL + page + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.WITH_GENRES_URL + selectedGenres.toString()
+        Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + sortBy + Constants.URL.PAGE_URL + page + Constants.URL.WITH_GENRES_URL + selectedGenres.toString()
       );
-      console.log(Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + sortBy + Constants.URL.PAGE_URL + page + Constants.URL.LIMIT_RELEASE_DATE + date + Constants.URL.WITH_GENRES_URL + selectedGenres.toString());
+      console.log(Constants.URL.DISCOVER_MOVIE_URL + Constants.URL.API_KEY + Constants.URL.LANGUAGE + sortBy + Constants.URL.PAGE_URL + page + Constants.URL.WITH_GENRES_URL + selectedGenres.toString());
       const json = await req.json();
 
       if (json) {
