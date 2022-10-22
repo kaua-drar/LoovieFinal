@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import Constants from "../../components/utilities/Constants";
 import Image from "react-native-scalable-image";
@@ -30,7 +30,7 @@ import {
   doc,
   updateDoc,
   where,
-  getDoc
+  getDoc,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -72,7 +72,6 @@ export default function Media({ navigation, route }) {
   }, []);
 
   const addToFolder = async (folderId) => {
-
     const pickedFolder = [];
 
     const docSnap = await getDoc(doc(db, "folders", folderId));
@@ -80,29 +79,37 @@ export default function Media({ navigation, route }) {
     if (docSnap.exists()) {
       pickedFolder.push(docSnap.data());
       console.log(pickedFolder);
-      if(!(pickedFolder[0].medias.filter(e => e.mediaId === `M${details.id}`).length > 0)) {
+      if (
+        !(
+          pickedFolder[0].medias.filter((e) => e.mediaId === `M${details.id}`)
+            .length > 0
+        )
+      ) {
         pickedFolder[0].medias.push({
           mediaId: `M${details.id}`,
           posterPath: details.poster_path,
           title: details.title,
         });
         await updateDoc(doc(collection(db, "folders"), folderId), {
-          medias: pickedFolder[0].medias })
-        .catch(error => console.log(error.code))
-        .finally(()=>{
-          console.log("funfou");
-          setToggleInputModal(false);
-          setToggleModal(false);
-          requests();
+          medias: pickedFolder[0].medias,
         })
-      }
-      else if(pickedFolder[0].medias.filter(e => e.mediaId === `M${details.id}`).length > 0) {
+          .catch((error) => console.log(error.code))
+          .finally(() => {
+            console.log("funfou");
+            setToggleInputModal(false);
+            setToggleModal(false);
+            setModalVisible(false);
+            setInputModalVisible(false);
+            requests();
+          });
+      } else if (
+        pickedFolder[0].medias.filter((e) => e.mediaId === `M${details.id}`)
+          .length > 0
+      ) {
         // doc.data() will be undefined in this case
         console.log("Já tá na pasta");
       }
-
-    } 
-    else {
+    } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
@@ -119,12 +126,21 @@ export default function Media({ navigation, route }) {
     await setDoc(doc(collection(db, "folders")), {
       userId: auth.currentUser.uid,
       name: folderName,
-      medias: [{mediaId: `M${details.id}`, title: details.title, posterPath: details.poster_path}] }).then(()=>{
-        console.log("funfou");
-        setToggleInputModal(false);
-        setToggleModal(false);
-        requests();
-      })
+      medias: [
+        {
+          mediaId: `M${details.id}`,
+          title: details.title,
+          posterPath: details.poster_path,
+        },
+      ],
+    }).then(() => {
+      console.log("funfou");
+      setToggleInputModal(false);
+      setToggleModal(false);
+      setModalVisible(false);
+      setInputModalVisible(false);
+      requests();
+    });
   };
 
   const tryYoutube = () => {
@@ -334,7 +350,6 @@ export default function Media({ navigation, route }) {
       setWatchProviders(jsonWatchProviders);
     }
 
-
     const q = query(
       collection(db, "folders"),
       where("userId", "==", auth.currentUser.uid)
@@ -371,7 +386,6 @@ export default function Media({ navigation, route }) {
 
   useEffect(() => {
     console.log(mediaId);
-    
 
     requests();
   }, []);
@@ -393,7 +407,6 @@ export default function Media({ navigation, route }) {
           <RefreshControl refreshing={refreshing} onRefresh={requests} />
         }
       >
-        
         {!loading && (
           <View style={[styles.content, { display: "flex" }]}>
             <View style={styles.header} onLayout={() => tries()}>
@@ -520,24 +533,39 @@ export default function Media({ navigation, route }) {
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
                   <View style={styles.barra}></View>
-                  <View style={{width: '100%', justifyContent: 'center', height: 250}}>
-                  <ScrollView>
-                  {folders.map((folder) => {
-                    return (
-                      <TouchableOpacity style={styles.button} key={folder.folderId} onPress={() => addToFolder(folder.folderId)}>
-                        <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W500}${folder.posterPath}`}} style={styles.folderImage}/>
-                        <Text style={styles.buttonText}>{folder.name}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                  </ScrollView>
+                  <View
+                    style={{
+                      width: "100%",
+                      justifyContent: "center",
+                      height: 260,
+                    }}
+                  >
+                    <ScrollView>
+                      {folders.map((folder) => {
+                        return (
+                          <TouchableOpacity
+                            style={styles.button}
+                            key={folder.folderId}
+                            onPress={() => addToFolder(folder.folderId)}
+                          >
+                            <ExpoFastImage
+                              source={{
+                                uri: `${Constants.URL.IMAGE_URL_W500}${folder.posterPath}`,
+                              }}
+                              style={styles.folderImage}
+                            />
+                            <Text style={styles.buttonText}>{folder.name}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
                   </View>
                   <View
                     style={{
                       flex: 1,
                       justifyContent: "flex-end",
                       alignItems: "center",
-                      marginBottom: 30,
+                      marginBottom: 10,
                       width: "100%",
                     }}
                   >
@@ -578,8 +606,10 @@ export default function Media({ navigation, route }) {
                       />
                     </TouchableOpacity>
                     <Text style={styles.errorMessage}>Salvar na Pasta</Text>
-                    <TouchableOpacity style={styles.createButton}
-                    onPress={() => createNewFolder()}>
+                    <TouchableOpacity
+                      style={styles.createButton}
+                      onPress={() => createNewFolder()}
+                    >
                       <Text
                         style={[
                           styles.buttonText,
@@ -696,9 +726,12 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   createFolderButton: {
-    padding: 15,
     backgroundColor: "#3D3D3D",
+    height: 60,
+    width: 60,
     borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center"
   },
   buttonText: {
     fontFamily: "Lato-Bold",

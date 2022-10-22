@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   TextInput,
-  RefreshControl
+  RefreshControl,
 } from "react-native";
 import Constants from "../../components/utilities/Constants";
 import Image from "react-native-scalable-image";
@@ -18,7 +18,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Entypo } from "@expo/vector-icons";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import YoutubePlayer from "react-native-youtube-iframe";
-import Star from 'react-native-star-view';
+import Star from "react-native-star-view";
 import Modal from "react-native-modal";
 import ExpoFastImage from "expo-fast-image";
 import {
@@ -30,7 +30,7 @@ import {
   doc,
   updateDoc,
   where,
-  getDoc
+  getDoc,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -72,7 +72,6 @@ export default function Media({ navigation, route }) {
   }, []);
 
   const addToFolder = async (folderId) => {
-
     const pickedFolder = [];
 
     const docSnap = await getDoc(doc(db, "folders", folderId));
@@ -80,29 +79,37 @@ export default function Media({ navigation, route }) {
     if (docSnap.exists()) {
       pickedFolder.push(docSnap.data());
       console.log(pickedFolder);
-      if(!(pickedFolder[0].medias.filter(e => e.mediaId === `S${details.id}`).length > 0)) {
+      if (
+        !(
+          pickedFolder[0].medias.filter((e) => e.mediaId === `S${details.id}`)
+            .length > 0
+        )
+      ) {
         pickedFolder[0].medias.push({
           mediaId: `S${details.id}`,
           posterPath: details.poster_path,
           title: details.name,
         });
         await updateDoc(doc(collection(db, "folders"), folderId), {
-          medias: pickedFolder[0].medias })
-        .catch(error => console.log(error.code))
-        .finally(()=>{
-          console.log("funfou");
-          requests();
-          setToggleInputModal(false);
-          setToggleModal(false);
+          medias: pickedFolder[0].medias,
         })
-      }
-      else if(pickedFolder[0].medias.filter(e => e.mediaId === `S${details.id}`).length > 0) {
+          .catch((error) => console.log(error.code))
+          .finally(() => {
+            console.log("funfou");
+            setToggleInputModal(false);
+            setToggleModal(false);
+            setModalVisible(false);
+            setInputModalVisible(false);
+            requests();
+          });
+      } else if (
+        pickedFolder[0].medias.filter((e) => e.mediaId === `S${details.id}`)
+          .length > 0
+      ) {
         // doc.data() will be undefined in this case
         console.log("Já tá na pasta");
       }
-
-    } 
-    else {
+    } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
     }
@@ -119,12 +126,21 @@ export default function Media({ navigation, route }) {
     await setDoc(doc(collection(db, "folders")), {
       userId: auth.currentUser.uid,
       name: folderName,
-      medias: [{mediaId: `S${details.id}`, title: details.name, posterPath: details.poster_path}] }).then(()=>{
-        console.log("funfou");
-        requests();
-        setToggleInputModal(false);
-        setToggleModal(false);
-      })
+      medias: [
+        {
+          mediaId: `S${details.id}`,
+          title: details.name,
+          posterPath: details.poster_path,
+        },
+      ],
+    }).then(() => {
+      console.log("funfou");
+      setToggleInputModal(false);
+      setToggleModal(false);
+      setModalVisible(false);
+      setInputModalVisible(false);
+      requests();
+    });
   };
 
   const tryYoutube = () => {
@@ -138,9 +154,8 @@ export default function Media({ navigation, route }) {
           onChangeState={onStateChange}
         />
       );
-    }
-    else {
-      return(null)
+    } else {
+      return null;
     }
   };
 
@@ -163,59 +178,65 @@ export default function Media({ navigation, route }) {
     }
   };
   const tryCertifications = () => {
-    setCertification(()=>{
+    setCertification(() => {
       try {
-        if(ratings.results.find((item) => item.iso_3166_1 === "BR")
-        .rating != "") {
-          return(
+        if (
+          ratings.results.find((item) => item.iso_3166_1 === "BR").rating != ""
+        ) {
+          return (
             <Text style={styles.mediaDetail}>
               Classificação:{" "}
-              {
-                ratings.results.find((item) => item.iso_3166_1 === "BR")
-                  .rating
-              }
+              {ratings.results.find((item) => item.iso_3166_1 === "BR").rating}
             </Text>
-          )
+          );
+        } else {
+          return null;
         }
-        else{
-          return(null)
-        }
+      } catch {
+        return null;
       }
-      catch{ 
-        return(null)
-      }
-    }
-    )
+    });
   };
   const tryWatchProviders = () => {
     try {
       return (
         <>
-        <Text style={[styles.mediaDetail, {marginTop: (Dimensions.get("window").height * 10) / 802.9,}]}>Onde assistir:</Text>
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} style={{maxWidth: '100%', marginLeft: 7.5}}>
-          {watchProviders.results.BR.flatrate.map((providers, index)=>{
-          return(
-            <Image
-            width={(Dimensions.get("window").width * 50) / 392.72}
-            source={{
-              uri: `${Constants.URL.IMAGE_URL_ORIGINAL}${providers.logo_path}`,
-            }}
-            style={{marginHorizontal: 2.5, borderRadius: 10}}
-            resizeMode="cover" key={index}/>
-          )
-          })
-          }
-        </ScrollView>
+          <Text
+            style={[
+              styles.mediaDetail,
+              { marginTop: (Dimensions.get("window").height * 10) / 802.9 },
+            ]}
+          >
+            Onde assistir:
+          </Text>
+          <ScrollView
+            showsHorizontalScrollIndicator={false}
+            horizontal={true}
+            style={{ maxWidth: "100%", marginLeft: 7.5 }}
+          >
+            {watchProviders.results.BR.flatrate.map((providers, index) => {
+              return (
+                <Image
+                  width={(Dimensions.get("window").width * 50) / 392.72}
+                  source={{
+                    uri: `${Constants.URL.IMAGE_URL_ORIGINAL}${providers.logo_path}`,
+                  }}
+                  style={{ marginHorizontal: 2.5, borderRadius: 10 }}
+                  resizeMode="cover"
+                  key={index}
+                />
+              );
+            })}
+          </ScrollView>
         </>
-      )
-    }
-    catch{ 
-      return(null)
+      );
+    } catch {
+      return null;
     }
   };
   const tryCast = () => {
-    if(cast.length > 3) {
-      return(
+    if (cast.length > 3) {
+      return (
         <Text style={styles.mediaDetail}>
           Elenco:{" "}
           {cast.map((item, index) => {
@@ -226,135 +247,132 @@ export default function Media({ navigation, route }) {
             }
           })}
         </Text>
-      )
-    }
-    else{
-      return (null)
+      );
+    } else {
+      return null;
     }
   };
   const tries = () => {
     tryDirector();
     tryCertifications();
   };
-  
+
   const requests = async () => {
     setRefreshing(true);
     setLoading(true);
 
-      const reqDetails = await fetch(
-        Constants.URL.TV_DETAILS_URL +
-          `${mediaId}` +
-          Constants.URL.API_KEY +
-          Constants.URL.LANGUAGE
-      );
+    const reqDetails = await fetch(
+      Constants.URL.TV_DETAILS_URL +
+        `${mediaId}` +
+        Constants.URL.API_KEY +
+        Constants.URL.LANGUAGE
+    );
 
-      const jsonDetails = await reqDetails.json();
+    const jsonDetails = await reqDetails.json();
 
-      if (jsonDetails) {
-        setDetails(jsonDetails);
-      }
-
-      const reqCredits = await fetch(
-        Constants.URL.TV_DETAILS_URL +
-          `${mediaId}` +
-          Constants.URL.CREDITS_URL +
-          Constants.URL.API_KEY +
-          Constants.URL.LANGUAGE
-      );
-      const jsonCredits = await reqCredits.json();
-
-      if (jsonCredits) {
-        setCast([]);
-        jsonCredits.cast.map((person) => {
-          if (person.known_for_department === "Acting") {
-            setCast((actor) => [...actor, person]);
-          }
-        });
-        setFullCast([]);
-        await jsonCredits.cast.map((person) => {
-          setFullCast((item) => [...item, person]);
-        });
-        await jsonCredits.crew.map((person) => {
-          setFullCast((item) => [...item, person]);
-        });
-      }
-
-      const reqRatings = await fetch(
-        Constants.URL.TV_DETAILS_URL +
-          `${mediaId}` +
-          Constants.URL.CONTENT_RATINGS_URL +
-          Constants.URL.API_KEY +
-          Constants.URL.LANGUAGE
-      );
-      const jsonRatings = await reqRatings.json();
-
-      if (jsonRatings) {
-        setRatings(jsonRatings);
-      }
-
-      const reqTrailer = await fetch(
-        Constants.URL.TV_DETAILS_URL +
-          `${mediaId}` +
-          Constants.URL.VIDEOS_URL +
-          Constants.URL.API_KEY +
-          Constants.URL.LANGUAGE
-      );
-      const jsonTrailer = await reqTrailer.json();
-
-      if (jsonTrailer) {
-        try {
-          setTrailer(jsonTrailer.results[0].key);
-        }
-        catch {
-        setTrailer("");
-        };
-      }
-
-      const reqWatchProviders = await fetch(
-        Constants.URL.TV_DETAILS_URL +
-          `${mediaId}` +
-          Constants.URL.WATCH_PROVIDERS_URL +
-          Constants.URL.API_KEY
-      );
-      const jsonWatchProviders = await reqWatchProviders.json();
-
-      if (jsonWatchProviders) {
-        setWatchProviders(jsonWatchProviders);
-      }
-
-      const q = query(
-        collection(db, "folders"),
-        where("userId", "==", auth.currentUser.uid)
-      );
-  
-      const querySnapshot = await getDocs(q);
-  
-      setFolders([]);
-      querySnapshot.forEach((doc) => {
-        setFolders((old) =>
-          [
-            ...old,
-            {
-              folderId: doc.id,
-              userId: doc.data().userId,
-              name: doc.data().name,
-              posterPath: doc.data().medias[0].posterPath,
-            },
-          ].sort(function (a, b) {
-            let x = a.name.toUpperCase(),
-              y = b.name.toUpperCase();
-  
-            return x == y ? 0 : x > y ? 1 : -1;
-          })
-        );
-      });
-
-      setToggleModal(false);
-      setToggleInputModal(false);
-      setLoading(false);
-      setRefreshing(false);
+    if (jsonDetails) {
+      setDetails(jsonDetails);
     }
-    
+
+    const reqCredits = await fetch(
+      Constants.URL.TV_DETAILS_URL +
+        `${mediaId}` +
+        Constants.URL.CREDITS_URL +
+        Constants.URL.API_KEY +
+        Constants.URL.LANGUAGE
+    );
+    const jsonCredits = await reqCredits.json();
+
+    if (jsonCredits) {
+      setCast([]);
+      jsonCredits.cast.map((person) => {
+        if (person.known_for_department === "Acting") {
+          setCast((actor) => [...actor, person]);
+        }
+      });
+      setFullCast([]);
+      await jsonCredits.cast.map((person) => {
+        setFullCast((item) => [...item, person]);
+      });
+      await jsonCredits.crew.map((person) => {
+        setFullCast((item) => [...item, person]);
+      });
+    }
+
+    const reqRatings = await fetch(
+      Constants.URL.TV_DETAILS_URL +
+        `${mediaId}` +
+        Constants.URL.CONTENT_RATINGS_URL +
+        Constants.URL.API_KEY +
+        Constants.URL.LANGUAGE
+    );
+    const jsonRatings = await reqRatings.json();
+
+    if (jsonRatings) {
+      setRatings(jsonRatings);
+    }
+
+    const reqTrailer = await fetch(
+      Constants.URL.TV_DETAILS_URL +
+        `${mediaId}` +
+        Constants.URL.VIDEOS_URL +
+        Constants.URL.API_KEY +
+        Constants.URL.LANGUAGE
+    );
+    const jsonTrailer = await reqTrailer.json();
+
+    if (jsonTrailer) {
+      try {
+        setTrailer(jsonTrailer.results[0].key);
+      } catch {
+        setTrailer("");
+      }
+    }
+
+    const reqWatchProviders = await fetch(
+      Constants.URL.TV_DETAILS_URL +
+        `${mediaId}` +
+        Constants.URL.WATCH_PROVIDERS_URL +
+        Constants.URL.API_KEY
+    );
+    const jsonWatchProviders = await reqWatchProviders.json();
+
+    if (jsonWatchProviders) {
+      setWatchProviders(jsonWatchProviders);
+    }
+
+    const q = query(
+      collection(db, "folders"),
+      where("userId", "==", auth.currentUser.uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    setFolders([]);
+    querySnapshot.forEach((doc) => {
+      setFolders((old) =>
+        [
+          ...old,
+          {
+            folderId: doc.id,
+            userId: doc.data().userId,
+            name: doc.data().name,
+            posterPath: doc.data().medias[0].posterPath,
+          },
+        ].sort(function (a, b) {
+          let x = a.name.toUpperCase(),
+            y = b.name.toUpperCase();
+
+          return x == y ? 0 : x > y ? 1 : -1;
+        })
+      );
+    });
+
+    setToggleModal(false);
+    setToggleInputModal(false);
+    setLoading(false);
+    setRefreshing(false);
+  };
 
   useEffect(() => {
     console.log(mediaId);
@@ -379,20 +397,19 @@ export default function Media({ navigation, route }) {
         }
       >
         {!loading && (
-          <View style={[styles.content, {display: 'flex'}]}>
+          <View style={[styles.content, { display: "flex" }]}>
             <View style={styles.header} onLayout={() => tries()}>
               <Text style={styles.title}>{details.name.toUpperCase()}</Text>
-              <TouchableOpacity style={{ alignItems: "flex-start" }} onPress={() => handleToggleModal()}>
-                <Entypo
-                  name="plus"
-                  size={30}
-                  color="white"
-                />
+              <TouchableOpacity
+                style={{ alignItems: "flex-start" }}
+                onPress={() => handleToggleModal()}
+              >
+                <Entypo name="plus" size={30} color="white" />
               </TouchableOpacity>
             </View>
 
             <View style={styles.mediaArea}>
-            <View style={styles.movieItem}>
+              <View style={styles.movieItem}>
                 <ExpoFastImage
                   source={{
                     uri: `${Constants.URL.IMAGE_URL_W500}${details.poster_path}`,
@@ -400,11 +417,16 @@ export default function Media({ navigation, route }) {
                   style={styles.mediaPoster}
                   resizeMode="cover"
                 />
-                <View style={{flexDirection: 'row', alignItems: 'flex-end'}}>
-                  <Text style={styles.note}>{details.vote_average.toFixed(1)}</Text>
+                <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                  <Text style={styles.note}>
+                    {details.vote_average.toFixed(1)}
+                  </Text>
                   <Text style={styles.noteof}>/10</Text>
                 </View>
-                <Star score={(details.vote_average.toFixed(1)*5)/10} style={styles.starStyle}/>
+                <Star
+                  score={(details.vote_average.toFixed(1) * 5) / 10}
+                  style={styles.starStyle}
+                />
               </View>
 
               <View style={styles.mediaDetails}>
@@ -444,13 +466,16 @@ export default function Media({ navigation, route }) {
                       toggle == true
                         ? styles.toggleActive
                         : styles.toggleInactive,
-                        {marginRight: 4}
+                      { marginRight: 4 },
                     ]}
                   >
                     Descrição
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setToggle(false)} style={{display: trailer === ""  ? 'none' : 'flex'}}>
+                <TouchableOpacity
+                  onPress={() => setToggle(false)}
+                  style={{ display: trailer === "" ? "none" : "flex" }}
+                >
                   <Text
                     style={[
                       styles.toggleOption,
@@ -479,7 +504,7 @@ export default function Media({ navigation, route }) {
                     color: "#FFF",
                     display: toggle == true ? "flex" : "none",
                     margin: 0,
-                    fontSize: 15
+                    fontSize: 15,
                   }}
                   numberOfLines={5}
                 >
@@ -499,26 +524,40 @@ export default function Media({ navigation, route }) {
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
                   <View style={styles.barra}></View>
-                  <View style={{width: '100%', justifyContent: 'center', height: 250}}>
-                  <ScrollView>
-                  {folders.map((folder) => {
-                    return (
-                      <TouchableOpacity style={styles.button} key={folder.folderId} onPress={() => addToFolder(folder.folderId)}>
-                        <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W500}${folder.posterPath}`}} style={styles.folderImage}/>
-                        <Text style={styles.buttonText}>{folder.name}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                  </ScrollView>
+                  <View
+                    style={{
+                      width: "100%",
+                      justifyContent: "center",
+                      height: 260,
+                    }}
+                  >
+                    <ScrollView>
+                      {folders.map((folder) => {
+                        return (
+                          <TouchableOpacity
+                            style={styles.button}
+                            key={folder.folderId}
+                            onPress={() => addToFolder(folder.folderId)}
+                          >
+                            <ExpoFastImage
+                              source={{
+                                uri: `${Constants.URL.IMAGE_URL_W500}${folder.posterPath}`,
+                              }}
+                              style={styles.folderImage}
+                            />
+                            <Text style={styles.buttonText}>{folder.name}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
                   </View>
-                  
-                  
+
                   <View
                     style={{
                       flex: 1,
                       justifyContent: "flex-end",
                       alignItems: "center",
-                      marginBottom: 30,
+                      marginBottom: 10,
                       width: "100%",
                     }}
                   >
@@ -559,8 +598,10 @@ export default function Media({ navigation, route }) {
                       />
                     </TouchableOpacity>
                     <Text style={styles.errorMessage}>Salvar na Pasta</Text>
-                    <TouchableOpacity style={styles.createButton}
-                    onPress={() => createNewFolder()}>
+                    <TouchableOpacity
+                      style={styles.createButton}
+                      onPress={() => createNewFolder()}
+                    >
                       <Text
                         style={[
                           styles.buttonText,
@@ -677,9 +718,12 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   createFolderButton: {
-    padding: 15,
     backgroundColor: "#3D3D3D",
+    height: 60,
+    width: 60,
     borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center"
   },
   buttonText: {
     fontFamily: "Lato-Bold",
@@ -738,18 +782,18 @@ const styles = StyleSheet.create({
     marginBottom: (Dimensions.get("window").height * 5) / 802.9,
   },
   movieItem: {
-    justifyContent: 'center'
+    justifyContent: "center",
   },
   note: {
-    color: '#FFF',
-    fontFamily: 'Lato-Bold',
-    fontSize: 30
+    color: "#FFF",
+    fontFamily: "Lato-Bold",
+    fontSize: 30,
   },
   noteof: {
-    color: '#FFF',
-    fontFamily: 'Lato-Regular',
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
     fontSize: 20,
-    marginBottom: 1.5
+    marginBottom: 1.5,
   },
   video: {
     alignSelf: "center",
@@ -761,7 +805,7 @@ const styles = StyleSheet.create({
     width: Dimensions.get("window").width,
     alignItems: "center",
     flex: 1,
-    justifySelf: "flex-start"
+    justifySelf: "flex-start",
   },
   header: {
     width: (Dimensions.get("window").width * 372) / 392.72,
@@ -810,7 +854,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: "9%",
     flexDirection: "column",
-    backgroundColor: '#0F0C0C'
+    backgroundColor: "#0F0C0C",
   },
   loadingArea: {
     flex: 1,
@@ -835,13 +879,13 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   mediaDetails2: {
-    width: '100%',
+    width: "100%",
     alignItems: "center",
-    justifyContent: 'center',
+    justifyContent: "center",
     width: (Dimensions.get("window").width * 372) / 392.72,
   },
   toggleOptions: {
-    width: '100%',
+    width: "100%",
     flexDirection: "row",
     marginTop: (Dimensions.get("window").height * 15) / 802.9,
   },
@@ -868,9 +912,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#474747",
   },
   toggledOptionsArea: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
     flex: 1,
     paddingHorizontal: (Dimensions.get("window").width * 12) / 392.72,
     paddingVertical: (Dimensions.get("window").width * 10) / 392.72,
