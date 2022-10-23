@@ -16,6 +16,7 @@ import {
   RefreshControl
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFocusEffect } from '@react-navigation/native';
 import Constants from "../../components/utilities/Constants";
 import styled from "styled-components/native";
 import { useFonts } from "expo-font";
@@ -39,6 +40,7 @@ export default function ProfileScreen ({navigation, route, props}) {
   const [favoriteGenres, setFavoriteGenres] = useState([]);
   const [folders, setFolders] = useState([]);
   const [refreshing, setRefreshing] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -124,33 +126,41 @@ export default function ProfileScreen ({navigation, route, props}) {
     setLoading(false);
   }
 
-  useEffect( () => {
-    sla();
-  }, [])
+  useFocusEffect(
+    useCallback(() =>{
+      setIsVisible(true)
+      sla();
+
+      return ()=>{
+        setIsVisible(false)
+      }
+    }, [])
+  )
 
 
   if (!fontsLoaded) {
     return null;
   } else {
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={sla} />
+      }>
         <StatusBar
         animated={true}
         backgroundColor="#9D0208"
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={sla} />
-        }/>
-        {loading &&(
+        />
+        {loading && !isVisible &&(
           <View style={styles.loadingArea}>
             <ActivityIndicator size="large" color="#FFF" />
             <Text style={styles.loadingText}>Carregando...</Text>
           </View>
         )}
-        {!loading &&(
+        {!loading && isVisible &&(
           <View style={styles.content}>
             <View style={styles.profile}>
                 <TouchableOpacity onPress={toggleModal} style={{alignSelf: 'flex-end', margin: 10}}>
-                  <Feather name="settings" size={27.5} color="white" />
+                  <FontAwesome5 name="bars" size={27.5} color="white" />
                 </TouchableOpacity>
                 
                 <ExpoFastImage
@@ -207,12 +217,12 @@ export default function ProfileScreen ({navigation, route, props}) {
                   <TouchableOpacity style={styles.button} onPress={() => {setModalVisible(false);
                   navigation.navigate("EditProfile");}}>
                     <FontAwesome5 name="edit" size={27.5} color="white" />
-                    <Text style={styles.buttonText}>Configuração de Perfil</Text>
+                    <Text style={styles.buttonText}>Editar Perfil</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.button} onPress={() => {setModalVisible(false);
                   navigation.navigate("Settings");}}>
                     <Feather name="settings" size={27.5} color="white" />
-                    <Text style={styles.buttonText}>Configuração Geral</Text>
+                    <Text style={styles.buttonText}>Configurações Gerais</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.button}>
                     <AntDesign name="infocirlceo" size={27.5} color="white" />

@@ -12,6 +12,7 @@ import { useFonts } from "expo-font";
 import { createStackNavigator } from "@react-navigation/stack";
 import Constants from "../../components/utilities/Constants";
 import styled from "styled-components/native";
+import { useIsFocused } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 
@@ -30,6 +31,7 @@ const ChipText = styled.Text`
 
 
 export default function SearchFilter({ navigation, route }) {
+  const isFocused = useIsFocused();
   const [genres, setGenres] = useState([]);
   const [mediaTypeRadio, setMediaTypeRadio] = useState(()=>{
     try{
@@ -100,7 +102,7 @@ export default function SearchFilter({ navigation, route }) {
 
   useEffect(() => {
     requestMovieGenres();
-  }, []);
+  }, [isFocused]);
 
   const toggleChip = (index) => {
     let selecteds = [...genres]

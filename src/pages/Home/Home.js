@@ -17,6 +17,7 @@ import { useFonts } from "expo-font";
 import { createStackNavigator } from "@react-navigation/stack";
 import Image from "react-native-scalable-image";
 import ExpoFastImage from 'expo-fast-image';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   query,
   collection,
@@ -42,6 +43,7 @@ export default function TabHomeScreen({ navigation }) {
   const [refreshing, setRefreshing] = useState(true);
   const [favoriteGenres, setFavoriteGenres] = useState(null)
   const [forYou, setForYou] = useState([])
+  const [isVisible, setIsVisible] = useState(false)
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
@@ -187,9 +189,17 @@ export default function TabHomeScreen({ navigation }) {
     setLoading(false);
   };
 
-  useEffect(() => {
-    requests();
-  }, []);
+
+  useFocusEffect(
+    useCallback(() =>{
+      requests();
+      setIsVisible(true)
+
+      return ()=>{
+        setIsVisible(false)
+      }
+    }, [])
+  )
 
   if (!fontsLoaded) {
     return null;
@@ -235,7 +245,7 @@ export default function TabHomeScreen({ navigation }) {
             </TouchableOpacity>
         </View>
         
-        {!loading && (
+        {!loading && isVisible && (
           <View style={[styles.content]}>
             <Text style={styles.title}>Principais Buscas</Text>
             <ScrollView
