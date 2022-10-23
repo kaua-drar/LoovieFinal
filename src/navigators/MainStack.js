@@ -36,6 +36,7 @@ import ChangePassword from "../pages/Profile/ChangePassword";
 import ChangeEmail from "../pages/Profile/ChangeEmail";
 import DeleteAccount from "../pages/Profile/DeleteAccount";
 import EditProfile from "../pages/Profile/EditProfile";
+import FavoriteGenres from "../pages/Profile/FavoriteGenres";
 
 const Stack = createStackNavigator();
 
@@ -642,6 +643,45 @@ export function ProfileStack() {
                   color="#FFF"
                   style={{
                     display: "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="FavoriteGenres"
+          component={FavoriteGenres}
+          options={({ route, navigation }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            headerTitle: "Gêneros Favoritos",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <Ionicons
+                  name="arrow-back"
+                  size={35}
+                  color="#FFF"
+                  style={{
+                    display: route.name === "Home" ? "none" : "flex",
                   }}
                 />
               </TouchableHighlight>

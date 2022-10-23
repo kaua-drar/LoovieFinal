@@ -175,7 +175,9 @@ export default function ProfileScreen ({navigation, route, props}) {
               <Text style={{color: '#FFF', fontSize: 20, fontFamily: 'Lato-Regular', marginBottom: 25}}>@{username}</Text>
               
               <View style={styles.itemArea}>
-                <Text style={styles.itemText}>Gêneros favoritos{' >'}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate("FavoriteGenres")}>
+                  <Text style={styles.itemText}>Gêneros favoritos{' >'}</Text>
+                </TouchableOpacity>
                 <View style={styles.itens}>
                   <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
                     {favoriteGenres.map((genre, index) => {
