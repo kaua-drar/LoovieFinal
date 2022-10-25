@@ -195,7 +195,9 @@ export default function ProfileScreen ({navigation, route, props}) {
 
 
               <View style={[styles.itemArea, {marginTop: 35, marginBottom: 50}]}>
+                <TouchableOpacity onPress={() => navigation.navigate("MyLibrary")}>
                 <Text style={styles.itemText}>Minha biblioteca{' >'}</Text>
+                </TouchableOpacity>
                 <View style={styles.itens}>
                   <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
                     {folders.map((folder, index) => {
