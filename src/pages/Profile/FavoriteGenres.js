@@ -199,7 +199,7 @@ export default function FavoriteGenres({ navigation, route, props }) {
             <View style={styles.footer}>
               <View style={styles.footerContent}>
                 <TouchableOpacity style={styles.submit} onPress={() => handleSubmit()}>
-                  <Text style={styles.submitText}>Continuar</Text>
+                  <Text style={styles.submitText}>Salvar</Text>
                 </TouchableOpacity>
               </View>
             </View>
