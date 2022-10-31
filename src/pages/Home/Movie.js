@@ -521,6 +521,40 @@ export default function Media({ navigation, route }) {
                 </ReadMore>
                 {tryYoutube()}
               </View>
+              <View style={styles.avaliacoesArea}>
+                <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
+                <View style={styles.avaliacaoArea}>
+                  <View style={styles.userInfo}>
+                    <ExpoFastImage
+                      style={styles.userImage}
+                      source={{
+                        uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
+                      }}
+                    />
+                    <Text style={styles.userName}>
+                      Kauã dos Reis Akamine Ribeiro
+                    </Text>
+                    <Text style={styles.avaliacaoData}>01/01/2022</Text>
+                  </View>
+                  <View style={styles.avaliacao}>
+                    <View style={styles.score}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "flex-end" }}
+                      >
+                        <Text style={styles.note}>
+                          {details.vote_average.toFixed(1)}
+                        </Text>
+                        <Text style={styles.noteof}>/10</Text>
+                      </View>
+                      <Star
+                        score={(details.vote_average.toFixed(1) * 5) / 10}
+                        style={[styles.starStyle, {marginBottom: (Dimensions.get("window").height * 5) / 802.9}]}
+                      />
+                    </View>
+                    <Text style={styles.avaliacaoText}>{details.overview}</Text>
+                  </View>
+                </View>
+              </View>
             </View>
             <Modal
               isVisible={isModalVisible}
@@ -643,6 +677,62 @@ export default function Media({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  score: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    width: (Dimensions.get("window").width * 225) / 392.72,
+  },
+  avaliacoesArea: {
+    marginTop: 20,
+  },
+  avaliacoesTitulo: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    fontSize: 17,
+    marginBottom: 5,
+  },
+  userInfo: {
+    justifyContent: "center",
+  },
+  userImage: {
+    width: (Dimensions.get("window").width * 80) / 392.72,
+    height: (Dimensions.get("window").width * 80) / 392.72,
+    borderRadius: (Dimensions.get("window").width * 40) / 392.72,
+    borderWidth: 2,
+    borderColor: "#FFF",
+    marginBottom: 5,
+  },
+  userName: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    width: (Dimensions.get("window").width * 80) / 392.72,
+    textAlign: "center",
+    fontSize: 14,
+  },
+  avaliacaoData: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    textAlign: "center",
+    fontSize: 14,
+  },
+  avaliacaoText: {
+    textAlign: "justify",
+    color: "#FFF",
+    margin: 0,
+    fontSize: 15,
+    width: (Dimensions.get("window").width * 250) / 392.72,
+  },
+  avaliacaoArea: {
+    display: "flex",
+    flexDirection: "row",
+    backgroundColor: "#292929",
+    width: (Dimensions.get("window").width * 372) / 392.72,
+    justifyContent: "space-between",
+    paddingHorizontal: (Dimensions.get("window").width * 12) / 392.72,
+    paddingVertical: (Dimensions.get("window").width * 10) / 392.72,
+    borderRadius: 10,
+  },
   changesArea: {
     flex: 1,
     alignItems: "center",
@@ -731,7 +821,7 @@ const styles = StyleSheet.create({
     width: 60,
     borderRadius: 15,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   buttonText: {
     fontFamily: "Lato-Bold",
@@ -888,7 +978,6 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   mediaDetails2: {
-    width: "100%",
     alignItems: "center",
     justifyContent: "center",
     width: (Dimensions.get("window").width * 372) / 392.72,

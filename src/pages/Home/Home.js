@@ -175,16 +175,10 @@ export default function TabHomeScreen({ navigation }) {
     }, 3000);
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      requests();
-      setIsVisible(true);
-
-      return () => {
-        setIsVisible(false);
-      };
-    }, [])
-  );
+  useEffect(() => {
+    requests();
+    setIsVisible(true);
+  }, [])
 
   if (!fontsLoaded) {
     return null;
