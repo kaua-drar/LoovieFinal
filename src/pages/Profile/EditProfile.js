@@ -79,7 +79,7 @@ export default function EditProfile({ navigation, route, props }) {
       setErrorMessage(
         <View style={styles.errorMessageArea}>
           <MaterialIcons name={"check"} size={24} color="#FFF" />
-          <Text style={styles.errorMessage}>Imagem de perfil alterada! Reinicie o aplicativo para aplicá-la.</Text>
+          <Text style={styles.errorMessage}>Imagem de perfil alterada!</Text>
         </View>
       );
     } else if ((username.length < 4 || username.length > 20 ) && regexUser.test(username) == false) {
@@ -100,7 +100,7 @@ export default function EditProfile({ navigation, route, props }) {
       setErrorMessage(
         <View style={styles.errorMessageArea}>
           <MaterialIcons name={"check"} size={24} color="#FFF" />
-          <Text style={styles.errorMessage}>Nome de usuário alterado! Reinicie o aplicativo para aplicá-lo.</Text>
+          <Text style={styles.errorMessage}>Nome de usuário alterado!</Text>
         </View>
       );
     } else if (
@@ -127,7 +127,7 @@ export default function EditProfile({ navigation, route, props }) {
       setErrorMessage(
         <View style={styles.errorMessageArea}>
           <MaterialIcons name={"check"} size={24} color="#FFF" />
-          <Text style={styles.errorMessage}>Alterações salvas! Reinicie o aplicativo para aplicá-las.</Text>
+          <Text style={styles.errorMessage}>Alterações salvas!</Text>
         </View>
       );
     }

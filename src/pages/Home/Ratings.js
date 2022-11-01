@@ -19,7 +19,7 @@ import { Entypo } from "@expo/vector-icons";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import YoutubePlayer from "react-native-youtube-iframe";
 import Star from "react-native-star-view";
-import Modal from "react-native-modal";
+import Modal from "../../components/react-native-modal";
 import ExpoFastImage from "expo-fast-image";
 import {
   query,
@@ -151,14 +151,7 @@ export default function Media({ navigation, route }) {
                             </View>
                             <Star
                               score={(rating.rating.toFixed(1) * 5) / 10}
-                              style={[
-                                styles.starStyle,
-                                {
-                                  marginBottom:
-                                    (Dimensions.get("window").height * 5) /
-                                    802.9,
-                                },
-                              ]}
+                              style={styles.starStyle}
                             />
                           </View>
                           <Text style={styles.avaliacaoText}>
@@ -198,7 +191,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
-    width: (Dimensions.get("window").width * 225) / 392.72,
+    width: (Dimensions.get("window").width * 250) / 392.72,
   },
   avaliacoesArea: {
     marginTop: 20,
@@ -401,9 +394,9 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   starStyle: {
+    marginBottom: (Dimensions.get("window").height * 3) / 802.9,
     width: (Dimensions.get("window").width * 125) / 392.72,
     height: (Dimensions.get("window").width * 25) / 392.72,
-    marginBottom: (Dimensions.get("window").height * 5) / 802.9,
   },
   movieItem: {
     justifyContent: "center",
@@ -411,12 +404,12 @@ const styles = StyleSheet.create({
   note: {
     color: "#FFF",
     fontFamily: "Lato-Bold",
-    fontSize: 30,
+    fontSize: 23,
   },
   noteof: {
     color: "#FFF",
     fontFamily: "Lato-Regular",
-    fontSize: 20,
+    fontSize: 17,
     marginBottom: 1.5,
   },
   video: {

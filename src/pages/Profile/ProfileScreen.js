@@ -21,7 +21,7 @@ import Constants from "../../components/utilities/Constants";
 import styled from "styled-components/native";
 import { useFonts } from "expo-font";
 import { Feather } from '@expo/vector-icons';
-import Modal from "react-native-modal";
+import Modal from "../../components/react-native-modal";
 import { connect } from "react-redux";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';

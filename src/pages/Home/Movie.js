@@ -19,7 +19,7 @@ import { Entypo } from "@expo/vector-icons";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import YoutubePlayer from "react-native-youtube-iframe";
 import Star from "react-native-star-view";
-import Modal from "react-native-modal";
+import Modal from "../../components/react-native-modal";
 import ExpoFastImage from "expo-fast-image";
 import {
   query,
@@ -32,14 +32,14 @@ import {
   where,
   getDoc,
   limit,
-  getCountFromServer
+  getCountFromServer,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 import StarRating from "react-native-star-rating-widget";
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from "@react-navigation/native";
 
 const Stack = createStackNavigator();
 
@@ -306,10 +306,17 @@ export default function Media({ navigation, route }) {
   };
 
   const Avaliacoes = () => {
-    try{
+    try {
       return (
         <View style={styles.avaliacoesArea}>
-          <TouchableOpacity onPress={() => navigation.navigate("Ratings", {mediaId: `M${details.id}`, title: details.title})}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Ratings", {
+                mediaId: `M${details.id}`,
+                title: details.title,
+              })
+            }
+          >
             <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
           </TouchableOpacity>
           <View style={styles.avaliacaoArea}>
@@ -324,21 +331,26 @@ export default function Media({ navigation, route }) {
               <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
             </View>
             <View style={styles.avaliacao}>
-              <View style={styles.score}>
+              <View
+                style={[
+                  styles.score,
+                  { width: (Dimensions.get("window").width * 250) / 392.72, },
+                ]}
+              >
                 <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                  <Text style={styles.note}>
+                  <Text style={[styles.note, { fontSize: 23 }]}>
                     {ratings.rating.toFixed(1)}
                   </Text>
-                  <Text style={styles.noteof}>/10</Text>
+                  <Text style={[styles.noteof, { fontSize: 17 }]}>/10</Text>
                 </View>
                 <Star
                   score={(ratings.rating.toFixed(1) * 5) / 10}
-                  style={[
-                    styles.starStyle,
-                    {
-                      marginBottom: (Dimensions.get("window").height * 5) / 802.9,
-                    },
-                  ]}
+                  style={{
+                      marginBottom:
+                        (Dimensions.get("window").height * 3) / 802.9,
+                      width: (Dimensions.get("window").width * 125) / 392.72,
+                      height: (Dimensions.get("window").width * 25) / 392.72,
+                    }}
                 />
               </View>
               <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
@@ -346,11 +358,9 @@ export default function Media({ navigation, route }) {
           </View>
         </View>
       );
-    }
-    catch{
+    } catch {
       return null;
     }
-    
   };
 
   const tries = () => {
@@ -361,7 +371,7 @@ export default function Media({ navigation, route }) {
   const requests = async () => {
     setRefreshing(true);
     setLoading(true);
-    
+
     setMediaId(route.params.mediaId);
 
     const reqDetails = await fetch(
@@ -497,14 +507,13 @@ export default function Media({ navigation, route }) {
     setRefreshing(false);
   };
 
-
   useFocusEffect(
-    useCallback(() =>{
+    useCallback(() => {
       requests();
 
-      return ()=>{
+      return () => {
         console.log(mediaId);
-      }
+      };
     }, [])
   );
 
@@ -645,7 +654,7 @@ export default function Media({ navigation, route }) {
                 onPress={() => handleToggleRateModal()}
               >
                 <Text style={styles.avalieButtonText}>Deixe sua avaliação</Text>
-                <FontAwesome name="pencil-square" size={30} color="white"/>
+                <FontAwesome name="pencil-square" size={30} color="white" />
               </TouchableOpacity>
             </View>
             <Modal
@@ -818,7 +827,7 @@ export default function Media({ navigation, route }) {
                         rating={rating}
                         onChange={setRating}
                         enableHalfStar={true}
-                        starSize={35}
+                        starSize={30}
                       />
                     </View>
                   </View>
@@ -840,13 +849,13 @@ const styles = StyleSheet.create({
     marginTop: 15,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-around"
+    justifyContent: "space-around",
   },
   avalieButtonText: {
     fontFamily: "Lato-Regular",
     color: "#FFF",
     fontSize: 17,
-    marginRight: 10
+    marginRight: 10,
   },
   score: {
     flexDirection: "row",
@@ -931,7 +940,7 @@ const styles = StyleSheet.create({
   rateInputArea: {
     backgroundColor: "#3D3D3D",
     borderRadius: 10,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: "#9D0208",
     height: 250,
     marginBottom: 10,
