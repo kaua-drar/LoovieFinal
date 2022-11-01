@@ -36,7 +36,7 @@ import {
   query,
   where,
   updateDoc,
-  deleteDoc
+  deleteDoc,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -45,6 +45,7 @@ import ExpoFastImage from "expo-fast-image";
 export default function MyLibrary({ navigation, route, props }) {
   const [loading, setLoading] = useState(true);
   const [folders, setFolders] = useState([]);
+  const [folder, setFolder] = useState([]);
   const [refreshing, setRefreshing] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -53,6 +54,7 @@ export default function MyLibrary({ navigation, route, props }) {
   const [isRenameModalVisible, setIsRenameModalVisible] = useState(false);
   const [newFolderName, setNewFolderName] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const folderId = route.params.folderId;
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
@@ -73,6 +75,11 @@ export default function MyLibrary({ navigation, route, props }) {
 
     const querySnapshot = await getDocs(q);
 
+    const docRef = doc(db, "folders", folderId);
+    await getDoc(docRef).then((v) => {
+      setFolder(v.data());
+    });
+
     setFolders([]);
     querySnapshot.forEach((doc) => {
       setFolders((old) =>
@@ -92,8 +99,6 @@ export default function MyLibrary({ navigation, route, props }) {
         })
       );
     });
-
-    console.log(folders);
 
     setRefreshing(false);
     setLoading(false);
@@ -165,192 +170,23 @@ export default function MyLibrary({ navigation, route, props }) {
       >
         {!loading && isVisible && (
           <View style={styles.content}>
-            {folders.map((folder) => {
+            {folder.medias.map((media) => {
               return (
                 <TouchableOpacity
                   style={styles.button}
-                  key={folder.folderId}
-                  onPress={() => navigation.navigate("ChoosedFolder", {folderId: folder.folderId})}
-                  onLongPress={() => {
-                    handleToggleModal(
-                      folder.posterPath,
-                      folder.name,
-                      folder.folderId
-                    );
-                  }}
+                  key={media.mediaId}
+                  onPress={() => media.mediaId.charAt(0) == 'M' ? navigation.navigate("Movie", {mediaId: `${media.mediaId.substring(1)}`}) : navigation.navigate("Serie", {mediaId: `${media.mediaId.substring(1)}`})}
                 >
                   <ExpoFastImage
                     source={{
-                      uri: `${Constants.URL.IMAGE_URL_W500}${folder.posterPath}`,
+                      uri: `${Constants.URL.IMAGE_URL_W500}${media.posterPath}`,
                     }}
                     style={styles.folderImage}
                   />
-                  <Text style={styles.buttonText}>{folder.name}</Text>
+                  <Text style={styles.buttonText}>{media.title}</Text>
                 </TouchableOpacity>
               );
             })}
-            <Modal
-              testID={"modal"}
-              isVisible={isModalVisible}
-              onSwipeComplete={() => setIsModalVisible(false)}
-              swipeDirection="down"
-              onSwipeThreshold={500}
-              onBackdropPress={handleToggleModal}
-              propagateSwipe={true}
-            >
-              <View style={styles.modalArea}>
-                <View style={styles.modalContent}>
-                  <View style={styles.barra}></View>
-                  {pickedFolder}
-                  <TouchableOpacity
-                    style={[styles.option, { marginTop: 10 }]}
-                    onPress={() => {
-                      setIsModalVisible(false);
-                      handleToggleRenameModal();
-                    }}
-                  >
-                    <FontAwesome5 name="edit" size={27.5} color="white" />
-                    <Text style={styles.optionText}>Renomear</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.option, { marginBottom: 25 }]}
-                    onPress={() => {
-                      setIsModalVisible(false);
-                      handleToggleDeleteModal();
-                    }}
-                  >
-                    <MaterialIcons name="delete" size={27.5} color="white" />
-                    <Text style={[styles.optionText]}>Excluir</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </Modal>
-            <Modal
-              isVisible={isRenameModalVisible}
-              animationIn="zoomInDown"
-              animationOut="zoomOutUp"
-              animationInTiming={600}
-              animationOutTiming={600}
-              backdropTransitionInTiming={600}
-              backdropTransitionOutTiming={600}
-              onBackdropPress={() => handleToggleRenameModal()}
-            >
-              <View style={styles.inputModalArea}>
-                <View style={styles.inputModalContent}>
-                  <View style={styles.row}>
-                    <TouchableOpacity onPress={() => handleToggleRenameModal()}>
-                      <AntDesign
-                        name="close"
-                        size={32}
-                        color="#FFF"
-                        style={{
-                          display: "flex",
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.errorMessage}>Renomear Pasta</Text>
-                    <TouchableOpacity
-                      style={styles.createButton}
-                      onPress={() => renameFolder()}
-                    >
-                      <Text
-                        style={[
-                          styles.buttonText,
-                          { marginLeft: 0, fontSize: 17, marginTop: 0 },
-                        ]}
-                      >
-                        Criar
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-
-                  <View style={styles.changesArea}>
-                    <View style={styles.changeItem}>
-                      <Text style={[styles.changeTitle]}>Nome da Pasta</Text>
-                      <TextInput
-                        placeholder="Digite um novo nome para a pasta"
-                        placeholderTextColor="#8F8F8F"
-                        style={styles.changeInput}
-                        onChangeText={(text) => setNewFolderName(text)}
-                      />
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </Modal>
-            <Modal
-              isVisible={isDeleteModalVisible}
-              animationIn="zoomInDown"
-              animationOut="zoomOutUp"
-              animationInTiming={600}
-              animationOutTiming={600}
-              backdropTransitionInTiming={600}
-              backdropTransitionOutTiming={600}
-              onBackdropPress={() => handleToggleDeleteModal()}
-            >
-              <View style={styles.inputModalArea}>
-                <View style={styles.inputModalContent}>
-                  <View style={styles.row}>
-                    <TouchableOpacity onPress={() => handleToggleDeleteModal()}>
-                      <AntDesign
-                        name="close"
-                        size={32}
-                        color="#FFF"
-                        style={{
-                          display: "flex",
-                        }}
-                      />
-                    </TouchableOpacity>
-                    <Text style={styles.errorMessage}>Excluir Pasta</Text>
-                    <View
-                      style={{width: 30, height: 1}}
-                      onPress={() => renameFolder()}
-                    ></View>
-                  </View>
-
-                  <View style={styles.changesArea}>
-                    <View style={[styles.changeItem, {borderBottomWidth: 0}]}>
-                      <Text
-                        style={[
-                          styles.changeTitle,
-                          { width: 250, textAlign: "center" },
-                        ]}
-                      >
-                        Tem certeza que deseja excluir a pasta?
-                      </Text>
-                      <View style={styles.deleteButtonsArea}>
-                        <TouchableOpacity
-                          style={[styles.createButton, {backgroundColor: "white", padding: 10}]}
-                          onPress={() => handleToggleDeleteModal()}
-                        >
-                          <Text
-                            style={[
-                              styles.buttonText,
-                              { marginLeft: 0, fontSize: 17, marginTop: 0, color: "#9D0208" },
-                            ]}
-                          >
-                            Não
-                          </Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[styles.createButton, {padding: 10}]}
-                          onPress={() => deleteFolder()}
-                        >
-                          <Text
-                            style={[
-                              styles.buttonText,
-                              { marginLeft: 0, fontSize: 17, marginTop: 0 },
-                            ]}
-                          >
-                            Sim
-                          </Text>
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </Modal>
           </View>
         )}
       </ScrollView>
@@ -363,7 +199,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: 65,
     justifyContent: "space-between",
-    marginTop: 10
+    marginTop: 10,
   },
   container: {
     paddingTop: "9%",

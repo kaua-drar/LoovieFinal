@@ -25,10 +25,11 @@ import Serie from "../pages/Home/Serie";
 import DiscoverMovies from "../pages/Home/DiscoverMovies";
 import DiscoverSeries from "../pages/Home/DiscoverSeries";
 import Multisearch from "../pages/Home/Multisearch";
+import Ratings from "../pages/Home/Ratings";
 
 import TabEmCartaz from "../pages/Cinema/TabEmCartaz";
 import HomeEmCartaz from "../pages/Cinema/HomeEmCartaz";
-import MovieEmCartaz from "../pages/Cinema/Movie";
+import MovieEmCartaz from "../pages/Cinema/MovieEmCartaz";
 
 import ProfileScreen from "../pages/Profile/ProfileScreen";
 import Settings from "../pages/Profile/Settings";
@@ -38,6 +39,7 @@ import DeleteAccount from "../pages/Profile/DeleteAccount";
 import EditProfile from "../pages/Profile/EditProfile";
 import FavoriteGenres from "../pages/Profile/FavoriteGenres";
 import MyLibrary from "../pages/Profile/MyLibrary";
+import ChoosedFolder from "../pages/Profile/ChoosedFolder";
 
 const Stack = createStackNavigator();
 
@@ -228,6 +230,16 @@ export function HomeStack() {
             gestureVelocityImpact: 1,
           })}
         />
+        <Stack.Screen
+          name="Ratings"
+          component={Ratings}
+          options={() => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+          })}
+        />
       </Stack.Navigator>
     );
   }
@@ -399,7 +411,7 @@ export function EmCartazStack() {
           })}
         />
         <Stack.Screen
-          name="Movie"
+          name="MovieEmCartaz"
           component={MovieEmCartaz}
           options={() => ({
             gestureEnabled: false,
@@ -726,6 +738,16 @@ export function ProfileStack() {
                 />
               </TouchableHighlight>
             ),
+          })}
+        />
+        <Stack.Screen
+          name="ChoosedFolder"
+          component={ChoosedFolder}
+          options={() => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
           })}
         />
       </Stack.Navigator>

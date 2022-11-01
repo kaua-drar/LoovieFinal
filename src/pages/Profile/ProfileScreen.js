@@ -135,7 +135,7 @@ export default function ProfileScreen ({navigation, route, props}) {
         setIsVisible(false)
       }
     }, [])
-  )
+  );
 
 
   if (!fontsLoaded) {
@@ -202,7 +202,7 @@ export default function ProfileScreen ({navigation, route, props}) {
                   <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
                     {folders.map((folder, index) => {
                       return(
-                        <TouchableOpacity style={{alignItems: 'center'}} key={index}>
+                        <TouchableOpacity style={{alignItems: 'center'}} key={index} onPress={() => navigation.navigate("ChoosedFolder", {folderId: folder.folderId})}>
                           <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W300}${folder.posterPath}`}} style={{width: 100, height: 100, borderRadius: 50, marginHorizontal: 5}}/>
                           <Text style={[styles.itemText, {fontSize: 14, marginLeft: 0, marginBottom: 0, maxWidth: 100, textAlign: 'center'}]}>{folder.name}</Text>
                         </TouchableOpacity>

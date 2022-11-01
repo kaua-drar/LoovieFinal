@@ -31,10 +31,14 @@ import {
   updateDoc,
   where,
   getDoc,
+  limit
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
+import { FontAwesome } from '@expo/vector-icons';
+import StarRating from "react-native-star-rating-widget";
+import { useFocusEffect } from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 
@@ -43,7 +47,7 @@ export default function Media({ navigation, route }) {
   const [details, setDetails] = useState([]);
   const [fullCast, setFullCast] = useState([]);
   const [cast, setCast] = useState([]);
-  const [ratings, setRatings] = useState([]);
+  const [contentRatings, setContentRatings] = useState([]);
   const [certification, setCertification] = useState("");
   const [watchProviders, setWatchProviders] = useState([]);
   const [director, setDirector] = useState("");
@@ -52,13 +56,18 @@ export default function Media({ navigation, route }) {
   const [toggle, setToggle] = useState(true);
   const [toggleModal, setToggleModal] = useState(true);
   const [toggleInputModal, setToggleInputModal] = useState(true);
+  const [toggleRateModal, setToggleRateModal] = useState(true);
   const mediaId = route.params.mediaId;
   const [isModalVisible, setModalVisible] = useState(false);
   const [isInputModalVisible, setInputModalVisible] = useState(false);
+  const [isRateModalVisible, setIsRateModalVisible] = useState(false);
   const [folders, setFolders] = useState([]);
   const [folderInfo, setFolderInfo] = useState([]);
   const [folderName, setFolderName] = useState("");
   const [refreshing, setRefreshing] = useState(true);
+  const [ratingText, setRatingText] = useState("");
+  const [rating, setRating] = useState(0);
+  const [ratings, setRatings] = useState({});
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
@@ -121,6 +130,9 @@ export default function Media({ navigation, route }) {
   const handleToggleInputModal = () => {
     setInputModalVisible(!isInputModalVisible);
   };
+  const handleToggleRateModal = () => {
+    setIsRateModalVisible(!isRateModalVisible);
+  };
 
   const createNewFolder = async () => {
     await setDoc(doc(collection(db, "folders")), {
@@ -139,6 +151,36 @@ export default function Media({ navigation, route }) {
       setToggleModal(false);
       setModalVisible(false);
       setInputModalVisible(false);
+      requests();
+    });
+  };
+
+  const submitCritic = async () => {
+    let today = new Date();
+    let date =
+      (today.getDate() + 1).toString().padStart(2, "0") +
+      "/" +
+      (today.getMonth() + 1).toString().padStart(2, "0") +
+      "/" +
+      today.getFullYear();
+    console.log(rating);
+
+    const docRef = doc(db, "users", auth.currentUser.uid);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+    const username = data.username;
+
+    await setDoc(doc(collection(db, "ratings")), {
+      userId: auth.currentUser.uid,
+      mediaId: `S${details.id}`,
+      ratingText: ratingText,
+      rating: rating * 2,
+      ratingDate: date,
+      userName: username,
+    }).then(() => {
+      console.log("funfou");
+      setToggleRateModal(false);
+      setIsRateModalVisible(false);
       requests();
     });
   };
@@ -181,12 +223,16 @@ export default function Media({ navigation, route }) {
     setCertification(() => {
       try {
         if (
-          ratings.results.find((item) => item.iso_3166_1 === "BR").rating != ""
+          contentRatings.results.find((item) => item.iso_3166_1 === "BR")
+            .rating != ""
         ) {
           return (
             <Text style={styles.mediaDetail}>
               Classificação:{" "}
-              {ratings.results.find((item) => item.iso_3166_1 === "BR").rating}
+              {
+                contentRatings.results.find((item) => item.iso_3166_1 === "BR")
+                  .rating
+              }
             </Text>
           );
         } else {
@@ -252,6 +298,52 @@ export default function Media({ navigation, route }) {
       return null;
     }
   };
+
+  const Avaliacoes = () => {
+    try {
+      return (
+        <View style={styles.avaliacoesArea}>
+          <TouchableOpacity onPress={() => console.log(ratings)}>
+            <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
+          </TouchableOpacity>
+          <View style={styles.avaliacaoArea}>
+            <View style={styles.userInfo}>
+              <ExpoFastImage
+                style={styles.userImage}
+                source={{
+                  uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
+                }}
+              />
+              <Text style={styles.userName}>{ratings.userName}</Text>
+              <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
+            </View>
+            <View style={styles.avaliacao}>
+              <View style={styles.score}>
+                <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                  <Text style={styles.note}>{ratings.rating.toFixed(1)}</Text>
+                  <Text style={styles.noteof}>/10</Text>
+                </View>
+                <Star
+                  score={(ratings.rating.toFixed(1) * 5) / 10}
+                  style={[
+                    styles.starStyle,
+                    {
+                      marginBottom:
+                        (Dimensions.get("window").height * 5) / 802.9,
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
+            </View>
+          </View>
+        </View>
+      );
+    } catch {
+      return null;
+    }
+  };
+
   const tries = () => {
     tryDirector();
     tryCertifications();
@@ -299,17 +391,17 @@ export default function Media({ navigation, route }) {
       });
     }
 
-    const reqRatings = await fetch(
+    const reqContentRatings = await fetch(
       Constants.URL.TV_DETAILS_URL +
         `${mediaId}` +
         Constants.URL.CONTENT_RATINGS_URL +
         Constants.URL.API_KEY +
         Constants.URL.LANGUAGE
     );
-    const jsonRatings = await reqRatings.json();
+    const jsonContentRatings = await reqContentRatings.json();
 
-    if (jsonRatings) {
-      setRatings(jsonRatings);
+    if (jsonContentRatings) {
+      setContentRatings(jsonContentRatings);
     }
 
     const reqTrailer = await fetch(
@@ -368,16 +460,41 @@ export default function Media({ navigation, route }) {
       );
     });
 
+    const queryRatings = query(
+      collection(db, "ratings"),
+      where("mediaId", "==", `S${mediaId}`),
+      limit(1)
+    );
+
+    const querySnapshotRatings = await getDocs(queryRatings);
+
+    setRatings({});
+    querySnapshotRatings.forEach((doc) => {
+      setRatings({
+        userName: doc.data().userName,
+        ratingText: doc.data().ratingText,
+        rating: doc.data().rating,
+        ratingDate: doc.data().ratingDate,
+      });
+    });
+
+    console.log(ratings);
+
     setToggleModal(false);
     setToggleInputModal(false);
     setLoading(false);
     setRefreshing(false);
   };
 
-  useEffect(() => {
-    console.log(mediaId);
-    requests();
-  }, []);
+  useFocusEffect(
+    useCallback(() =>{
+      requests();
+
+      return ()=>{
+        console.log(mediaId);
+      }
+    }, [])
+  );
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
@@ -512,6 +629,16 @@ export default function Media({ navigation, route }) {
                 </ReadMore>
                 {tryYoutube()}
               </View>
+              <Avaliacoes />
+                <TouchableOpacity
+                  style={styles.avalieButtonArea}
+                  onPress={() => handleToggleRateModal()}
+                >
+                  <Text style={styles.avalieButtonText}>
+                    Deixe sua avaliação
+                  </Text>
+                  <FontAwesome name="pencil-square" size={30} color="white" />
+                </TouchableOpacity>
             </View>
             <Modal
               isVisible={isModalVisible}
@@ -627,6 +754,70 @@ export default function Media({ navigation, route }) {
                 </View>
               </View>
             </Modal>
+            <Modal
+              isVisible={isRateModalVisible}
+              animationIn="zoomInDown"
+              animationOut="zoomOutUp"
+              animationInTiming={600}
+              animationOutTiming={600}
+              backdropTransitionInTiming={600}
+              backdropTransitionOutTiming={600}
+              onBackdropPress={handleToggleRateModal}
+            >
+              <View style={styles.inputModalArea}>
+                <View style={styles.inputModalContent}>
+                  <View style={styles.row}>
+                    <TouchableOpacity onPress={() => handleToggleRateModal()}>
+                      <AntDesign
+                        name="close"
+                        size={32}
+                        color="#FFF"
+                        style={{
+                          display: "flex",
+                        }}
+                      />
+                    </TouchableOpacity>
+                    <Text style={styles.errorMessage}>Avaliação</Text>
+                    <TouchableOpacity
+                      style={styles.createButton}
+                      onPress={() => submitCritic()}
+                    >
+                      <Text
+                        style={[
+                          styles.buttonText,
+                          { marginLeft: 0, fontSize: 17 },
+                        ]}
+                      >
+                        Enviar
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.changesArea}>
+                    <View style={styles.changeItem}>
+                      <Text style={[styles.changeTitle]}>Avalie</Text>
+                      <View style={styles.rateInputArea}>
+                        <ScrollView horizontal={false}>
+                          <TextInput
+                            placeholder="Deixe sua avaliação aqui."
+                            placeholderTextColor="#8F8F8F"
+                            style={[styles.changeInput]}
+                            onChangeText={(text) => setRatingText(text)}
+                            multiline={true}
+                          />
+                        </ScrollView>
+                      </View>
+                      <StarRating
+                        rating={rating}
+                        onChange={setRating}
+                        enableHalfStar={true}
+                        starSize={35}
+                      />
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </Modal>
           </View>
         )}
       </ScrollView>
@@ -635,6 +826,77 @@ export default function Media({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  avalieButtonArea: {
+    backgroundColor: "#474747",
+    padding: 10,
+    borderRadius: 10,
+    marginTop: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around"
+  },
+  avalieButtonText: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    fontSize: 17,
+    marginRight: 10
+  },
+  score: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    width: (Dimensions.get("window").width * 225) / 392.72,
+  },
+  avaliacoesArea: {
+    marginTop: 20,
+  },
+  avaliacoesTitulo: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    fontSize: 17,
+    marginBottom: 5,
+  },
+  userInfo: {
+    justifyContent: "center",
+  },
+  userImage: {
+    width: (Dimensions.get("window").width * 80) / 392.72,
+    height: (Dimensions.get("window").width * 80) / 392.72,
+    borderRadius: (Dimensions.get("window").width * 40) / 392.72,
+    borderWidth: 2,
+    borderColor: "#FFF",
+    marginBottom: 5,
+  },
+  userName: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    width: (Dimensions.get("window").width * 80) / 392.72,
+    textAlign: "center",
+    fontSize: 14,
+  },
+  avaliacaoData: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    textAlign: "center",
+    fontSize: 14,
+  },
+  avaliacaoText: {
+    textAlign: "justify",
+    color: "#FFF",
+    margin: 0,
+    fontSize: 15,
+    width: (Dimensions.get("window").width * 250) / 392.72,
+  },
+  avaliacaoArea: {
+    display: "flex",
+    flexDirection: "row",
+    backgroundColor: "#292929",
+    width: (Dimensions.get("window").width * 372) / 392.72,
+    justifyContent: "space-between",
+    paddingHorizontal: (Dimensions.get("window").width * 12) / 392.72,
+    paddingVertical: (Dimensions.get("window").width * 10) / 392.72,
+    borderRadius: 10,
+  },
   changesArea: {
     flex: 1,
     alignItems: "center",
@@ -649,15 +911,23 @@ const styles = StyleSheet.create({
   },
   changeItem: {
     paddingBottom: 5,
-    borderBottomWidth: 1,
-    borderColor: "#9D0208",
   },
   changeInput: {
-    width: (Dimensions.get("window").width * 270) / 392.72,
-    height: 20,
+    width: (Dimensions.get("window").width * 315) / 392.72,
+    minHeight: 20,
     color: "#FFF",
     fontFamily: "Lato-Regular",
     fontSize: 17,
+    textAlignVertical: "top",
+    padding: 10,
+  },
+  rateInputArea: {
+    backgroundColor: "#3D3D3D",
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#9D0208",
+    height: 250,
+    marginBottom: 10,
   },
   createButton: {
     padding: 8,
@@ -705,7 +975,7 @@ const styles = StyleSheet.create({
   inputModalContent: {
     paddingHorizontal: 15,
     borderRadius: 25,
-    height: (Dimensions.get("window").width * 270) / 392.72,
+    height: (Dimensions.get("window").width * 440) / 392.72,
     width: (Dimensions.get("window").width * 340) / 392.72,
     backgroundColor: "#292929",
     justifyContent: "space-between",
@@ -723,7 +993,7 @@ const styles = StyleSheet.create({
     width: 60,
     borderRadius: 15,
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   buttonText: {
     fontFamily: "Lato-Bold",
