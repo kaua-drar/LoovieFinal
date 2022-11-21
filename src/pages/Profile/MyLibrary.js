@@ -21,7 +21,7 @@ import Constants from "../../components/utilities/Constants";
 import styled from "styled-components/native";
 import { useFonts } from "expo-font";
 import { Feather } from "@expo/vector-icons";
-import Modal from "../../components/react-native-modal";
+import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -170,7 +170,7 @@ export default function MyLibrary({ navigation, route, props }) {
                 <TouchableOpacity
                   style={styles.button}
                   key={folder.folderId}
-                  onPress={() => navigation.navigate("ChoosedFolder", {folderId: folder.folderId})}
+                  onPress={() => navigation.navigate("ChoosedFolder", {folderId: folder.folderId, folderName: folder.name})}
                   onLongPress={() => {
                     handleToggleModal(
                       folder.posterPath,
@@ -197,6 +197,7 @@ export default function MyLibrary({ navigation, route, props }) {
               onSwipeThreshold={500}
               onBackdropPress={handleToggleModal}
               propagateSwipe={true}
+              style={{margin: 0}}
             >
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
@@ -234,6 +235,7 @@ export default function MyLibrary({ navigation, route, props }) {
               backdropTransitionInTiming={600}
               backdropTransitionOutTiming={600}
               onBackdropPress={() => handleToggleRenameModal()}
+              style={{margin: 0}}
             >
               <View style={styles.inputModalArea}>
                 <View style={styles.inputModalContent}>
@@ -287,6 +289,7 @@ export default function MyLibrary({ navigation, route, props }) {
               backdropTransitionInTiming={600}
               backdropTransitionOutTiming={600}
               onBackdropPress={() => handleToggleDeleteModal()}
+              style={{margin: 0}}
             >
               <View style={styles.inputModalArea}>
                 <View style={styles.inputModalContent}>
@@ -309,7 +312,7 @@ export default function MyLibrary({ navigation, route, props }) {
                   </View>
 
                   <View style={styles.changesArea}>
-                    <View style={[styles.changeItem, {borderBottomWidth: 0}]}>
+                    <View style={[styles.changeItem, {borderBottomWidth: 0, alignItems: "center"}]}>
                       <Text
                         style={[
                           styles.changeTitle,
@@ -320,7 +323,7 @@ export default function MyLibrary({ navigation, route, props }) {
                       </Text>
                       <View style={styles.deleteButtonsArea}>
                         <TouchableOpacity
-                          style={[styles.createButton, {backgroundColor: "white", padding: 10}]}
+                          style={[styles.createButton, {backgroundColor: "white", padding: 10, marginHorizontal: 10, width: 100}]}
                           onPress={() => handleToggleDeleteModal()}
                         >
                           <Text
@@ -333,7 +336,7 @@ export default function MyLibrary({ navigation, route, props }) {
                           </Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          style={[styles.createButton, {padding: 10}]}
+                          style={[styles.createButton, {padding: 10, marginHorizontal: 10, width: 100}]}
                           onPress={() => deleteFolder()}
                         >
                           <Text
@@ -461,6 +464,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   changeItem: {
+    justifyContent: "center",
     paddingBottom: 5,
     borderBottomWidth: 1,
     borderColor: "#9D0208",
@@ -473,6 +477,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
   },
   createButton: {
+    width: 70,
     padding: 8,
     backgroundColor: "#9D0208",
     borderRadius: 14,

@@ -19,7 +19,6 @@ import { Entypo } from "@expo/vector-icons";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import YoutubePlayer from "react-native-youtube-iframe";
 import Star from "react-native-star-view";
-import Modal from "../../components/react-native-modal";
 import ExpoFastImage from "expo-fast-image";
 import {
   query,

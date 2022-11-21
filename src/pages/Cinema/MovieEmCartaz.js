@@ -354,8 +354,8 @@ export default function Movie({ navigation, route }) {
               <ScrollView>
                 {sessions.find(item => item.selected == true).theaters.map((v, index) => {
                   return(
-                    <View>
-                    <TouchableOpacity style={styles.theaterArea} key={index}>
+                    <View key={index}>
+                    <TouchableOpacity style={styles.theaterArea}>
                     <Text style={styles.theaterText}>{v.name}</Text>
                     </TouchableOpacity>
                     {v.rooms.map((x, index) => {

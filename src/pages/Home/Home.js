@@ -74,7 +74,7 @@ export default function TabHomeScreen({ navigation }) {
       setTrending(jsonTrending);
     }
 
-    const docRef = doc(db, "users", auth.currentUser.uid);
+    const docRef = doc(db, "users", `${auth.currentUser.uid}`);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {

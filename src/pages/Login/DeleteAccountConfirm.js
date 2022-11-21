@@ -172,7 +172,7 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
                   <ExpoFastImage
                     style={styles.userImage}
                     source={{
-                      uri: "https://pbs.twimg.com/profile_images/1560255496715632643/oZr-_U7g_400x400.jpg",
+                      uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
                     }}
                     resizeMode="cover"
                   />

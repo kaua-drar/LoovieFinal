@@ -61,7 +61,7 @@ export default function TabEmCartaz({ navigation, route }) {
   const tryMainMovie = () => {
     try{
       return(
-        <TouchableOpacity style={[styles.movieItem, { marginBottom: 20 }]} onPress={() => navigation.navigate("Movie", {movie: ratedMovies.sort(
+        <TouchableOpacity style={[styles.movieItem, { marginBottom: 20 }]} onPress={() => navigation.navigate("MovieEmCartaz", {movie: ratedMovies.sort(
           (a, b) =>
             b.rottenTomatoe.audienceScore -
             a.rottenTomatoe.audienceScore
@@ -144,7 +144,7 @@ export default function TabEmCartaz({ navigation, route }) {
               {movies.map((movie, i) => {
                 try{
                   return (
-                    <TouchableOpacity onPress={() => navigation.navigate("Movie", {movie: movie, uf: uf, cityId: cityId})} key={movie.id}>
+                    <TouchableOpacity onPress={() => navigation.navigate("MovieEmCartaz", {movie: movie, uf: uf, cityId: cityId})} key={movie.id}>
                       <Image
                       key={i}
                       width={(Dimensions.get("window").width * 114) / 392.72}

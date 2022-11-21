@@ -12,16 +12,24 @@ import Register from '../pages/Login/Register';
 import Preloader from '../pages/Login/Preloader';
 import ChooseGenres from '../pages/Login/ChooseGenres';
 import DeleteAccountConfirm from "../pages/Login/DeleteAccountConfirm";
+import {
+  getAuth
+} from "firebase/auth";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../../firebase-config";
+
 
 const Stack = createStackNavigator();
 
 
 export default function MainNavigator() {
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
   return (
     <Stack.Navigator
       showLabel="false"
-      initialRouteName="Preloader"
+      initialRouteName= "Preloader"
       screenOptions={({ route, navigation }) => ({
         headerShown: false,
         ...TransitionPresets.FadeFromBottomAndroid,

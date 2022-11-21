@@ -743,11 +743,40 @@ export function ProfileStack() {
         <Stack.Screen
           name="ChoosedFolder"
           component={ChoosedFolder}
-          options={() => ({
+          options={({ route, navigation }) => ({
             gestureEnabled: false,
             gestureDirection: "vertical",
             ...TransitionPresets.ModalSlideFromBottomIOS,
-            gestureVelocityImpact: 1,
+            headerTitle: route.params.folderName,
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <Ionicons
+                  name="arrow-back"
+                  size={35}
+                  color="#FFF"
+                  style={{
+                    display: route.name === "Home" ? "none" : "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
           })}
         />
       </Stack.Navigator>

@@ -20,7 +20,7 @@ import styled from "styled-components/native";
 import { useFonts } from "expo-font";
 import LoovieLogo from '../../icons/LoovieLogo.svg'
 import { Feather } from '@expo/vector-icons';
-import Modal from "../../components/react-native-modal";
+import Modal from "react-native-modal";
 import { connect } from "react-redux";
 import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
@@ -195,7 +195,7 @@ export default function ProfileScreen({navigation, route, props}) {
                 </TouchableOpacity>
               </View>
             </View>
-            <Modal isVisible={isModalVisible} onSwipeComplete={() => setModalVisible(false)} swipeDirection="down" onSwipeThreshold={500} onBackdropPress={toggleModal}>
+            <Modal isVisible={isModalVisible} onSwipeComplete={() => setModalVisible(false)} swipeDirection="down" onSwipeThreshold={500} onBackdropPress={toggleModal} style={{margin: 0}}>
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
                   <TouchableOpacity style={{position:'relative', top: (Dimensions.get("window").width * -35) / 392.72, right: (Dimensions.get("window").width * -115) / 392.72}} onPress={() => setModalVisible(false)}>

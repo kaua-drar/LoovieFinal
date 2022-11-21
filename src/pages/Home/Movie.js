@@ -19,7 +19,7 @@ import { Entypo } from "@expo/vector-icons";
 import ReadMore from "@fawazahmed/react-native-read-more";
 import YoutubePlayer from "react-native-youtube-iframe";
 import Star from "react-native-star-view";
-import Modal from "../../components/react-native-modal";
+import Modal from "react-native-modal";
 import ExpoFastImage from "expo-fast-image";
 import {
   query,
@@ -664,6 +664,7 @@ export default function Media({ navigation, route }) {
               onSwipeThreshold={500}
               onBackdropPress={handleToggleModal}
               propagateSwipe={true}
+              style={{margin: 0}}
             >
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
@@ -726,6 +727,7 @@ export default function Media({ navigation, route }) {
               backdropTransitionInTiming={600}
               backdropTransitionOutTiming={600}
               onBackdropPress={handleToggleInputModal}
+              style={{margin: 0}}
             >
               <View style={styles.inputModalArea}>
                 <View style={styles.inputModalContent}>
@@ -762,7 +764,7 @@ export default function Media({ navigation, route }) {
                       <TextInput
                         placeholder="Digite o nome da sua nova pasta"
                         placeholderTextColor="#8F8F8F"
-                        style={styles.changeInput}
+                        style={[styles.changeInput, {borderBottomWidth: 1, borderColor: "#9D0208"}]}
                         onChangeText={(text) => setFolderName(text)}
                       />
                     </View>
@@ -779,6 +781,7 @@ export default function Media({ navigation, route }) {
               backdropTransitionInTiming={600}
               backdropTransitionOutTiming={600}
               onBackdropPress={handleToggleRateModal}
+              style={{margin: 0}}
             >
               <View style={styles.inputModalArea}>
                 <View style={styles.inputModalContent}>
@@ -1139,7 +1142,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingTop: "9%",
+    paddingTop: "2%",
     flexDirection: "column",
     backgroundColor: "#0F0C0C",
   },
