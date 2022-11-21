@@ -74,7 +74,7 @@ export default function TabHomeScreen({ navigation }) {
       setTrending(jsonTrending);
     }
 
-    const docRef = doc(db, "users", `${auth.currentUser.uid}`);
+    /*const docRef = doc(db, "users", `${auth.currentUser.uid}`);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -86,8 +86,8 @@ export default function TabHomeScreen({ navigation }) {
     const data = docSnap.data();
     const favoriteGenres = data.favoriteGenres;
 
-    /*let today = new Date();
-    let date = today.getFullYear()+"-"+(today.getMonth()+1).toString().padStart(2, '0')+"-"+today.getDate();*/
+    let today = new Date();
+    let date = today.getFullYear()+"-"+(today.getMonth()+1).toString().padStart(2, '0')+"-"+today.getDate();
 
     let resultsGenresFavorites = [];
 
@@ -169,16 +169,16 @@ export default function TabHomeScreen({ navigation }) {
             },
           ]);
         }
-        setRefreshing(false);
-        setLoading(false);
       });
-    }, 3000);
+    }, 3000);*/
+    setRefreshing(false);
+    setLoading(false);
   };
 
   useEffect(() => {
     requests();
     setIsVisible(true);
-  }, [])
+  }, []);
 
   if (!fontsLoaded) {
     return null;
@@ -264,7 +264,7 @@ export default function TabHomeScreen({ navigation }) {
               alignItems="center"
               showsHorizontalScrollIndicator={false}
             >
-              {forYou.map((media, index) => {
+              {/*forYou.map((media, index) => {
                 return (
                   <TouchableOpacity
                     style={styles.movieItem}
@@ -285,7 +285,7 @@ export default function TabHomeScreen({ navigation }) {
                     />
                   </TouchableOpacity>
                 );
-              })}
+              })*/}
             </ScrollView>
 
             <Text style={[styles.title, { marginTop: 20 }]}>Em Alta</Text>

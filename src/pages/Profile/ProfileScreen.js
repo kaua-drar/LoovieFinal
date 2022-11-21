@@ -132,7 +132,7 @@ export default function ProfileScreen ({navigation, route, props}) {
       sla();
 
       return ()=>{
-        setIsVisible(false)
+        setIsVisible(false);
       }
     }, [])
   );

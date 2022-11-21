@@ -18,6 +18,7 @@ import ReadMore from "@fawazahmed/react-native-read-more";
 import YoutubePlayer from "react-native-youtube-iframe";
 import Star from 'react-native-star-view';
 import styled from "styled-components/native";
+import { openBrowserAsync } from 'expo-web-browser'
 
 const Stack = createStackNavigator();
 
@@ -188,28 +189,27 @@ export default function Movie({ navigation, route }) {
     setSessions(selecteds);
   }
 
+  const requests = async () => {
+    setLoading(true);
+    const req = await fetch(
+      `https://api-content.ingresso.com/v0/sessions/city/${cityId}/event/${movie.id}/`
+    );
+
+    console.log(`https://api-content.ingresso.com/v0/sessions/city/${cityId}/event/${movie.id}/`);
+    const json = await req.json();
+
+    if (json) {
+      for (const obj of json) {
+        obj.selected = false;
+      }
+      json[0].selected = true;
+      setSessions(json);
+    }
+
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const requests = async () => {
-      setLoading(true);
-      const req = await fetch(
-        `https://api-content.ingresso.com/v0/sessions/city/${cityId}/event/${movie.id}/`
-      );
-
-      console.log(`https://api-content.ingresso.com/v0/sessions/city/${cityId}/event/${movie.id}/`);
-      const json = await req.json();
-
-      if (json) {
-        for (const obj of json) {
-          obj.selected = false;
-        }
-        json[0].selected = true;
-        setSessions(json);
-      }
-
-      setLoading(false);
-    };
-
     requests();
   }, []);
 
@@ -360,7 +360,7 @@ export default function Movie({ navigation, route }) {
                     </TouchableOpacity>
                     {v.rooms.map((x, index) => {
                       return(
-                        <TouchableOpacity style={styles.sessionArea} key={index}>
+                        <TouchableOpacity style={styles.sessionArea} key={index} onPress={() => openBrowserAsync(`${x.sessions[0].siteURL}`)}>
                           <View style={styles.sessionInfo}>
                             <Text style={[styles.sessionText, {minWidth: 65,}]}>{x.name}</Text>
                             <View style={styles.cardHour}>

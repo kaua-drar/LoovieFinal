@@ -47,7 +47,7 @@ export default function Preloader({ navigation }) {
   const onLayoutRootView = useCallback(async () => {
     if (auth) {
       await SplashScreen.hideAsync();
-      if (auth) {
+      if (auth.currentUser) {
         navigation.navigate("MainTab");
       } else {
         navigation.navigate("Welcome");
