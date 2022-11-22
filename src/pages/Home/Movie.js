@@ -33,6 +33,7 @@ import {
   getDoc,
   limit,
   getCountFromServer,
+  serverTimestamp
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -178,6 +179,7 @@ export default function Media({ navigation, route }) {
       rating: rating * 2,
       ratingDate: date,
       userName: username,
+      timestamp: serverTimestamp()
     }).then(() => {
       console.log("funfou");
       setToggleRateModal(false);

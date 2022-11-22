@@ -27,10 +27,11 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getAuth } from 'firebase/auth';
-import { collection, doc, getDoc, getFirestore, getDocs, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getFirestore, getDocs, query, where, limit } from "firebase/firestore";
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../../../firebase-config';
 import ExpoFastImage from 'expo-fast-image';
+import Star from "react-native-star-view";
 
 
 export default function ProfileScreen ({navigation, route, props}) {
@@ -41,6 +42,7 @@ export default function ProfileScreen ({navigation, route, props}) {
   const [folders, setFolders] = useState([]);
   const [refreshing, setRefreshing] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
+  const [ratings, setRatings] = useState({});
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -119,8 +121,27 @@ export default function ProfileScreen ({navigation, route, props}) {
       );
     });
 
-    console.log(favoriteGenres);
-    console.log(folders);
+    /*console.log(favoriteGenres);
+    console.log(folders);*/
+
+    const queryRatings = query(
+      collection(db, "ratings"),
+      where("userId", "==", `${auth.currentUser.uid}`),
+      limit(1)
+    );
+
+    const querySnapshotRatings = await getDocs(queryRatings);
+    
+    querySnapshotRatings.forEach((doc) => {
+      setRatings({
+        userName: doc.data().userName,
+        ratingText: doc.data().ratingText,
+        rating: doc.data().rating,
+        ratingDate: doc.data().ratingDate,
+      });
+    });
+
+    console.log(ratings);
 
     setRefreshing(false);
     setLoading(false);
@@ -136,6 +157,60 @@ export default function ProfileScreen ({navigation, route, props}) {
       }
     }, [])
   );
+
+  const Avaliacoes = () => {
+    return (
+      <View style={styles.avaliacoesArea}>
+        <TouchableOpacity
+          onPress={() =>
+            navigation.navigate("Ratings", {
+              mediaId: `M${details.id}`,
+              title: details.title,
+            })
+          }
+        >
+          <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
+        </TouchableOpacity>
+        <View style={styles.avaliacaoArea}>
+          <View style={styles.userInfo}>
+            <ExpoFastImage
+              style={styles.userImage}
+              source={{
+                uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
+              }}
+            />
+            <Text style={styles.userName}>{ratings.userName}</Text>
+            <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
+          </View>
+          <View style={styles.avaliacao}>
+            <View
+              style={[
+                styles.score,
+                { width: (Dimensions.get("window").width * 250) / 392.72, },
+              ]}
+            >
+              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                <Text style={[styles.note, { fontSize: 23 }]}>
+                  {ratings.rating.toFixed(1)}
+                </Text>
+                <Text style={[styles.noteof, { fontSize: 17 }]}>/10</Text>
+              </View>
+              <Star
+                score={(ratings.rating.toFixed(1) * 5) / 10}
+                style={{
+                    marginBottom:
+                      (Dimensions.get("window").height * 3) / 802.9,
+                    width: (Dimensions.get("window").width * 125) / 392.72,
+                    height: (Dimensions.get("window").width * 25) / 392.72,
+                  }}
+              />
+            </View>
+            <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
 
   if (!fontsLoaded) {
@@ -212,6 +287,7 @@ export default function ProfileScreen ({navigation, route, props}) {
                   </ScrollView>
                 </View>
               </View>
+              <Avaliacoes />
             </View>
 
             <Modal isVisible={isModalVisible} onSwipeComplete={() => setModalVisible(false)} swipeDirection="down" onSwipeThreshold={500} onBackdropPress={toggleModal} style={{margin: 0}}>
@@ -250,6 +326,67 @@ export default function ProfileScreen ({navigation, route, props}) {
 }
 
 const styles = StyleSheet.create({
+  note: {
+    color: "#FFF",
+    fontFamily: "Lato-Bold",
+    fontSize: 30,
+  },
+  noteof: {
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
+    fontSize: 20,
+    marginBottom: 1.5,
+  },
+  avaliacoesArea: {
+    marginTop: 20,
+  },
+  avaliacoesTitulo: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    fontSize: 17,
+    marginBottom: 5,
+  },
+  userInfo: {
+    justifyContent: "center",
+  },
+  userImage: {
+    width: (Dimensions.get("window").width * 80) / 392.72,
+    height: (Dimensions.get("window").width * 80) / 392.72,
+    borderRadius: (Dimensions.get("window").width * 40) / 392.72,
+    borderWidth: 2,
+    borderColor: "#FFF",
+    marginBottom: 5,
+  },
+  userName: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    width: (Dimensions.get("window").width * 80) / 392.72,
+    textAlign: "center",
+    fontSize: 14,
+  },
+  avaliacaoData: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    textAlign: "center",
+    fontSize: 14,
+  },
+  avaliacaoText: {
+    textAlign: "justify",
+    color: "#FFF",
+    margin: 0,
+    fontSize: 14,
+    width: (Dimensions.get("window").width * 250) / 392.72,
+  },
+  avaliacaoArea: {
+    display: "flex",
+    flexDirection: "row",
+    backgroundColor: "#292929",
+    width: (Dimensions.get("window").width * 372) / 392.72,
+    justifyContent: "space-between",
+    paddingHorizontal: (Dimensions.get("window").width * 12) / 392.72,
+    paddingVertical: (Dimensions.get("window").width * 10) / 392.72,
+    borderRadius: 10,
+  },
   loadingArea: {
     flex: 1,
     justifyContent: "center",
