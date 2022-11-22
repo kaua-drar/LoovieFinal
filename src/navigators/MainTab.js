@@ -52,8 +52,6 @@ export default function MainTab({ route }) {
           },
           tabBarIcon: ({ focused, color, size }) => {
             let colorCode;
-            let tamanhoBorda;
-            let tamanhoIcone;
             colorCode = focused ? "#9D0208" : "#FFF";
             if (route.name === "HomeTab") {
               return (

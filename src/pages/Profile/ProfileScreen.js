@@ -186,7 +186,7 @@ export default function ProfileScreen ({navigation, route, props}) {
             <View
               style={[
                 styles.score,
-                { width: (Dimensions.get("window").width * 250) / 392.72, },
+                { width: (Dimensions.get("window").width * 250) / 392.72, flexDirection: "row", justifyContent: "space-between"},
               ]}
             >
               <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
@@ -345,6 +345,7 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 17,
     marginBottom: 5,
+    marginLeft: 30
   },
   userInfo: {
     justifyContent: "center",

@@ -50,6 +50,7 @@ const Stack = createStackNavigator();
 export function HomeStack() {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
+    "Lato-Bold": require("../../assets/fonts/Lato-Bold.ttf"),
   });
 
 
@@ -103,15 +104,6 @@ export function HomeStack() {
                     color="#FFF"
                     style={{
                       display: route.name === "Feed" ? "none" : "flex",
-                    }}
-                  />
-                  <LoovieLogo
-                    width={37.5}
-                    height={37.5}
-                    fill={"#FFF"}
-                    style={{
-                      padding: 0,
-                      margin: 0,
                     }}
                   />
                 </View>
@@ -209,15 +201,6 @@ export function ExplorerStack() {
                       display: route.name === "HomeExplorer" ? "none" : "flex",
                     }}
                   />
-                  <LoovieLogo
-                    width={37.5}
-                    height={37.5}
-                    fill={"#FFF"}
-                    style={{
-                      padding: 0,
-                      margin: 0,
-                    }}
-                  />
                 </View>
               </TouchableHighlight>
               <Text
@@ -226,7 +209,8 @@ export function ExplorerStack() {
                   padding: 0,
                   margin: 0,
                   marginLeft: 2,
-                  fontSize: 20,
+                  fontSize: 23,
+                  fontFamily: "Lato-Bold",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -410,15 +394,6 @@ export function ForYouStack() {
                       display: route.name === "Recomendations" ? "none" : "flex",
                     }}
                   />
-                  <LoovieLogo
-                    width={37.5}
-                    height={37.5}
-                    fill={"#FFF"}
-                    style={{
-                      padding: 0,
-                      margin: 0,
-                    }}
-                  />
                 </View>
               </TouchableHighlight>
               <Text
@@ -512,15 +487,6 @@ export function EmCartazStack() {
                     color="#FFF"
                     style={{
                       display: route.name === "HomeEmCartaz" ? "none" : "flex",
-                    }}
-                  />
-                  <LoovieLogo
-                    width={37.5}
-                    height={37.5}
-                    fill={"#FFF"}
-                    style={{
-                      padding: 0,
-                      margin: 0,
                     }}
                   />
                 </View>
