@@ -35,7 +35,7 @@ import { getAuth } from "firebase/auth";
 
 const Stack = createStackNavigator();
 
-export default function TabHomeScreen({ navigation }) {
+export default function HomeExplorer({ navigation }) {
   const [loading, setLoading] = useState(true);
   const [trending, setTrending] = useState([]);
   const [search, setSearch] = useState("");

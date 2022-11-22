@@ -4,15 +4,16 @@ import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import LoovieLogo from '../icons/LoovieLogo.svg';
+import { FontAwesome5 } from '@expo/vector-icons';
 
-import { HomeStack, EmCartazStack, ProfileStack } from "./MainStack";
+import { HomeStack, ExplorerStack, ForYouStack, EmCartazStack, ProfileStack } from "./MainStack";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ActivityIndicator, View, StyleSheet, Text } from "react-native";
 
 const Tab = createMaterialTopTabNavigator();
 
 
-export default function MainTab({route}) {
+export default function MainTab({ route }) {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
   });
@@ -21,7 +22,7 @@ export default function MainTab({route}) {
   const isTabBarVisible = (route) => {
     const routeName = route.state ? route.state.routes[route.state.index]?.name : (route.params ? route.params.screen : 'HOME');
 
-    return[
+    return [
       'DeleteAccountConfirm'
     ].includes(routeName);
   };
@@ -54,14 +55,24 @@ export default function MainTab({route}) {
             let tamanhoBorda;
             let tamanhoIcone;
             colorCode = focused ? "#9D0208" : "#FFF";
-            tamanhoBorda = focused ? 2 : 0;
-            tamanhoIcone = focused ? 50 : 40;
             if (route.name === "HomeTab") {
               return (
                 <TouchableOpacity>
+                  <Entypo name="home" size={40} color={colorCode} />
+                </TouchableOpacity>
+              );
+            } else if (route.name === "ExplorerTab") {
+              return (
+                <TouchableOpacity>
+                  <FontAwesome name="search" size={40} color={colorCode} />
+                </TouchableOpacity>
+              );
+            } else if (route.name === "ForYouTab") {
+              return (
+                <TouchableOpacity>
                   <LoovieLogo
-                    width={tamanhoIcone}
-                    height={tamanhoIcone}
+                    width={45}
+                    height={45}
                     fill={colorCode}
                   />
                 </TouchableOpacity>
@@ -69,13 +80,13 @@ export default function MainTab({route}) {
             } else if (route.name === "CinemaTab") {
               return (
                 <TouchableOpacity>
-                  <Entypo name="ticket" size={tamanhoIcone} color={colorCode} />
+                  <Entypo name="ticket" size={40} color={colorCode} />
                 </TouchableOpacity>
               );
             } else if (route.name === "ProfileTab") {
               return (
                 <TouchableOpacity>
-                  <FontAwesome name="user" size={tamanhoIcone} color={colorCode} />
+                  <FontAwesome name="user" size={40} color={colorCode} />
                 </TouchableOpacity>
               );
             }
@@ -94,18 +105,20 @@ export default function MainTab({route}) {
           headerShown: false,
         })}
       >
-        <Tab.Screen name="CinemaTab" component={EmCartazStack} options={()=>({
+        <Tab.Screen name="HomeTab" component={HomeStack} />
+        <Tab.Screen name="ExplorerTab" component={ExplorerStack} />
+        <Tab.Screen name="ForYouTab" component={ForYouStack} />
+        <Tab.Screen name="CinemaTab" component={EmCartazStack} options={() => ({
           lazyPlaceholder: () => (
             <View style={styles.loadingArea}>
               <ActivityIndicator size="large" color="#FFF" />
               <Text style={styles.loadingText}>Carregando...</Text>
             </View>
           )
-        })}/>
-        <Tab.Screen name="HomeTab" component={HomeStack} />
-        <Tab.Screen name="ProfileTab" component={ProfileStack} 
-        options={()=>({
-        })}/>
+        })} />
+        <Tab.Screen name="ProfileTab" component={ProfileStack}
+          options={() => ({
+          })} />
       </Tab.Navigator>
     );
   }

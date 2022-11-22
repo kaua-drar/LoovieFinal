@@ -18,14 +18,18 @@ import LoovieLogo from "../icons/LoovieLogo.svg";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 
-import Home from "../pages/Home/Home";
-import SearchFilter from "../pages/Home/SearchFilter";
-import Movie from "../pages/Home/Movie";
-import Serie from "../pages/Home/Serie";
-import DiscoverMovies from "../pages/Home/DiscoverMovies";
-import DiscoverSeries from "../pages/Home/DiscoverSeries";
-import Multisearch from "../pages/Home/Multisearch";
-import Ratings from "../pages/Home/Ratings";
+import HomeExplorer from "../pages/Explorer/HomeExplorer";
+import SearchFilter from "../pages/Explorer/SearchFilter";
+import Movie from "../pages/Explorer/Movie";
+import Serie from "../pages/Explorer/Serie";
+import DiscoverMovies from "../pages/Explorer/DiscoverMovies";
+import DiscoverSeries from "../pages/Explorer/DiscoverSeries";
+import Multisearch from "../pages/Explorer/Multisearch";
+import Ratings from "../pages/Explorer/Ratings";
+
+import Feed from "../pages/Home/Feed";
+
+import Recomendations from "../pages/ForYou/Recomendations";
 
 import TabEmCartaz from "../pages/Cinema/TabEmCartaz";
 import HomeEmCartaz from "../pages/Cinema/HomeEmCartaz";
@@ -43,7 +47,6 @@ import ChoosedFolder from "../pages/Profile/ChoosedFolder";
 
 const Stack = createStackNavigator();
 
-
 export function HomeStack() {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
@@ -56,7 +59,7 @@ export function HomeStack() {
     return (
       <Stack.Navigator
         showLabel="false"
-        initialRouteName="Home"
+        initialRouteName="Feed"
         screenOptions={({ route, navigation }) => ({
           unmountOnBlur: true,
           headerShown: route.name === "SearchFilter" ? false : true,
@@ -84,14 +87,14 @@ export function HomeStack() {
                   flexDirection: "row",
                   alignItems: "center",
                   padding: 5,
-                  marginLeft: route.name == "Home" ? 22.5 : 2.5,
+                  marginLeft: route.name == "Feed" ? 22.5 : 2.5,
                 }}
                 onPress={() =>
-                  route.name === "Home" ? null : navigation.goBack()
+                  route.name === "Feed" ? null : navigation.goBack()
                 }
                 activeOpacity={0.8}
                 underlayColor="#ba5256"
-                disabled={route.name === "Home" ? true : false}
+                disabled={route.name === "Feed" ? true : false}
               >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <Ionicons
@@ -99,7 +102,7 @@ export function HomeStack() {
                     size={20}
                     color="#FFF"
                     style={{
-                      display: route.name === "Home" ? "none" : "flex",
+                      display: route.name === "Feed" ? "none" : "flex",
                     }}
                   />
                   <LoovieLogo
@@ -142,7 +145,111 @@ export function HomeStack() {
           ...TransitionPresets.ModalPresentationIOS,
         })}
       >
-        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Feed" component={Feed} />
+      </Stack.Navigator>
+    );
+  }
+}
+
+export function ExplorerStack() {
+  const [fontsLoaded] = useFonts({
+    "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
+  });
+
+
+  if (!fontsLoaded) {
+    return null;
+  } else {
+    return (
+      <Stack.Navigator
+        showLabel="false"
+        initialRouteName="HomeExplorer"
+        screenOptions={({ route, navigation }) => ({
+          unmountOnBlur: true,
+          headerShown: route.name === "SearchFilter" ? false : true,
+          headerStyle: {
+            backgroundColor: "#9D0208",
+            height: 75,
+          },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            margin: 0,
+            fontFamily: "Lato-Regular",
+            fontWeight: "bold",
+          },
+          headerLeft: () => (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <TouchableHighlight
+                style={{
+                  borderRadius: 20,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: route.name == "HomeExplorer" ? 22.5 : 2.5,
+                }}
+                onPress={() =>
+                  route.name === "HomeExplorer" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "HomeExplorer" ? true : false}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Ionicons
+                    name="arrow-back"
+                    size={20}
+                    color="#FFF"
+                    style={{
+                      display: route.name === "HomeExplorer" ? "none" : "flex",
+                    }}
+                  />
+                  <LoovieLogo
+                    width={37.5}
+                    height={37.5}
+                    fill={"#FFF"}
+                    style={{
+                      padding: 0,
+                      margin: 0,
+                    }}
+                  />
+                </View>
+              </TouchableHighlight>
+              <Text
+                style={{
+                  color: "#FFF",
+                  padding: 0,
+                  margin: 0,
+                  marginLeft: 2,
+                  fontSize: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                LOOVIE
+              </Text>
+            </View>
+          ),
+          headerTitle: "",
+          headerRight: () => (
+            <Ionicons
+              name="notifications"
+              size={35}
+              color="#FFF"
+              style={{ padding: 0, marginRight: 22.5 }}
+            />
+          ),
+          gestureEnabled: true,
+          gestureDirection: "horizontal",
+          ...TransitionPresets.ModalPresentationIOS,
+        })}
+      >
+        <Stack.Screen name="HomeExplorer" component={HomeExplorer} />
         <Stack.Screen name="EmCartaz" component={TabEmCartaz} />
         <Stack.Screen
           name="SearchFilter"
@@ -240,6 +347,110 @@ export function HomeStack() {
             gestureVelocityImpact: 1,
           })}
         />
+      </Stack.Navigator>
+    );
+  }
+}
+
+export function ForYouStack() {
+  const [fontsLoaded] = useFonts({
+    "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
+  });
+
+
+  if (!fontsLoaded) {
+    return null;
+  } else {
+    return (
+      <Stack.Navigator
+        showLabel="false"
+        initialRouteName="Recomendations"
+        screenOptions={({ route, navigation }) => ({
+          unmountOnBlur: true,
+          headerShown: route.name === "SearchFilter" ? false : true,
+          headerStyle: {
+            backgroundColor: "#9D0208",
+            height: 75,
+          },
+          headerTintColor: "#fff",
+          headerTitleStyle: {
+            margin: 0,
+            fontFamily: "Lato-Regular",
+            fontWeight: "bold",
+          },
+          headerLeft: () => (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <TouchableHighlight
+                style={{
+                  borderRadius: 20,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: route.name == "Recomendations" ? 22.5 : 2.5,
+                }}
+                onPress={() =>
+                  route.name === "Recomendations" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Recomendations" ? true : false}
+              >
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                  <Ionicons
+                    name="arrow-back"
+                    size={20}
+                    color="#FFF"
+                    style={{
+                      display: route.name === "Recomendations" ? "none" : "flex",
+                    }}
+                  />
+                  <LoovieLogo
+                    width={37.5}
+                    height={37.5}
+                    fill={"#FFF"}
+                    style={{
+                      padding: 0,
+                      margin: 0,
+                    }}
+                  />
+                </View>
+              </TouchableHighlight>
+              <Text
+                style={{
+                  color: "#FFF",
+                  padding: 0,
+                  margin: 0,
+                  marginLeft: 2,
+                  fontSize: 20,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                LOOVIE
+              </Text>
+            </View>
+          ),
+          headerTitle: "",
+          headerRight: () => (
+            <Ionicons
+              name="notifications"
+              size={35}
+              color="#FFF"
+              style={{ padding: 0, marginRight: 22.5 }}
+            />
+          ),
+          gestureEnabled: true,
+          gestureDirection: "horizontal",
+          ...TransitionPresets.ModalPresentationIOS,
+        })}
+      >
+        <Stack.Screen name="Recomendations" component={Recomendations} />
       </Stack.Navigator>
     );
   }
