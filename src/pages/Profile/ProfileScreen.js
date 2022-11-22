@@ -269,7 +269,7 @@ export default function ProfileScreen ({navigation, route, props}) {
               </View>
 
 
-              <View style={[styles.itemArea, {marginTop: 35, marginBottom: 50}]}>
+              <View style={[styles.itemArea, {marginTop: 35, marginBottom: 35}]}>
                 <TouchableOpacity onPress={() => navigation.navigate("MyLibrary")}>
                 <Text style={styles.itemText}>Minha biblioteca{' >'}</Text>
                 </TouchableOpacity>
@@ -304,7 +304,7 @@ export default function ProfileScreen ({navigation, route, props}) {
                     <Feather name="settings" size={27.5} color="white" />
                     <Text style={styles.buttonText}>Configurações Gerais</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.button}>
+                  <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("About")}>
                     <AntDesign name="infocirlceo" size={27.5} color="white" />
                     <Text style={styles.buttonText}>Sobre</Text>
                   </TouchableOpacity>
@@ -338,7 +338,8 @@ const styles = StyleSheet.create({
     marginBottom: 1.5,
   },
   avaliacoesArea: {
-    marginTop: 20,
+    width: Dimensions.get('window').width,
+    
   },
   avaliacoesTitulo: {
     fontFamily: "Lato-Regular",
@@ -382,8 +383,8 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     backgroundColor: "#292929",
-    width: (Dimensions.get("window").width * 372) / 392.72,
     justifyContent: "space-between",
+    marginHorizontal: '2%',
     paddingHorizontal: (Dimensions.get("window").width * 12) / 392.72,
     paddingVertical: (Dimensions.get("window").width * 10) / 392.72,
     borderRadius: 10,

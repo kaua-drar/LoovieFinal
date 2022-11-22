@@ -44,6 +44,7 @@ import EditProfile from "../pages/Profile/EditProfile";
 import FavoriteGenres from "../pages/Profile/FavoriteGenres";
 import MyLibrary from "../pages/Profile/MyLibrary";
 import ChoosedFolder from "../pages/Profile/ChoosedFolder";
+import About from "../pages/Profile/About";
 
 const Stack = createStackNavigator();
 
@@ -113,8 +114,8 @@ export function HomeStack() {
                   color: "#FFF",
                   padding: 0,
                   margin: 0,
-                  marginLeft: 2,
-                  fontSize: 20,
+                  fontSize: 23,
+                  fontFamily: "Lato-Bold",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -208,7 +209,6 @@ export function ExplorerStack() {
                   color: "#FFF",
                   padding: 0,
                   margin: 0,
-                  marginLeft: 2,
                   fontSize: 23,
                   fontFamily: "Lato-Bold",
                   alignItems: "center",
@@ -401,8 +401,8 @@ export function ForYouStack() {
                   color: "#FFF",
                   padding: 0,
                   margin: 0,
-                  marginLeft: 2,
-                  fontSize: 20,
+                  fontSize: 23,
+                  fontFamily: "Lato-Bold",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -496,8 +496,8 @@ export function EmCartazStack() {
                   color: "#FFF",
                   padding: 0,
                   margin: 0,
-                  marginLeft: 2,
-                  fontSize: 20,
+                  fontSize: 23,
+                  fontFamily: "Lato-Bold",
                   alignItems: "center",
                   justifyContent: "center",
                 }}
@@ -950,6 +950,46 @@ export function ProfileStack() {
                   color="#FFF"
                   style={{
                     display: route.name === "Home" ? "none" : "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
+        <Stack.Screen
+          name="About"
+          component={About}
+          options={({ navigation, route }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+            headerTitle: "Sobre",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <AntDesign
+                  name="close"
+                  size={32}
+                  color="#FFF"
+                  style={{
+                    display: "flex",
                   }}
                 />
               </TouchableHighlight>
