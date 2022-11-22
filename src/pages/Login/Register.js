@@ -21,14 +21,16 @@ import { useFonts } from "expo-font";
 import { connect } from "react-redux";
 import { Entypo } from '@expo/vector-icons';
 import { Foundation } from '@expo/vector-icons';
+import { MaterialIcons } from '@expo/vector-icons';
 
 
 
 
 export default function Register({navigation, route, props}) {
   
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -55,6 +57,14 @@ export default function Register({navigation, route, props}) {
     console.log(regexPassword.test(password));
 
 
+    if(name.length < 4 || name.length > 20) {
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <Foundation name="alert" size={24} color="#9D0208"/>
+          <Text style={styles.errorMessage}>O nome precisa ter entre 4 e 20 caracteres.</Text>
+        </View>
+      );
+    }
     if(username.length < 4 || username.length > 20) {
       setErrorMessage(
         <View style={styles.errorMessageArea}>
@@ -133,8 +143,7 @@ export default function Register({navigation, route, props}) {
     return null;
   } else {
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView style={{ alignItems: "center", flex: 1}}>
+    <SafeAreaView style={styles.container} keyboardShouldPersistTaps="handled">
         <LoovieLogo
             width={140}
             height={140}
@@ -142,18 +151,25 @@ export default function Register({navigation, route, props}) {
             style={{marginBottom: 20, marginTop: 40}}
         />
         <TextInput
-          value={username}
-          placeholder="Usuário"
-          placeholderTextColor="#8F8F8F"
-          style={styles.input}
-          onChangeText={(text) => setUsername(text)}
-        />
-        <TextInput
           value={email}
           placeholder="E-mail"
           placeholderTextColor="#8F8F8F"
           style={styles.input}
           onChangeText={(text) => setEmail(text)}
+        />
+        <TextInput
+          value={username}
+          placeholder="Nome de Usuário"
+          placeholderTextColor="#8F8F8F"
+          style={styles.input}
+          onChangeText={(text) => setUsername(text)}
+        />
+        <TextInput
+          value={name}
+          placeholder="Nome"
+          placeholderTextColor="#8F8F8F"
+          style={styles.input}
+          onChangeText={(text) => setName(text)}
         />
         <View style={styles.passwordInputArea}>
           <TextInput
@@ -194,7 +210,6 @@ export default function Register({navigation, route, props}) {
             <Text Text style={styles.text}>.</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
     </SafeAreaView>
   );
   }
