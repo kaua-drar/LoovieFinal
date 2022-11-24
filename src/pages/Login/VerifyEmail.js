@@ -11,7 +11,14 @@ import {
   Keyboard,
   Dimensions,
 } from "react-native";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateEmail,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+  sendEmailVerification,
+} from "firebase/auth";
 import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -27,24 +34,46 @@ import { AntDesign } from "@expo/vector-icons";
 import Modal from "react-native-modal";
 
 export default function Register({ navigation, route, props }) {
-  const email = route.params.email;
-  const [errorMessage, setErrorMessage] = useState("");
-  const [infoMessage, setInfoMessage] = useState("");
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [newEmail, setNewEmail] = useState(email);
-
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  const openInfoModal = (infoMessage) => {
-    Keyboard.dismiss();
-    setInfoMessage(infoMessage);
-    toggleModal();
-  };
+  const email = route.params.email;
+  const password = route.params.password;
+  const [infoMessage, setInfoMessage] = useState("");
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+  const proceed = async () => {
+    const credential = EmailAuthProvider.credential(
+      auth.currentUser.email,
+      password
+    );
+    await reauthenticateWithCredential(auth.currentUser, credential).then(
+      () => {
+        console.log(auth.currentUser.emailVerified);
+        if (auth.currentUser.emailVerified === true) {
+          setInfoMessage(
+            <View style={styles.infoMessageArea}>
+              <MaterialIcons name={"check"} size={24} color="#FFF" />
+              <Text style={styles.infoMessage}>
+                Seu e-mail foi verificado com sucesso!
+              </Text>
+            </View>
+          );
+          setTimeout(() => {
+            navigation.navigate("ChooseGenres");
+          }, 1000);
+        } else if (auth.currentUser.emailVerified === false) {
+          setInfoMessage(
+            <View style={styles.infoMessageArea}>
+              <Foundation name="alert" size={24} color="#9D0208" />
+              <Text style={styles.infoMessage}>
+                Seu e-mail ainda não foi verificado!
+              </Text>
+            </View>
+          );
+        }
+      }
+    );
   };
 
   const [fontsLoaded] = useFonts({
@@ -59,37 +88,61 @@ export default function Register({ navigation, route, props }) {
       <View style={styles.container}>
         <LoovieLogo width={170} height={170} fill={"#9D0208"} />
         <Text style={styles.title}>E-mail de verificação enviado!</Text>
-        <Text style={styles.text}>
-          Um e-mail de verificação foi enviado para:
-        </Text>
-        <View style={styles.inputArea}>
-          <View style={styles.empty}></View>
-          <View style={styles.passwordInputArea}>
-            <TextInput
-              value={newEmail}
-              placeholder="Confirmar Senha"
-              placeholderTextColor="#8F8F8F"
-              style={styles.passwordInput}
-              onChangeText={(text) => setNewEmail(text)}
-            />
+            <Text style={styles.text}>
+              Um e-mail de verificação foi enviado para:
+            </Text>
+
+            <Text style={[styles.text, {fontFamily: "Lato-Bold"}]}>
+              {email}
+            </Text>
+            <Text style={styles.text}>
+              Verifique sua caixa de entrada e sua caixa de spam, e siga as
+              instruções antes de prosseguir.
+            </Text>
             <TouchableOpacity
+              style={[styles.submitButton, { marginTop: 20 }]}
+              onPress={() => proceed()}
             >
-                <FontAwesome5 name="edit" size={24} color="#8F8F8F" />
+              <Text style={styles.submitText}>Prosseguir</Text>
             </TouchableOpacity>
-          </View>
-          <View style={styles.empty}></View>
-        </View>
-        <Text style={styles.text}>{email}</Text>
-        <Text style={styles.text}>
-          Verifique sua caixa de entrada e sua caixa de spam, e siga as
-          instruções antes de prosseguir.
-        </Text>
+        {infoMessage}
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  infoMessageArea: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    marginTop: 15,
+    width: (Dimensions.get("window").width * 300) / 392.72,
+  },
+  infoMessage: {
+    fontSize: 15,
+    color: "#FFF",
+    fontStyle: "Lato-Regular",
+    marginLeft: 5,
+    textAlign: "center",
+  },
+  submitText: {
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
+    fontSize: 18,
+  },
+  submitButton: {
+    marginTop: 10,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: (Dimensions.get("window").width * 10) / 392.72,
+    paddingHorizontal: (Dimensions.get("window").width * 35) / 392.72,
+    borderWidth: 2,
+    borderColor: "#9D0208",
+    borderRadius: 10,
+    backgroundColor: "#141414",
+  },
   container: {
     backgroundColor: "#0F0C0C",
     flex: 1,
@@ -132,13 +185,13 @@ const styles = StyleSheet.create({
     fontFamily: "Lato-Regular",
     color: "#FFF",
   },
-  passwordInput: {
+  input: {
     fontFamily: "Lato-Regular",
     fontSize: 16,
     flex: 1,
     color: "#FFF",
   },
-  passwordInputArea: {
+  inputArea: {
     flexDirection: "row",
     alignItems: "center",
     height: 45,
@@ -153,22 +206,5 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     backgroundColor: "#0f0c0c",
-  },
-  inputArea: {
-    width: (Dimensions.get("window").width * 330) / 392.72,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  input: {
-    height: 45,
-    width: (Dimensions.get("window").width * 270) / 392.72,
-    marginVertical: 10,
-    backgroundColor: "#1f1f1f",
-    color: "#FFF",
-    borderRadius: 10,
-    padding: 10,
-    fontFamily: "Lato-Regular",
-    fontSize: 16,
   },
 });

@@ -11,7 +11,7 @@ import {
   Keyboard,
   Dimensions,
 } from "react-native";
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
 import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -146,8 +146,11 @@ export default function Register({ navigation, route, props }) {
             name: name,
           }).then(() => {
             updateProfile(userCredential.user, {
-              displayName: username}).then(() => {
-                navigation.navigate("VerifyEmail", {email: email});
+              displayName: username}).then(async () => {
+                await sendEmailVerification(userCredential.user).then(() => {
+                  console.log("e-mail enviado");
+                  navigation.navigate("VerifyEmail", {email: email, password: password});
+                });
               }).catch((error) => {
                 console.log(error.code, ": ", error.message)
               });
@@ -171,8 +174,7 @@ export default function Register({ navigation, route, props }) {
                   ? "E-mail já associado a outra conta."
                   : error.code === "auth/invalid-display-name"
                   ? "Nome de usuário inválido."
-                  : error.code === "auth/invalid-email-verified" ||
-                    error.code === "auth/invalid-email"
+                  : error.code === "auth/invalid-email"
                   ? "E-mail inválido"
                   : error.code === "auth/invalid-password"
                   ? "A senha precisa ter pelo menos 6 caracteres."

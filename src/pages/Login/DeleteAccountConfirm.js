@@ -19,7 +19,7 @@ import {
   EmailAuthProvider,
   deleteUser,
 } from "firebase/auth";
-import { collection, doc, getDoc, getFirestore, deleteDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getFirestore, deleteDoc, getDocs, writeBatch, query, where } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { Entypo } from "@expo/vector-icons";
@@ -78,26 +78,60 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
       .then(async () => {
         console.log("deu");
         const user = auth.currentUser;
-        await deleteDoc(doc(db, "users", `${auth.currentUser.uid}`)).then(()=>{
-          deleteUser(user)
-          .then(async() => {
-            setErrorMessage(
-              <View style={styles.errorMessageArea}>
-                <MaterialIcons name={"check"} size={24} color="#FFF" />
-                <Text style={styles.errorMessage}>
-                  Usuário excluído com sucesso!
-                </Text>
-              </View>
-            );
-            setTimeout(()=>{
-              console.log("Usuário Excluído");
-              navigation.navigate("Welcome");
-            }, 1000)
-            
+        const queryRatings = query(
+          collection(db, "ratings"),
+          where("userId", "==", `${auth.currentUser.uid}`)
+        );
+
+        await getDocs(queryRatings).then(async(queryRatings) => {
+          const batch = writeBatch(db);
+          queryRatings.forEach((v) => {
+            console.log("delete one rating");
+            const laRef = doc(db, "ratings", v.id);
+            batch.delete(laRef);
+          });
+          return await batch.commit();
+        }).then(async () => {
+          console.log("delete all ratings");
+          const queryFolders = query(
+            collection(db, "folders"),
+            where("userId", "==", `${auth.currentUser.uid}`)
+          );
+  
+          await getDocs(queryFolders).then(async(queryFolders) => {
+            const batch = writeBatch(db);
+            queryFolders.forEach((v) => {
+              console.log("delete one folder");
+              const laRef = doc(db, "ratings", v.id);
+              batch.delete(laRef);
+            });
+            return await batch.commit();
+          }).then(async () => {
+            console.log("delete all folders");
+            await deleteDoc(doc(db, "users", `${auth.currentUser.uid}`)).then(()=>{
+              console.log("delete from firestore");
+              deleteUser(user)
+              .then(async() => {
+                console.log("delete from authentication");
+                setErrorMessage(
+                  <View style={styles.errorMessageArea}>
+                    <MaterialIcons name={"check"} size={24} color="#FFF" />
+                    <Text style={styles.errorMessage}>
+                      Usuário excluído com sucesso!
+                    </Text>
+                  </View>
+                );
+                setTimeout(()=>{
+                  console.log("Usuário Excluído");
+                  navigation.navigate("Welcome");
+                }, 1000)
+                
+              })
+              .catch((error) => {
+                console.log("Ocorreu um erro: ", error.code, " - ", error.message);
+              });})
           })
-          .catch((error) => {
-            console.log("Ocorreu um erro: ", error.code, " - ", error.message);
-          });})
+        });
       })
       .catch((error) => {
         console.log("nao deu: ", error.message);
