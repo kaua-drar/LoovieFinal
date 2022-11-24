@@ -147,6 +147,7 @@ export function HomeStack() {
 export function ExplorerStack() {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
+    "Lato-Bold": require("../../assets/fonts/Lato-Bold.ttf"),
   });
 
 
@@ -339,6 +340,7 @@ export function ExplorerStack() {
 export function ForYouStack() {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
+    "Lato-Bold": require("../../assets/fonts/Lato-Bold.ttf"),
   });
 
 
@@ -434,6 +436,7 @@ export function ForYouStack() {
 export function EmCartazStack() {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
+    "Lato-Bold": require("../../assets/fonts/Lato-Bold.ttf"),
   });
 
 
@@ -605,6 +608,7 @@ export function EmCartazStack() {
 export function ProfileStack() {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../assets/fonts/Lato-Regular.ttf"),
+    "Lato-Bold": require("../../assets/fonts/Lato-Bold.ttf"),
   });
 
 

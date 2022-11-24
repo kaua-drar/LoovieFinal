@@ -81,6 +81,8 @@ export default function ProfileScreen ({navigation, route, props}) {
       setUsername("");
     }
 
+    console.log(auth.currentUser.photoURL);
+
     const docRefGenre = doc(db, "users", auth.currentUser.uid);
     const docSnapGenre = await getDoc(docRefGenre);
 
@@ -159,58 +161,80 @@ export default function ProfileScreen ({navigation, route, props}) {
   );
 
   const Avaliacoes = () => {
-    return (
-      <View style={styles.avaliacoesArea}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("Ratings", {
-              mediaId: `M${details.id}`,
-              title: details.title,
-            })
-          }
-        >
-          <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
-        </TouchableOpacity>
-        <View style={styles.avaliacaoArea}>
-          <View style={styles.userInfo}>
-            <ExpoFastImage
-              style={styles.userImage}
-              source={{
-                uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
-              }}
-            />
-            <Text style={styles.userName}>{ratings.userName}</Text>
-            <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
-          </View>
-          <View style={styles.avaliacao}>
-            <View
-              style={[
-                styles.score,
-                { width: (Dimensions.get("window").width * 250) / 392.72, flexDirection: "row", justifyContent: "space-between"},
-              ]}
-            >
-              <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
-                <Text style={[styles.note, { fontSize: 23 }]}>
-                  {ratings.rating.toFixed(1)}
-                </Text>
-                <Text style={[styles.noteof, { fontSize: 17 }]}>/10</Text>
-              </View>
-              <Star
-                score={(ratings.rating.toFixed(1) * 5) / 10}
-                style={{
-                    marginBottom:
-                      (Dimensions.get("window").height * 3) / 802.9,
-                    width: (Dimensions.get("window").width * 125) / 392.72,
-                    height: (Dimensions.get("window").width * 25) / 392.72,
-                  }}
+    try{
+      return (
+        <View style={styles.avaliacoesArea}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Ratings", {
+                mediaId: `M${details.id}`,
+                title: details.title,
+              })
+            }
+          >
+            <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
+          </TouchableOpacity>
+          <View style={styles.avaliacaoArea}>
+            <View style={styles.userInfo}>
+              <ExpoFastImage
+                style={styles.userImage}
+                source={{
+                  uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
+                }}
               />
+              <Text style={styles.userName}>{ratings.userName}</Text>
+              <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
             </View>
-            <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
+            <View style={styles.avaliacao}>
+              <View
+                style={[
+                  styles.score,
+                  { width: (Dimensions.get("window").width * 250) / 392.72, flexDirection: "row", justifyContent: "space-between"},
+                ]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                  <Text style={[styles.note, { fontSize: 23 }]}>
+                    {ratings.rating.toFixed(1)}
+                  </Text>
+                  <Text style={[styles.noteof, { fontSize: 17 }]}>/10</Text>
+                </View>
+                <Star
+                  score={(ratings.rating.toFixed(1) * 5) / 10}
+                  style={{
+                      marginBottom:
+                        (Dimensions.get("window").height * 3) / 802.9,
+                      width: (Dimensions.get("window").width * 125) / 392.72,
+                      height: (Dimensions.get("window").width * 25) / 392.72,
+                    }}
+                />
+              </View>
+              <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
+            </View>
           </View>
         </View>
-      </View>
-    );
+      );
+    }
+    catch{
+      return null
+    }
+    
   };
+
+  const tryFavoriteGenres = () => {
+    try{
+      favoriteGenres.map((genre, index) => {
+        return(
+          <TouchableOpacity style={{alignItems: 'center'}} key={index}>
+            <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W300}${genre.backdrop_path}`}} style={{width: 100, height: 100, borderRadius: 50, marginHorizontal: 5}}/>
+            <Text style={[styles.itemText, {fontSize: 14, marginLeft: 0, marginBottom: 0, maxWidth: 100, textAlign: 'center'}]}>{genre.genreName}</Text>
+          </TouchableOpacity>
+        );
+      });
+    }
+    catch{
+      return null
+    }
+  }
 
 
   if (!fontsLoaded) {
@@ -241,7 +265,7 @@ export default function ProfileScreen ({navigation, route, props}) {
                 <ExpoFastImage
                 style={styles.profileImage}
                 source={{
-                  uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
+                  uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAEazAe?format=jpg&name=large" : auth.currentUser.photoURL,
                 }}
                 />
                 
@@ -255,15 +279,7 @@ export default function ProfileScreen ({navigation, route, props}) {
                 </TouchableOpacity>
                 <View style={styles.itens}>
                   <ScrollView horizontal={true} alignItems="center" showsHorizontalScrollIndicator={false}>
-                    {favoriteGenres.map((genre, index) => {
-                      return(
-                        <TouchableOpacity style={{alignItems: 'center'}} key={index}>
-                          <ExpoFastImage source={{uri: `${Constants.URL.IMAGE_URL_W300}${genre.backdrop_path}`}} style={{width: 100, height: 100, borderRadius: 50, marginHorizontal: 5}}/>
-                          <Text style={[styles.itemText, {fontSize: 14, marginLeft: 0, marginBottom: 0, maxWidth: 100, textAlign: 'center'}]}>{genre.genreName}</Text>
-                        </TouchableOpacity>
-                        
-                      )
-                    })}
+                    {tryFavoriteGenres()}
                   </ScrollView>
                 </View>
               </View>

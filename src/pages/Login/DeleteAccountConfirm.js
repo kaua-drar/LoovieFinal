@@ -19,7 +19,7 @@ import {
   EmailAuthProvider,
   deleteUser,
 } from "firebase/auth";
-import { collection, doc, getDoc, getFirestore } from "firebase/firestore";
+import { collection, doc, getDoc, getFirestore, deleteDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { Entypo } from "@expo/vector-icons";
@@ -75,20 +75,32 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
     Keyboard.dismiss();
 
     reauthenticate()
-      .then(() => {
+      .then(async () => {
         console.log("deu");
         const user = auth.currentUser;
-        deleteUser(user)
-          .then(() => {
-            console.log("Usuário Excluído");
-            navigation.navigate("Welcome");
+        await deleteDoc(doc(db, "users", `${auth.currentUser.uid}`)).then(()=>{
+          deleteUser(user)
+          .then(async() => {
+            setErrorMessage(
+              <View style={styles.errorMessageArea}>
+                <MaterialIcons name={"check"} size={24} color="#FFF" />
+                <Text style={styles.errorMessage}>
+                  Usuário excluído com sucesso!
+                </Text>
+              </View>
+            );
+            setTimeout(()=>{
+              console.log("Usuário Excluído");
+              navigation.navigate("Welcome");
+            }, 1000)
+            
           })
           .catch((error) => {
-            console.log("Ocorreu um erro: ", error.code);
-          });
+            console.log("Ocorreu um erro: ", error.code, " - ", error.message);
+          });})
       })
       .catch((error) => {
-        console.log("nao deu: ", error.code);
+        console.log("nao deu: ", error.message);
         setErrorMessage(
           <View style={styles.errorMessageArea}>
             <Foundation name="alert" size={24} color="#9D0208" />
@@ -172,7 +184,7 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
                   <ExpoFastImage
                     style={styles.userImage}
                     source={{
-                      uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
+                      uri: auth?.currentUser?.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
                     }}
                     resizeMode="cover"
                   />

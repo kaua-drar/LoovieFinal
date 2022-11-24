@@ -9,6 +9,7 @@ import MainTab from './MainTab';
 import Welcome from '../pages/Login/Welcome';
 import Login from '../pages/Login/Login';
 import Register from '../pages/Login/Register';
+import VerifyEmail from '../pages/Login/VerifyEmail';
 import Preloader from '../pages/Login/Preloader';
 import ChooseGenres from '../pages/Login/ChooseGenres';
 import DeleteAccountConfirm from "../pages/Login/DeleteAccountConfirm";
@@ -38,6 +39,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Welcome" component={Welcome}/>
       <Stack.Screen name="Login" component={Login}/>
       <Stack.Screen name="Register" component={Register}/>
+      <Stack.Screen name="VerifyEmail" component={VerifyEmail}/>
       <Stack.Screen name="MainTab" component={MainTab}/>
       <Stack.Screen name="Preloader" component={Preloader}/>
       <Stack.Screen name="ChooseGenres" component={ChooseGenres}/>

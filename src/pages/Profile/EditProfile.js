@@ -29,20 +29,28 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from "../../../firebase-config";
+import { firebaseConfig, firebase } from "../../../firebase-config";
 import { Entypo } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import ExpoFastImage from "expo-fast-image";
 import { FontAwesome } from "@expo/vector-icons";
-
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
 
 export default function EditProfile({ navigation, route, props }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState(null);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
+  const [uploading, setUploading] = useState(false)
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
@@ -52,6 +60,7 @@ export default function EditProfile({ navigation, route, props }) {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   useEffect(() => {
     async () => {
@@ -82,7 +91,13 @@ export default function EditProfile({ navigation, route, props }) {
           <Text style={styles.errorMessage}>Imagem de perfil alterada!</Text>
         </View>
       );
-    } else if ((username.length < 4 || username.length > 20 ) && regexUser.test(username) == false) {
+      setTimeout(()=>{
+        navigation.navigate("ProfileScreen")
+      }, 2000);
+    } else if (
+      (username.length < 4 || username.length > 20) &&
+      regexUser.test(username) == false
+    ) {
       setErrorMessage(
         <View style={styles.errorMessageArea}>
           <Foundation name="alert" size={24} color="#9D0208" />
@@ -103,6 +118,9 @@ export default function EditProfile({ navigation, route, props }) {
           <Text style={styles.errorMessage}>Nome de usuário alterado!</Text>
         </View>
       );
+      setTimeout(()=>{
+        navigation.navigate("ProfileScreen")
+      }, 2000);
     } else if (
       username.length > 3 &&
       username.length < 21 &&
@@ -130,6 +148,9 @@ export default function EditProfile({ navigation, route, props }) {
           <Text style={styles.errorMessage}>Alterações salvas!</Text>
         </View>
       );
+      setTimeout(()=>{
+        navigation.navigate("ProfileScreen")
+      }, 2000);
     }
   };
 
@@ -141,6 +162,47 @@ export default function EditProfile({ navigation, route, props }) {
       .catch((error) => {
         console.log("imagem nao foi: ", error.code);
       });
+
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function () {
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", image, true);
+      xhr.send(null);
+    });
+    const ref = firebase.storage().ref().child(`profilePictures/${auth.currentUser.uid}`);
+    const snapshot = ref.put(blob);
+    snapshot.on(
+      firebase.storage.TaskEvent.STATE_CHANGED,
+      () => {
+        setUploading(true);
+      },
+      (error) => {
+        setUploading(false);
+        console.log(error);
+        blob.close();
+        return;
+      },
+      () => {
+        snapshot.snapshot.ref.getDownloadURL().then(async(url) => {
+          setUploading(false);
+          console.log("Download URL: ", url);
+          blob.close();
+          await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
+            profilePictureURL: url,
+          })
+            .then(() => {
+              console.log("foto foi pro firebase");
+            })
+          return url;
+        });
+      }
+    );
   };
 
   const changeUsername = async () => {
@@ -178,10 +240,7 @@ export default function EditProfile({ navigation, route, props }) {
     return null;
   } else {
     return (
-      <ScrollView
-        style={styles.container}
-        alignItems="center"
-      >
+      <ScrollView style={styles.container} alignItems="center">
         <ExpoFastImage source={{ uri: image }} style={{ flex: 1 / 2 }} />
         <View style={styles.content}>
           <Text style={styles.title}>Editar Perfil</Text>
@@ -190,7 +249,10 @@ export default function EditProfile({ navigation, route, props }) {
               <ExpoFastImage
                 style={styles.userImage}
                 source={{
-                  uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
+                  uri: image == null ?
+                    auth.currentUser.photoURL == null
+                      ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large"
+                      : auth.currentUser.photoURL : image,
                 }}
                 resizeMode="cover"
               ></ExpoFastImage>
@@ -232,7 +294,7 @@ export default function EditProfile({ navigation, route, props }) {
       </ScrollView>
     );
   }
-};
+}
 
 const styles = StyleSheet.create({
   sla: {},
