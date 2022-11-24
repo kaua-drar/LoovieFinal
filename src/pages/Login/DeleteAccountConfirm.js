@@ -35,7 +35,7 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
   const [email, setEmail] = useState("");
   const [currentPasswordVisible, setCurrentPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [username, setUsername] = useState("");
+  const [userInfos, setUserInfos] = useState({});
   const [loading, setLoading] = useState(true);
 
   const [fontsLoaded] = useFonts({
@@ -53,11 +53,15 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      setUsername(data.username);
+      setUserInfos({
+        username: data.username,
+        name: data.name,
+        profilePictureURL: null,
+      });
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
-      setUsername("");
+      setUserInfos({});
     }
 
     loaded();
@@ -65,7 +69,7 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
 
   const loaded = useCallback(async () => {
     setLoading(false);
-  }, [username]);
+  }, [userInfos]);
 
   useEffect(() => {
     sla();
@@ -218,11 +222,11 @@ export default function DeleteAccountConfirm({ navigation, route, props }) {
                   <ExpoFastImage
                     style={styles.userImage}
                     source={{
-                      uri: auth?.currentUser?.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
+                      uri: userInfos.profilePictureURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAEazAe?format=jpg&name=large" : userInfos.profilePictureURL,
                     }}
                     resizeMode="cover"
                   />
-                  <Text style={styles.userName}>@{username}</Text>
+                  <Text style={styles.userName}>@{userInfos.username}</Text>
                 </View>
                 <TouchableOpacity
                   style={styles.submitButton}
@@ -273,6 +277,8 @@ const styles = StyleSheet.create({
     width: 130,
     height: 130,
     borderRadius: 65,
+    borderWidth: 2,
+    borderColor: "#FFF"
   },
   userName: {
     marginTop: 8,

@@ -8,6 +8,7 @@ import {
   TextInput,
   ScrollView,
   Keyboard,
+  ActivityIndicator
 } from "react-native";
 import { connect } from "react-redux";
 import { useFonts } from "expo-font";
@@ -25,13 +26,12 @@ import { Foundation } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import ExpoFastImage from "expo-fast-image";
 
-
 export default function DeleteAccount({ navigation, route, props }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [email, setEmail] = useState("");
   const [currentPasswordVisible, setCurrentPasswordVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [username, setUsername] = useState("");
+  const [userInfos, setUserInfos] = useState({});
   const [loading, setLoading] = useState(true);
 
   const [fontsLoaded] = useFonts({
@@ -49,11 +49,15 @@ export default function DeleteAccount({ navigation, route, props }) {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      setUsername(data.username);
+      setUserInfos({
+        username: data.username,
+        name: data.name,
+        profilePictureURL: null,
+      });
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
-      setUsername("");
+      setUserInfos({});
     }
     setLoading(false);
   };
@@ -130,51 +134,69 @@ export default function DeleteAccount({ navigation, route, props }) {
     return null;
   } else {
     return (
-      <ScrollView
-        style={styles.container}
-        alignItems="center"
-      >
-        <View style={styles.content}>
-          <View style={styles.userArea}>
-            <ExpoFastImage
-              style={styles.userImage}
-              source={{
-                uri: auth.currentUser.photoURL == null ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large" : auth.currentUser.photoURL,
-              }}
-              resizeMode="cover"
-            />
-            <Text style={styles.userName}>@{username}</Text>
+      <ScrollView style={styles.container} alignItems="center">
+        {loading && (
+          <View style={styles.loadingArea}>
+            <ActivityIndicator size="large" color="#FFF" />
+            <Text style={styles.loadingText}>Carregando...</Text>
           </View>
+        )}
+        {!loading && (
+          <View style={styles.content}>
+            <View style={styles.userArea}>
+              <ExpoFastImage
+                style={styles.userImage}
+                source={{
+                  uri:
+                    userInfos.profilePictureURL === null
+                      ? "https://pbs.twimg.com/media/Fdnl8v_XoAEazAe?format=jpg&name=large"
+                      : userInfos.profilePictureURL,
+                }}
+                resizeMode="cover"
+              />
+              <Text style={styles.userName}>@{userInfos.username}</Text>
+            </View>
 
-          <Text style={styles.warningTitle}>
-            Isso irá excluir sua conta permanentemente
-          </Text>
-          <Text style={styles.warningText}>
-            Você está prestes a iniciar o processo de exclusão permanente da sua
-            conta.
-          </Text>
-          <Text style={styles.warningText}>
-            Portanto, ela não poderá ser recuperada.
-          </Text>
-          <Text style={styles.warningText}>
-            Tem certeza que deseja prosseguir?
-          </Text>
+            <Text style={styles.warningTitle}>
+              Isso irá excluir sua conta permanentemente
+            </Text>
+            <Text style={styles.warningText}>
+              Você está prestes a iniciar o processo de exclusão permanente da
+              sua conta.
+            </Text>
+            <Text style={styles.warningText}>
+              Portanto, ela não poderá ser recuperada.
+            </Text>
+            <Text style={styles.warningText}>
+              Tem certeza que deseja prosseguir?
+            </Text>
 
-          <View style={styles.submitArea}>
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={() => navigation.navigate("DeleteAccountConfirm")}
-            >
-              <Text style={styles.submitText}>Prosseguir</Text>
-            </TouchableOpacity>
+            <View style={styles.submitArea}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => navigation.navigate("DeleteAccountConfirm")}
+              >
+                <Text style={styles.submitText}>Prosseguir</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
     );
   }
-};
+}
 
 const styles = StyleSheet.create({
+  loadingArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: Dimensions.get("window").height,
+  },
+  loadingText: {
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
+  },
   sla: {},
   warningTitle: {
     marginTop: 40,
@@ -200,6 +222,8 @@ const styles = StyleSheet.create({
     width: 130,
     height: 130,
     borderRadius: 65,
+    borderWidth: 2,
+    borderColor: "#FFF"
   },
   userName: {
     marginTop: 8,

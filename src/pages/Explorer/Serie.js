@@ -32,6 +32,7 @@ import {
   where,
   getDoc,
   limit,
+  serverTimestamp
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -167,16 +168,29 @@ export default function Media({ navigation, route }) {
 
     const docRef = doc(db, "users", auth.currentUser.uid);
     const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
-    const username = data.username;
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      setUserInfos({
+        username: data.username,
+        name: data.name,
+        profilePictureURL: null,
+      });
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+      setUserInfos({});
+    }
 
     await setDoc(doc(collection(db, "ratings")), {
       userId: auth.currentUser.uid,
       mediaId: `S${details.id}`,
       ratingText: ratingText,
       rating: rating * 2,
-      ratingDate: date,
-      userName: username,
+      userName: userInfos.name,
+      userProfilePictureURL: userInfos.userProfilePictureURL,
+      mediaName: details.name,
+      mediaPoster: details.poster_path,
+      timestamp: serverTimestamp(),
     }).then(() => {
       console.log("funfou");
       setToggleRateModal(false);

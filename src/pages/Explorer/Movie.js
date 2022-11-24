@@ -169,17 +169,29 @@ export default function Media({ navigation, route }) {
 
     const docRef = doc(db, "users", auth.currentUser.uid);
     const docSnap = await getDoc(docRef);
-    const data = docSnap.data();
-    const username = data.username;
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      setUserInfos({
+        username: data.username,
+        name: data.name,
+        profilePictureURL: null,
+      });
+    } else {
+      // doc.data() will be undefined in this case
+      console.log("No such document!");
+      setUserInfos({});
+    }
 
     await setDoc(doc(collection(db, "ratings")), {
       userId: auth.currentUser.uid,
       mediaId: `M${details.id}`,
       ratingText: ratingText,
       rating: rating * 2,
-      ratingDate: date,
-      userName: username,
-      timestamp: serverTimestamp()
+      userName: userInfos.name,
+      userProfilePictureURL: userInfos.userProfilePictureURL,
+      mediaName: details.title,
+      mediaPoster: details.poster_path,
+      timestamp: serverTimestamp(),
     }).then(() => {
       console.log("funfou");
       setToggleRateModal(false);

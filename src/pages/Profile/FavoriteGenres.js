@@ -103,7 +103,7 @@ export default function FavoriteGenres({ navigation, route, props }) {
       setModalVisible(true);
     }
     else {
-      await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
+      await updateDoc(doc(collection(db, "userPreferences"), auth.currentUser.uid), {
         favoriteGenres: selectedGenres })
       .catch(error => console.log(error.code))
       .finally(()=>{
@@ -118,7 +118,7 @@ export default function FavoriteGenres({ navigation, route, props }) {
 
   const sla = async () => {
 
-    const docRefGenre = doc(db, "users", auth.currentUser.uid);
+    const docRefGenre = doc(db, "userPreferences", auth.currentUser.uid);
     const docSnapGenre = await getDoc(docRefGenre);
 
     if (docSnapGenre.exists()) {

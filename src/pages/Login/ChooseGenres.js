@@ -48,7 +48,7 @@ export default function ProfileScreen({navigation, route, props}) {
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
   const [genres, setGenres] = useState([]);
-  const [username, setUsername] = useState("");
+  const [userInfos, setUserInfos] = useState({});
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -93,7 +93,7 @@ export default function ProfileScreen({navigation, route, props}) {
       setModalVisible(true);
     }
     else {
-      await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
+      await setDoc(doc(collection(db, "userPreferences"), auth.currentUser.uid), {
         favoriteGenres: selectedGenres })
       .catch(error => console.log(error.code))
       .finally(()=>{
@@ -124,11 +124,13 @@ export default function ProfileScreen({navigation, route, props}) {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      setUsername(data.username);
+      setUserInfos({
+        name: data.name,
+      });
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
-      setUsername("");
+      setUserInfos({});
     }
 
     setTimeout(() => {
@@ -164,8 +166,8 @@ export default function ProfileScreen({navigation, route, props}) {
                   fill='#9D0208'
                   style={{marginBottom: 20, marginTop: 20}}
                 />
-                <Text style={styles.title}>Olá!</Text>
-                <Text style={styles.text}>Escolha gêneros que goste de assistir. Isso vai nos ajudar a recomendar algo que você goste.</Text>
+                <Text style={styles.title}>Olá, {userInfos.name}!</Text>
+                <Text style={styles.text}>Para iniciarmos, escolha até 5 gêneros que goste de assistir. Isso vai nos ajudar a recomendar algo que você goste.</Text>
               </View>
               <View style={styles.results}>
                 {genres.map((genre, index) => {
@@ -303,7 +305,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     textAlign: 'center',
     marginTop: (Dimensions.get("window").width * 15) / 392.72,
-    width: (Dimensions.get("window").width * 250) / 392.72,
+    width: (Dimensions.get("window").width * 280) / 392.72,
   },
   mediaBackdrop: {
     width: (Dimensions.get("window").width * 178) / 392.72,

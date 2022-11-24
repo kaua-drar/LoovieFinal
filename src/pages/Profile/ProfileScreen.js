@@ -46,7 +46,7 @@ import Star from "react-native-star-view";
 export default function ProfileScreen({ navigation, route, props }) {
   const [loading, setLoading] = useState(true);
   const [isModalVisible, setModalVisible] = useState(false);
-  const [username, setUsername] = useState("");
+  const [userInfos, setUserInfos] = useState({});
   const [favoriteGenres, setFavoriteGenres] = useState([]);
   const [folders, setFolders] = useState([]);
   const [refreshing, setRefreshing] = useState(true);
@@ -85,16 +85,20 @@ export default function ProfileScreen({ navigation, route, props }) {
 
     if (docSnap.exists()) {
       const data = docSnap.data();
-      setUsername(data.username);
+      setUserInfos({
+        username: data.username,
+        name: data.name,
+        profilePictureURL: null,
+      });
     } else {
       // doc.data() will be undefined in this case
       console.log("No such document!");
-      setUsername("");
+      setUserInfos({});
     }
 
     console.log(auth.currentUser.photoURL);
 
-    const docRefGenre = doc(db, "users", auth.currentUser.uid);
+    const docRefGenre = doc(db, "userPreferences", auth.currentUser.uid);
     const docSnapGenre = await getDoc(docRefGenre);
 
     if (docSnapGenre.exists()) {
@@ -149,7 +153,10 @@ export default function ProfileScreen({ navigation, route, props }) {
         userName: doc.data().userName,
         ratingText: doc.data().ratingText,
         rating: doc.data().rating,
-        ratingDate: doc.data().ratingDate,
+        ratingDate: `${doc.data().timestamp.toDate().getDate()}/${doc
+          .data()
+          .timestamp.toDate()
+          .getMonth()}/${doc.data().timestamp.toDate().getFullYear()}`,
       });
     });
 
@@ -174,14 +181,7 @@ export default function ProfileScreen({ navigation, route, props }) {
     try {
       return (
         <View style={styles.avaliacoesArea}>
-          <TouchableOpacity
-            onPress={() =>
-              navigation.navigate("Ratings", {
-                mediaId: `M${details.id}`,
-                title: details.title,
-              })
-            }
-          >
+          <TouchableOpacity onPress={() => navigation.navigate("Ratings")}>
             <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
           </TouchableOpacity>
           <View style={styles.avaliacaoArea}>
@@ -193,7 +193,9 @@ export default function ProfileScreen({ navigation, route, props }) {
                 }}
               />
               <Text style={styles.userName}>{ratings.userName}</Text>
-              <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
+              <Text
+                style={styles.avaliacaoData}
+              >{`${ratings.ratingDate}`}</Text>
             </View>
             <View style={styles.avaliacao}>
               <View
@@ -231,44 +233,6 @@ export default function ProfileScreen({ navigation, route, props }) {
     }
   };
 
-  const tryFavoriteGenres = () => {
-    try {
-      favoriteGenres.map((genre, index) => {
-        return (
-          <TouchableOpacity style={{ alignItems: "center" }} key={index}>
-            <ExpoFastImage
-              source={{
-                uri: `${Constants.URL.IMAGE_URL_W300}${genre.backdrop_path}`,
-              }}
-              style={{
-                width: 100,
-                height: 100,
-                borderRadius: 50,
-                marginHorizontal: 5,
-              }}
-            />
-            <Text
-              style={[
-                styles.itemText,
-                {
-                  fontSize: 14,
-                  marginLeft: 0,
-                  marginBottom: 0,
-                  maxWidth: 100,
-                  textAlign: "center",
-                },
-              ]}
-            >
-              {genre.genreName}
-            </Text>
-          </TouchableOpacity>
-        );
-      });
-    } catch {
-      return null;
-    }
-  };
-
   if (!fontsLoaded) {
     return null;
   } else {
@@ -300,9 +264,9 @@ export default function ProfileScreen({ navigation, route, props }) {
                 style={styles.profileImage}
                 source={{
                   uri:
-                    auth.currentUser.photoURL == null
+                    userInfos.profilePictureURL == null
                       ? "https://pbs.twimg.com/media/Fdnl8v_XoAEazAe?format=jpg&name=large"
-                      : auth.currentUser.photoURL,
+                      : userInfos.profilePictureURL,
                 }}
               />
             </View>
@@ -310,12 +274,22 @@ export default function ProfileScreen({ navigation, route, props }) {
               <Text
                 style={{
                   color: "#FFF",
-                  fontSize: 20,
+                  fontSize: 21,
+                  fontFamily: "Lato-Regular",
+                  marginBottom: 5,
+                }}
+              >
+                {userInfos.name}
+              </Text>
+              <Text
+                style={{
+                  color: "#D3D3D3",
+                  fontSize: 18,
                   fontFamily: "Lato-Regular",
                   marginBottom: 25,
                 }}
               >
-                @{username}
+                @{userInfos.username}
               </Text>
 
               <View style={styles.itemArea}>
@@ -330,7 +304,40 @@ export default function ProfileScreen({ navigation, route, props }) {
                     alignItems="center"
                     showsHorizontalScrollIndicator={false}
                   >
-                    {tryFavoriteGenres()}
+                    {favoriteGenres.map((genre, index) => {
+                      return (
+                        <TouchableOpacity
+                          style={{ alignItems: "center" }}
+                          key={index}
+                        >
+                          <ExpoFastImage
+                            source={{
+                              uri: `${Constants.URL.IMAGE_URL_W300}${genre.backdrop_path}`,
+                            }}
+                            style={{
+                              width: 100,
+                              height: 100,
+                              borderRadius: 50,
+                              marginHorizontal: 5,
+                            }}
+                          />
+                          <Text
+                            style={[
+                              styles.itemText,
+                              {
+                                fontSize: 14,
+                                marginLeft: 0,
+                                marginBottom: 0,
+                                maxWidth: 100,
+                                textAlign: "center",
+                              },
+                            ]}
+                          >
+                            {genre.genreName}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </ScrollView>
                 </View>
               </View>

@@ -144,6 +144,7 @@ export default function Register({ navigation, route, props }) {
           setDoc(doc(usersRef, uid), {
             username: username,
             name: name,
+            profilePictureURL: null,
           }).then(() => {
             updateProfile(userCredential.user, {
               displayName: username}).then(async () => {
