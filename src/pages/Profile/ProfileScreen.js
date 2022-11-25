@@ -117,6 +117,8 @@ export default function ProfileScreen({ navigation, route, props }) {
 
     const querySnapshot = await getDocs(q);
 
+    
+
     setFolders([]);
     querySnapshot.forEach((doc) => {
       setFolders((old) =>

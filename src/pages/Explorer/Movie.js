@@ -388,6 +388,8 @@ export default function Media({ navigation, route }) {
 
     setMediaId(route.params.mediaId);
 
+    console.log(route.params.mediaId);
+
     const reqDetails = await fetch(
       Constants.URL.MOVIE_DETAILS_URL +
         `${mediaId}` +
