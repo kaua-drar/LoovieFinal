@@ -1,8 +1,8 @@
 import ExpoFastImage from "expo-fast-image";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
-import { Entypo, Ionicons } from "@expo/vector-icons";
+import { Entypo } from "@expo/vector-icons";
 import {
   View,
   StyleSheet,
@@ -12,24 +12,10 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
-  Modal,
-  TouchableHighlight,
 } from "react-native";
 import { useFonts } from "expo-font";
-import ImageViewer from "react-native-image-zoom-viewer";
-import { FlatList } from "react-native-gesture-handler";
 
-export default function Feed({ navigation }) {
-  const [isModalVisible, setModalVisible] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [borderRadius, setBorderRadius] = useState(
-    (Dimensions.get("window").width * 15) / 392.72
-  );
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-
+export default function Feed({navigation}) {
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
     "Lato-Bold": require("../../../assets/fonts/Lato-Bold.ttf"),
@@ -55,30 +41,9 @@ export default function Feed({ navigation }) {
     );
   };
 
-  const images = [
-    {
-      id: 1,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-    {
-      id: 2,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-    {
-      id: 3,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-    {
-      id: 4,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-  ];
-
-  const changeActiveIndex = (e) => {};
-
   return (
-    <View style={[styles.container]}>
-      <ScrollView style={[styles.container, {maxHeight: Dimensions.get("window").height}]} alignItems="center">
+    <View style={[styles.container, { padding: 0 }]}>
+      <ScrollView style={styles.container} alignItems="center">
         {/*
     <>
     <Text style={styleSheet.text}>
@@ -96,7 +61,7 @@ export default function Feed({ navigation }) {
     </>
      */}
 
-        <View>
+        <TouchableOpacity>
           <View style={styles.postHeader}>
             <TouchableOpacity style={{ marginRight: 8 }}>
               <ExpoFastImage
@@ -175,138 +140,39 @@ export default function Feed({ navigation }) {
             cena desse filme é realmente incrivel!essa cena desse filme é
             realmente incrivel!
           </Text>
-          <FlatList
-            data={images}
-            style={styles.imageCarousel}
-            pagingEnabled
-            horizontal
-            onMomentumScrollEnd={(e) => {
-              setActiveIndex(
-                Math.round(
-                  e.nativeEvent.contentOffset.x /
-                    ((Dimensions.get("window").width * 340) / 392.72)
-                )
-              );
-            }}
-            scrollEventThrottle={16}
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => String(item?.id)}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => toggleModal()}>
-                <ExpoFastImage
-                  source={{
-                    uri: item.url,
-                  }}
-                  style={styles.postMedia}
-                />
-              </TouchableOpacity>
-            )}
-          />
-          <View style={styles.dotsContainer}>
-            {images.map((_, i) => (
-              <View
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor: i === activeIndex ? "#9D0208" : "#76767F",
-                  },
-                ]}
-                key={i}
-              />
-            ))}
-          </View>
-          {/*<TouchableOpacity onPress={() => toggleModal()}>
+          <TouchableOpacity>
             <ExpoFastImage
               source={{
                 uri: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
               }}
               style={styles.postMedia}
             />
-            </TouchableOpacity>*/}
+          </TouchableOpacity>
 
           <View style={styles.postOptions}>
             <TouchableOpacity>
               <AntDesign name="hearto" size={22} color="#FFF" />
             </TouchableOpacity>
             <Text style={styles.postNumbers}>500</Text>
-            <TouchableOpacity style={{ marginLeft: 15 }}>
+            <TouchableOpacity style={{marginLeft: 15}}>
               <FontAwesome5 name="comment" size={22} color="#FFF" />
             </TouchableOpacity>
             <Text style={styles.postNumbers}>40</Text>
           </View>
-        </View>
-
-        <Modal visible={isModalVisible} transparent={isModalVisible}>
-          <TouchableOpacity
-            style={styles.imageButtons}
-            onPress={() => toggleModal()}
-          >
-            <Ionicons name="arrow-back" size={30} color="#FFF" />
-          </TouchableOpacity>
-
-          <ImageViewer
-            imageUrls={images}
-            renderIndicator={() => null}
-            enableSwipeDown={true}
-            onSwipeDown={toggleModal}
-          />
-        </Modal>
-        <TouchableOpacity
-        style={styles.newButtonArea}
-        onPress={() => navigation.navigate("Post")}
-      >
+        </TouchableOpacity>
+      </ScrollView>
+      <TouchableOpacity style={styles.newButtonArea} onPress={() => navigation.navigate("Post")}>
         <Text style={styles.newButtonText}>+</Text>
       </TouchableOpacity>
-      </ScrollView>
-      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  imageCarousel: {
-    maxHeight: (Dimensions.get("window").width * 340) / 392.72,
-    width: (Dimensions.get("window").width * 340) / 392.72,
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  dotsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 1,
-  },
-  images: {
-    width: (Dimensions.get("window").width * 340) / 392.72,
-    height: (Dimensions.get("window").width * 253.3) / 392.72,
-  },
-  imageButtons: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    zIndex: 1000000,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  imageViewer: {
-    flex: 1,
-    backgroundColor: "#000",
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
   newButtonArea: {
     position: "absolute",
-    right: (Dimensions.get("window").width * 0) / 392.72,
-    bottom: (Dimensions.get("window").width * -20) / 392.72,
+    right: (Dimensions.get("window").width * 30) / 392.72,
+    bottom: (Dimensions.get("window").width * 30) / 392.72,
     width: (Dimensions.get("window").width * 60) / 392.72,
     height: (Dimensions.get("window").width * 60) / 392.72,
     borderRadius: (Dimensions.get("window").width * 30) / 392.72,
@@ -321,6 +187,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    padding: 10,
     backgroundColor: "#0F0C0C",
   },
   postHeader: {
@@ -385,21 +252,23 @@ const styles = StyleSheet.create({
     height: (Dimensions.get("window").width * 65) / 392.72,
     borderRadius: (Dimensions.get("window").width * 32.5) / 392.72,
     borderWidth: 3,
-    borderColor: "#76767F",
+    borderColor: "#9D0208",
   },
   postMedia: {
+    marginVertical: 10,
     width: (Dimensions.get("window").width * 340) / 392.72,
     height: (Dimensions.get("window").width * 253.3) / 392.72,
+    borderRadius: (Dimensions.get("window").width * 15) / 392.72,
   },
   postOptions: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "center"
   },
   postNumbers: {
     fontFamily: "Lato-Regular",
     fontSize: (Dimensions.get("window").width * 15) / 392.72,
     color: "#474747",
-    marginLeft: 5,
+    marginLeft: 5
   },
   text: {
     fontSize: 28,

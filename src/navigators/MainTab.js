@@ -1,5 +1,6 @@
 import React, { useCallback } from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Entypo } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
@@ -10,7 +11,7 @@ import { HomeStack, ExplorerStack, ForYouStack, EmCartazStack, ProfileStack } fr
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { ActivityIndicator, View, StyleSheet, Text } from "react-native";
 
-const Tab = createMaterialTopTabNavigator();
+const Tab = createBottomTabNavigator();
 
 
 export default function MainTab({ route }) {
@@ -36,6 +37,10 @@ export default function MainTab({ route }) {
         initialRouteName="HomeTab"
         screenOptions={({ route }) => ({
           swipeEnabled: isTabBarVisible(route),
+          unmountOnBlur: true,
+          tabBarStyle: {
+            height: 300
+          },
           tabBarOptions: {
             showIcon: true,
             showLabel: false,
@@ -53,21 +58,23 @@ export default function MainTab({ route }) {
           tabBarIcon: ({ focused, color, size }) => {
             let colorCode;
             colorCode = focused ? "#9D0208" : "#FFF";
+            let borderWidth;
+            borderWidth = focused ? 4 : 0;
             if (route.name === "HomeTab") {
               return (
-                <TouchableOpacity>
+                <TouchableOpacity style={[styles.icons, {borderBottomWidth: borderWidth}]}>
                   <Entypo name="home" size={40} color={colorCode} />
                 </TouchableOpacity>
               );
             } else if (route.name === "ExplorerTab") {
               return (
-                <TouchableOpacity>
+                <TouchableOpacity style={[styles.icons, {borderBottomWidth: borderWidth}]}>
                   <FontAwesome name="search" size={40} color={colorCode} />
                 </TouchableOpacity>
               );
             } else if (route.name === "ForYouTab") {
               return (
-                <TouchableOpacity>
+                <TouchableOpacity style={[styles.icons, {borderBottomWidth: borderWidth}]}>
                   <LoovieLogo
                     width={45}
                     height={45}
@@ -77,13 +84,13 @@ export default function MainTab({ route }) {
               );
             } else if (route.name === "CinemaTab") {
               return (
-                <TouchableOpacity>
+                <TouchableOpacity style={[styles.icons, {borderBottomWidth: borderWidth}]}>
                   <Entypo name="ticket" size={40} color={colorCode} />
                 </TouchableOpacity>
               );
             } else if (route.name === "ProfileTab") {
               return (
-                <TouchableOpacity>
+                <TouchableOpacity style={[styles.icons, {borderBottomWidth: borderWidth}]}>
                   <FontAwesome name="user" size={40} color={colorCode} />
                 </TouchableOpacity>
               );
@@ -94,8 +101,10 @@ export default function MainTab({ route }) {
 
           tabBarStyle: {
             backgroundColor: "#0F0C0C",
-            borderColor: "#292929",
-            borderTopWidth: 1,
+            height: 100,
+            borderTopWidth: 2,
+            borderTopColor: "#292929",
+            position: "absolute"
           },
           tabBarLabelStyle: {
             display: "none",
@@ -134,4 +143,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#0F0C0C',
     paddingTop: 95
   },
+  icons: {
+    borderBottomWidth: 4, 
+    paddingBottom: 6, 
+    paddingTop: 10, 
+    paddingHorizontal: 5, 
+    borderColor: "#9D0208",
+    justifyContent: "center",
+    alignItems: "center"
+  }
 })

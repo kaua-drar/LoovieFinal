@@ -28,6 +28,7 @@ import Multisearch from "../pages/Explorer/Multisearch";
 import Ratings from "../pages/Explorer/Ratings";
 
 import Feed from "../pages/Home/Feed";
+import Post from "../pages/Home/Post";
 
 import Recomendations from "../pages/ForYou/Recomendations";
 
@@ -67,7 +68,7 @@ export function HomeStack() {
           headerShown: route.name === "SearchFilter" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 75,
+            height: 100,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {
@@ -133,12 +134,10 @@ export function HomeStack() {
               style={{ padding: 0, marginRight: 22.5 }}
             />
           ),
-          gestureEnabled: true,
-          gestureDirection: "horizontal",
-          ...TransitionPresets.ModalPresentationIOS,
         })}
       >
         <Stack.Screen name="Feed" component={Feed} />
+        <Stack.Screen name="Post" component={Post} />
       </Stack.Navigator>
     );
   }
@@ -163,7 +162,7 @@ export function ExplorerStack() {
           headerShown: route.name === "SearchFilter" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 75,
+            height: 100,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {
@@ -356,7 +355,7 @@ export function ForYouStack() {
           headerShown: route.name === "SearchFilter" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 75,
+            height: 100,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {
@@ -452,7 +451,7 @@ export function EmCartazStack() {
           headerShown: route.name === "SearchFilter" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 75,
+            height: 100,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {
@@ -624,7 +623,7 @@ export function ProfileStack() {
           headerShown: route.name === "ProfileScreen" ? false : true,
           headerStyle: {
             backgroundColor: "#9D0208",
-            height: 75,
+            height: 100,
           },
           headerTintColor: "#fff",
           headerTitleStyle: {
