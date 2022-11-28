@@ -32,7 +32,7 @@ import {
   where,
   getDoc,
   limit,
-  serverTimestamp
+  serverTimestamp,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";

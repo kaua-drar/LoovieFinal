@@ -38,9 +38,6 @@ export default function MainTab({ route }) {
         screenOptions={({ route }) => ({
           swipeEnabled: isTabBarVisible(route),
           unmountOnBlur: true,
-          tabBarStyle: {
-            height: 300
-          },
           tabBarOptions: {
             showIcon: true,
             showLabel: false,

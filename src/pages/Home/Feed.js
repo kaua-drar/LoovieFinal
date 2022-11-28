@@ -1,5 +1,6 @@
 import ExpoFastImage from "expo-fast-image";
-import { useState } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo, Ionicons } from "@expo/vector-icons";
@@ -14,17 +15,88 @@ import {
   ScrollView,
   Modal,
   TouchableHighlight,
+  ActivityIndicator,
+  RefreshControl,
+  FlatList,
 } from "react-native";
 import { useFonts } from "expo-font";
 import ImageViewer from "react-native-image-zoom-viewer";
-import { FlatList } from "react-native-gesture-handler";
+import {
+  query,
+  collection,
+  getDocs,
+  getFirestore,
+  setDoc,
+  doc,
+  updateDoc,
+  where,
+  getDoc,
+  limit,
+  serverTimestamp,
+} from "firebase/firestore";
+import { initializeApp } from "firebase/app";
+import { firebaseConfig } from "../../../firebase-config";
+import { getAuth } from "firebase/auth";
+import { SwiperFlatList } from "react-native-swiper-flatlist";
+import { Video, AVPlaybackStatus } from "expo-av";
 
 export default function Feed({ navigation }) {
-  const [isModalVisible, setModalVisible] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [borderRadius, setBorderRadius] = useState(
-    (Dimensions.get("window").width * 15) / 392.72
-  );
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [images, setImages] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [status, setStatus] = React.useState({});
+  const [imageOpen, setImageOpen] = useState("");
+  const [position, setPosition] = useState(0);
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  const requests = async () => {
+    setLoading(true);
+    setRefreshing(true);
+
+    const citiesRef = collection(db, "posts");
+
+    const q = query(
+      citiesRef,
+      where("postTags", "array-contains-any", ["BATMAN"])
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    setPosts([]);
+    querySnapshot.forEach((doc) => {
+      setPosts((old) => [
+        ...old,
+        {
+          postId: doc.id,
+          userId: doc.data().userId,
+          userName: doc.data().userName,
+          userProfilePictureURL: doc.data().userProfilePictureURL,
+          postDate: `${doc.data().postDate.toDate().getDate()}/${doc
+            .data()
+            .postDate.toDate()
+            .getMonth()}/${doc.data().postDate.toDate().getFullYear()}`,
+          postDescription: doc.data().postDescription,
+          postMedias: doc.data().postMedias,
+          postMediaType: doc.data().postMediaType,
+          postTags: doc.data().postTags,
+          totalLikes: doc.data().totalLikes,
+          totalComments: doc.data().totalComments,
+        },
+      ]);
+    });
+
+    setLoading(false);
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    requests();
+  }, []);
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -55,31 +127,176 @@ export default function Feed({ navigation }) {
     );
   };
 
-  const images = [
-    {
-      id: 1,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-    {
-      id: 2,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-    {
-      id: 3,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-    {
-      id: 4,
-      url: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-    },
-  ];
+  const openImage = (i, index) => {
+    setImages([]);
+    posts[i].postMedias.map((v) => {
+      setImages((old) => [
+        ...old,
+        {
+          url: v,
+        },
+      ]);
+    });
+    setPosition(index);
 
-  const changeActiveIndex = (e) => {};
+    console.log("INDEEEEEEEEEEEEEEEEXXXXXXXX: ", index);
+
+    toggleModal();
+  };
 
   return (
-    <View style={[styles.container]}>
-      <ScrollView style={[styles.container, {maxHeight: Dimensions.get("window").height}]} alignItems="center">
-        {/*
+    <View style={[styles.container, { paddingBottom: 20 }]}>
+      {loading && (
+        <View style={styles.loadingArea}>
+          <ActivityIndicator size="large" color="#FFF" />
+          <Text style={styles.loadingText}>Carregando...</Text>
+        </View>
+      )}
+      {!loading && (
+        <View>
+          <TouchableOpacity
+            style={styles.newButtonArea}
+            onPress={() => navigation.navigate("Post")}
+          >
+            <Text style={styles.newButtonText}>+</Text>
+          </TouchableOpacity>
+          <FlatList
+            alignItems="center"
+            data={posts}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={requests} />
+            }
+            ListHeaderComponentStyle={{ marginTop: 25 }}
+            ListHeaderComponent={<View></View>}
+            ListFooterComponentStyle={{ marginBottom: 200 }}
+            ListFooterComponent={<View></View>}
+            renderItem={({ item, index }) => {
+              return (
+                <View
+                  style={{
+                    marginBottom: 50,
+                    width: (Dimensions.get("window").width * 340) / 392.72,
+                  }}
+                >
+                  <View style={styles.postHeader}>
+                    <TouchableOpacity style={{ marginRight: 8 }}>
+                      <ExpoFastImage
+                        source={{
+                          uri: "https://static.wikia.nocookie.net/shingekinokyojin/images/b/b1/Levi_Ackermann_%28Anime%29_character_image.png/revision/latest?cb=20220227211605",
+                        }}
+                        style={styles.userPicture}
+                      />
+                    </TouchableOpacity>
+                    <View style={styles.postTexts}>
+                      <View style={styles.postInfos}>
+                        <Text
+                          style={styles.userName}
+                          onPress={() => console.log(data)}
+                        >
+                          {item.userName}
+                        </Text>
+                        <Text style={styles.postDate}>10 min</Text>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: "row",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <TouchableOpacity>
+                            <Entypo
+                              name="dots-three-horizontal"
+                              size={22}
+                              color="#474747"
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                      <FlatList
+                        horizontal
+                        data={item.postTags}
+                        renderItem={({ item }) => (
+                          <TouchableOpacity
+                            style={[
+                              styles.chipArea,
+                              { flexDirection: "row", alignItems: "flex-end" },
+                            ]}
+                          >
+                            <Text style={[styles.chipText, { color: "#FFF" }]}>
+                              {item}
+                            </Text>
+                          </TouchableOpacity>
+                        )}
+                        keyExtractor={(_, i) => i}
+                      />
+                    </View>
+                  </View>
+                  <TouchableOpacity>
+                    <Text style={styles.postDescription}>
+                      {item.postDescription}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {item.postMediaType === "image" ? (
+                    <SwiperFlatList
+                      onPressIn={() => console.log("clicou no flatlist")}
+                      autoplayDelay={2}
+                      showPagination
+                      data={item.postMedias}
+                      paginationStyleItem={{
+                        width: 8,
+                        height: 8,
+                        marginHorizontal: 4,
+                      }}
+                      paginationDefaultColor="#76767F"
+                      paginationActiveColor="#9D0208"
+                      style={styles.imageCarousel}
+                      renderItem={({ item, index, i = index }) => {
+                        return (
+                          <ExpoFastImage
+                            source={{
+                              uri: item,
+                            }}
+                            style={styles.postMedia}
+                          />
+                        );
+                      }}
+                      keyExtractor={(_, index) => index}
+                    />
+                  ) : item.postMediaType === "video" ? (
+                    <Video
+                      style={styles.postMedia}
+                      source={{
+                        uri: item.postMedias[0],
+                      }}
+                      useNativeControls
+                      volume={1.0}
+                      resizeMode="contain"
+                      isLooping
+                      onPlaybackStatusUpdate={(status) =>
+                        setStatus(() => status)
+                      }
+                    />
+                  ) : null}
+
+                  <View style={styles.postOptions}>
+                    <TouchableOpacity>
+                      <AntDesign name="hearto" size={22} color="#FFF" />
+                    </TouchableOpacity>
+                    <Text style={styles.postNumbers}>{item.totalLikes}</Text>
+                    <TouchableOpacity style={{ marginLeft: 15 }}>
+                      <FontAwesome5 name="comment" size={22} color="#FFF" />
+                    </TouchableOpacity>
+                    <Text style={styles.postNumbers}>{item.totalComments}</Text>
+                  </View>
+                </View>
+              );
+            }}
+            keyExtractor={(item) => item.postId}
+          />
+        </View>
+      )}
+      {/*
     <>
     <Text style={styleSheet.text}>
         Example of getSize on Image in React Native
@@ -96,174 +313,59 @@ export default function Feed({ navigation }) {
     </>
      */}
 
-        <View>
-          <View style={styles.postHeader}>
-            <TouchableOpacity style={{ marginRight: 8 }}>
-              <ExpoFastImage
-                source={{
-                  uri: "https://static.wikia.nocookie.net/shingekinokyojin/images/b/b1/Levi_Ackermann_%28Anime%29_character_image.png/revision/latest?cb=20220227211605",
-                }}
-                style={styles.userPicture}
-              />
-            </TouchableOpacity>
-            <View style={styles.postTexts}>
-              <View style={styles.postInfos}>
-                <Text style={styles.userName}>@Drar</Text>
-                <Text style={styles.postDate}>10 min</Text>
-                <View
-                  style={{
-                    flex: 1,
-                    flexDirection: "row",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <TouchableOpacity>
-                    <Entypo
-                      name="dots-three-horizontal"
-                      size={22}
-                      color="#474747"
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-              <ScrollView horizontal={true} justifyContent="flex-start">
-                <TouchableOpacity
-                  style={[
-                    styles.chipArea,
-                    { flexDirection: "row", alignItems: "flex-end" },
-                  ]}
-                >
-                  <Text style={[styles.chipText, { color: "#FFF" }]}>
-                    Batman
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.chipArea,
-                    { flexDirection: "row", alignItems: "flex-end" },
-                  ]}
-                >
-                  <Text style={[styles.chipText, { color: "#FFF" }]}>
-                    Bruce Wayne
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.chipArea,
-                    {
-                      flexDirection: "row",
-                      alignItems: "flex-end",
-                      backgroundColor: "#76767F",
-                    },
-                  ]}
-                >
-                  <Text style={[styles.chipText, { color: "#FFF" }]}>
-                    Ver mais
-                  </Text>
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>4</Text>
-                  </View>
-                </TouchableOpacity>
-              </ScrollView>
-            </View>
-          </View>
-          <Text style={styles.postDescription}>
-            essa cena desse filme é realmente incrivel!essa cena desse filme é
-            realmente incrivel!essa cena desse filme é realmente incrivel!essa
-            cena desse filme é realmente incrivel!essa cena desse filme é
-            realmente incrivel!essa cena desse filme é realmente incrivel!essa
-            cena desse filme é realmente incrivel!essa cena desse filme é
-            realmente incrivel!
-          </Text>
-          <FlatList
-            data={images}
-            style={styles.imageCarousel}
-            pagingEnabled
-            horizontal
-            onMomentumScrollEnd={(e) => {
-              setActiveIndex(
-                Math.round(
-                  e.nativeEvent.contentOffset.x /
-                    ((Dimensions.get("window").width * 340) / 392.72)
-                )
-              );
-            }}
-            scrollEventThrottle={16}
-            showsHorizontalScrollIndicator={false}
-            keyExtractor={(item) => String(item?.id)}
-            renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => toggleModal()}>
-                <ExpoFastImage
-                  source={{
-                    uri: item.url,
-                  }}
-                  style={styles.postMedia}
-                />
-              </TouchableOpacity>
-            )}
-          />
-          <View style={styles.dotsContainer}>
-            {images.map((_, i) => (
-              <View
-                style={[
-                  styles.dot,
-                  {
-                    backgroundColor: i === activeIndex ? "#9D0208" : "#76767F",
-                  },
-                ]}
-                key={i}
-              />
-            ))}
-          </View>
-          {/*<TouchableOpacity onPress={() => toggleModal()}>
-            <ExpoFastImage
-              source={{
-                uri: "https://pm1.narvii.com/6704/42eda7be653b6818be6bf1be390b8c3845a1a6e7_hq.jpg",
-              }}
-              style={styles.postMedia}
-            />
-            </TouchableOpacity>*/}
-
-          <View style={styles.postOptions}>
-            <TouchableOpacity>
-              <AntDesign name="hearto" size={22} color="#FFF" />
-            </TouchableOpacity>
-            <Text style={styles.postNumbers}>500</Text>
-            <TouchableOpacity style={{ marginLeft: 15 }}>
-              <FontAwesome5 name="comment" size={22} color="#FFF" />
-            </TouchableOpacity>
-            <Text style={styles.postNumbers}>40</Text>
-          </View>
-        </View>
-
-        <Modal visible={isModalVisible} transparent={isModalVisible}>
-          <TouchableOpacity
-            style={styles.imageButtons}
-            onPress={() => toggleModal()}
-          >
-            <Ionicons name="arrow-back" size={30} color="#FFF" />
-          </TouchableOpacity>
-
-          <ImageViewer
-            imageUrls={images}
-            renderIndicator={() => null}
-            enableSwipeDown={true}
-            onSwipeDown={toggleModal}
-          />
-        </Modal>
+      {/*<Modal visible={isModalVisible} transparent={isModalVisible}>
         <TouchableOpacity
-        style={styles.newButtonArea}
-        onPress={() => navigation.navigate("Post")}
-      >
-        <Text style={styles.newButtonText}>+</Text>
-      </TouchableOpacity>
-      </ScrollView>
-      
+          style={styles.imageButtons}
+          onPress={() => toggleModal()}
+        >
+          <Ionicons name="arrow-back" size={30} color="#FFF" />
+        </TouchableOpacity>
+
+        <ImageViewer
+          imageUrls={images}
+          index={position}
+          renderIndicator={() => null}
+          enableSwipeDown={true}
+          onSwipeDown={toggleModal}
+        />
+    </Modal>*/}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  newButtonArea: {
+    position: "absolute",
+    right: (Dimensions.get("window").width * 30) / 392.72,
+    bottom: (Dimensions.get("window").width * 100) / 392.72,
+    width: (Dimensions.get("window").width * 60) / 392.72,
+    height: (Dimensions.get("window").width * 60) / 392.72,
+    borderRadius: (Dimensions.get("window").width * 30) / 392.72,
+    backgroundColor: "#9D0208",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 5000,
+  },
+  newButtonText: {
+    fontSize: (Dimensions.get("window").width * 50) / 392.72,
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+  },
+  video: {
+    alignSelf: "center",
+    width: 320,
+    height: 200,
+  },
+  loadingArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: Dimensions.get("window").height,
+  },
+  loadingText: {
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
+  },
   imageCarousel: {
     maxHeight: (Dimensions.get("window").width * 340) / 392.72,
     width: (Dimensions.get("window").width * 340) / 392.72,
@@ -302,22 +404,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
-  },
-  newButtonArea: {
-    position: "absolute",
-    right: (Dimensions.get("window").width * 0) / 392.72,
-    bottom: (Dimensions.get("window").width * -20) / 392.72,
-    width: (Dimensions.get("window").width * 60) / 392.72,
-    height: (Dimensions.get("window").width * 60) / 392.72,
-    borderRadius: (Dimensions.get("window").width * 30) / 392.72,
-    backgroundColor: "#9D0208",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  newButtonText: {
-    fontSize: (Dimensions.get("window").width * 50) / 392.72,
-    fontFamily: "Lato-Regular",
-    color: "#FFF",
   },
   container: {
     flex: 1,
@@ -390,8 +476,11 @@ const styles = StyleSheet.create({
   postMedia: {
     width: (Dimensions.get("window").width * 340) / 392.72,
     height: (Dimensions.get("window").width * 253.3) / 392.72,
+    alignSelf: "center",
+    marginTop: 10,
   },
   postOptions: {
+    marginTop: 20,
     flexDirection: "row",
     alignItems: "center",
   },

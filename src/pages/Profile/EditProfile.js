@@ -93,7 +93,7 @@ export default function EditProfile({ navigation, route, props }) {
       );
       setTimeout(()=>{
         navigation.navigate("ProfileScreen")
-      }, 2000);
+      }, 3000);
     } else if (
       (username.length < 4 || username.length > 20) &&
       regexUser.test(username) == false
@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingBottom: "4%",
+    paddingBottom: "15%",
   },
   changesArea: {
     marginTop: 20,

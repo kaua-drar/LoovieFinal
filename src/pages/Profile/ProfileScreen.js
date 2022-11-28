@@ -88,7 +88,7 @@ export default function ProfileScreen({ navigation, route, props }) {
       setUserInfos({
         username: data.username,
         name: data.name,
-        profilePictureURL: null,
+        profilePictureURL: data.profilePictureURL,
       });
     } else {
       // doc.data() will be undefined in this case
