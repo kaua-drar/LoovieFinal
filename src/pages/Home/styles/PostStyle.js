@@ -1,0 +1,173 @@
+import { StyleSheet, Dimensions } from "react-native";
+
+const styles = StyleSheet.create({
+  closeButton: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#292929",
+    borderWidth: 2,
+    borderColor: "#FFF",
+  },
+  imageCarousel: {
+    maxHeight: (Dimensions.get("window").width * 223.5) / 392.72,
+    width: (Dimensions.get("window").width * 300) / 392.72,
+    marginTop: 10,
+    alignSelf: "center",
+    marginBottom: (Dimensions.get("window").width * 20) / 392.72,
+  },
+  postMedia: {
+    width: (Dimensions.get("window").width * 300) / 392.72,
+    height: (Dimensions.get("window").width * 223.5) / 392.72,
+    alignSelf: "center",
+  },
+  errorMessage: {
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
+    fontSize: (Dimensions.get("window").width * 17) / 392.72,
+    textAlign: "center",
+    marginBottom: (Dimensions.get("window").width * 35) / 392.72,
+  },
+  closeModal: {
+    height: (Dimensions.get("window").width * 60) / 392.72,
+    width: (Dimensions.get("window").width * 120) / 392.72,
+    backgroundColor: "#FFF",
+    borderColor: "#0F0C0C",
+    borderWidth: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 15,
+    marginBottom: (Dimensions.get("window").width * 10) / 392.72,
+  },
+  closeModalText: {
+    color: "#0F0C0C",
+    fontSize: 20,
+    fontFamily: "Lato-Bold",
+  },
+  modalArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    width: Dimensions.get("window").width,
+    height: Dimensions.get("window").height,
+  },
+  modalContent: {
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    height: (Dimensions.get("window").width * 250) / 392.72,
+    width: (Dimensions.get("window").width * 250) / 392.72,
+    backgroundColor: "#292929",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingTop: 15,
+  },
+  notice: {
+    fontFamily: "Lato-Regular",
+    fontSize: (Dimensions.get("window").width * 14) / 392.72,
+    color: "#474747",
+    marginTop: 5,
+  },
+  textLength: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    fontSize: (Dimensions.get("window").width * 15) / 392.72,
+    marginBottom: 5,
+  },
+  input: {
+    fontStyle: "Lato-Regular",
+    fontSize: (Dimensions.get("window").width * 16) / 392.72,
+    color: "#FFF",
+    alignItems: "flex-start",
+    minHeight: (Dimensions.get("window").width * 40) / 392.72,
+    flex: 1,
+  },
+  footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  inputArea: {
+    flex: 1,
+    justifyContent: "space-between",
+    paddingTop: (Dimensions.get("window").width * 8) / 392.72,
+    paddingBottom: 0,
+  },
+  tagButtonText: {
+    fontFamily: "Lato-Regular",
+    color: "#FFF",
+    fontSize: (Dimensions.get("window").width * 16) / 392.72,
+    height: (Dimensions.get("window").width * 20) / 392.72,
+  },
+  tagButton: {
+    padding: (Dimensions.get("window").width * 7) / 392.72,
+    backgroundColor: "#9D0208",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderRadius: (Dimensions.get("window").width * 8) / 392.72,
+    marginHorizontal: (Dimensions.get("window").width * 3) / 392.72,
+  },
+  tagsArea: {
+    flexDirection: "row",
+    width: (Dimensions.get("window").width * 270) / 392.72,
+  },
+  userPhoto: {
+    width: (Dimensions.get("window").width * 75) / 392.72,
+    height: (Dimensions.get("window").width * 75) / 392.72,
+    borderRadius: (Dimensions.get("window").width * 37.5) / 392.72,
+  },
+  name: {
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
+    fontSize: (Dimensions.get("window").width * 18) / 392.72,
+    marginLeft: (Dimensions.get("window").width * 3) / 392.72,
+    marginBottom: (Dimensions.get("window").width * 3) / 392.72,
+  },
+  postInfos: {
+    marginLeft: (Dimensions.get("window").width * 8) / 392.72,
+  },
+  postInfo: {
+    flexDirection: "row",
+  },
+  loadingArea: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    height: Dimensions.get("window").height,
+  },
+  loadingText: {
+    color: "#FFF",
+    fontFamily: "Lato-Regular",
+  },
+  buttonText: {
+    fontFamily: "Lato-Bold",
+    color: "#FFF",
+    fontSize: (Dimensions.get("window").width * 18) / 392.72,
+  },
+  button: {
+    padding: (Dimensions.get("window").width * 10) / 392.72,
+    backgroundColor: "#9D0208",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: (Dimensions.get("window").width * 12) / 392.72,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: (Dimensions.get("window").width * 10) / 392.72,
+  },
+  content: {
+    flex: 1,
+    padding: (Dimensions.get("window").width * 20) / 392.72,
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#0F0C0C",
+  },
+});
+
+export default styles;

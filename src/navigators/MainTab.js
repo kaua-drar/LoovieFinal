@@ -36,6 +36,7 @@ export default function MainTab({ route }) {
         tabBarPosition="bottom"
         initialRouteName="HomeTab"
         screenOptions={({ route }) => ({
+          tabBarHideOnKeyboard: true,
           swipeEnabled: isTabBarVisible(route),
           unmountOnBlur: true,
           tabBarOptions: {
@@ -101,7 +102,6 @@ export default function MainTab({ route }) {
             height: 100,
             borderTopWidth: 2,
             borderTopColor: "#292929",
-            position: "absolute"
           },
           tabBarLabelStyle: {
             display: "none",

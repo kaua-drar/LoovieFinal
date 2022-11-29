@@ -137,7 +137,9 @@ export function HomeStack() {
         })}
       >
         <Stack.Screen name="Feed" component={Feed} />
-        <Stack.Screen name="Post" component={Post} />
+        <Stack.Screen name="Post" component={Post} options={({ route }) => ({
+          headerShown: false,
+        })}/>
       </Stack.Navigator>
     );
   }

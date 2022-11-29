@@ -145,7 +145,7 @@ export default function Feed({ navigation }) {
   };
 
   return (
-    <View style={[styles.container, { paddingBottom: 20 }]}>
+    <View style={styles.container}>
       {loading && (
         <View style={styles.loadingArea}>
           <ActivityIndicator size="large" color="#FFF" />
@@ -168,8 +168,6 @@ export default function Feed({ navigation }) {
             }
             ListHeaderComponentStyle={{ marginTop: 25 }}
             ListHeaderComponent={<View></View>}
-            ListFooterComponentStyle={{ marginBottom: 200 }}
-            ListFooterComponent={<View></View>}
             renderItem={({ item, index }) => {
               return (
                 <View
@@ -337,7 +335,7 @@ const styles = StyleSheet.create({
   newButtonArea: {
     position: "absolute",
     right: (Dimensions.get("window").width * 30) / 392.72,
-    bottom: (Dimensions.get("window").width * 100) / 392.72,
+    bottom: (Dimensions.get("window").width * 30) / 392.72,
     width: (Dimensions.get("window").width * 60) / 392.72,
     height: (Dimensions.get("window").width * 60) / 392.72,
     borderRadius: (Dimensions.get("window").width * 30) / 392.72,

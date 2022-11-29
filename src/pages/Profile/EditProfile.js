@@ -48,7 +48,6 @@ export default function EditProfile({ navigation, route, props }) {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
   const [uploading, setUploading] = useState(false)
 
