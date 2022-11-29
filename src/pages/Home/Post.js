@@ -46,6 +46,8 @@ import {
   getDoc,
   limit,
   serverTimestamp,
+  addDoc,
+  orderBy
 } from "firebase/firestore";
 import styles from "./styles/PostStyle";
 import { AntDesign } from "@expo/vector-icons";
@@ -65,6 +67,7 @@ export default function Post({ navigation }) {
   const [description, setDescription] = useState("");
   const [medias, setMedias] = useState([]);
   const [mediaComponent, setMediaComponent] = useState("");
+  const [isInfoModalVisible, setInfoModalVisible] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
   const [isVideoPicked, setIsVideoPicked] = useState(false);
   const [isImagePicked, setIsImagePicked] = useState(false);
@@ -74,6 +77,11 @@ export default function Post({ navigation }) {
   const auth = getAuth(app);
   const db = getFirestore(app);
   const storage = getStorage(app);
+
+  const toggleInfoModal = (text) => {
+    setMessage(text);
+    setInfoModalVisible(!isInfoModalVisible);
+  };
 
   const toggleModal = (text) => {
     setMessage(text);
@@ -115,7 +123,7 @@ export default function Post({ navigation }) {
     let newMedias = [...medias];
     newMedias = newMedias.filter((item, i) => i != index);
     setMedias(newMedias);
-    refFlatList.current.scrollToIndex({index: 0});
+    refFlatList.current.scrollToIndex({ index: 0 });
   };
 
   const [fontsLoaded] = useFonts({
@@ -196,11 +204,38 @@ export default function Post({ navigation }) {
       postDate: serverTimestamp(),
       postDescription: description,
       totalComments: 0,
-      totalLikes: 0
+      totalLikes: 0,
     }).then(() => {
       console.log("funfou");
       requests();
     });
+  };
+  
+  const sla = async () => {
+    const Ref = collection(db, 'userPreferences');
+
+    /*setDoc(doc(collection(Ref, auth.currentUser.uid, 'favoriteTags'), 'teste5'), {
+      tagName: 'GREEN LANTERN',
+      likeCount: 4
+  }).then(()=>{
+    console.log("foi")
+  }).catch((e)=> {
+    console.log(e.code, ": ", e.message)
+  })*/
+
+  const q = query(
+    collection(Ref, auth.currentUser.uid, 'favoriteTags'),
+    orderBy("likeCount", "desc"),
+    limit(2)
+  );
+
+    await getDocs(q).then((e)=>{
+      e.forEach((doc)=>{
+        console.log(doc.data())
+      })
+  }).catch((e)=> {
+    console.log(e.code, ": ", e.message)
+  })
   }
 
   return (
@@ -223,7 +258,14 @@ export default function Post({ navigation }) {
             >
               <Text style={styles.buttonText}>Cancelar</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={() => tags.length < 1 ? toggleModal("Adicione pelo menos 1 tag.") : submit()}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() =>
+                tags.length < 1
+                  ? toggleInfoModal("Adicione pelo menos 1 tag.")
+                  : submit()
+              }
+            >
               <Text style={styles.buttonText}>Publicar</Text>
             </TouchableOpacity>
           </View>
@@ -233,14 +275,26 @@ export default function Post({ navigation }) {
               style={styles.userPhoto}
             />
             <View style={styles.postInfos}>
-              <Text style={styles.name}>{userInfos.name}</Text>
+              <TouchableOpacity onPress={() => sla()}>
+                <Text style={styles.name}>{userInfos.name}</Text>
+              </TouchableOpacity>
               <View style={styles.tagsArea}>
                 <TouchableOpacity
                   style={[
                     styles.tagButton,
-                    { display: isTagging ? "none" : "flex", marginRight: (Dimensions.get("window").width * 10) / 392.72 },
+                    {
+                      display: isTagging ? "none" : "flex",
+                      marginRight:
+                        (Dimensions.get("window").width * 10) / 392.72,
+                    },
                   ]}
-                  onPress={() => tags.length >= 10 ? toggleModal("Você já adicionou 10 tags, remova alguma tag para poder adicionar uma nova.") : doTag()}
+                  onPress={() =>
+                    tags.length >= 10
+                      ? toggleInfoModal(
+                          "Você já adicionou 10 tags, remova alguma tag para poder adicionar uma nova."
+                        )
+                      : toggleModal()
+                  }
                 >
                   <AntDesign
                     name={"plus"}
@@ -253,7 +307,11 @@ export default function Post({ navigation }) {
                 <TouchableOpacity
                   style={[
                     styles.tagButton,
-                    { display: isTagging ? "flex" : "none", marginRight: (Dimensions.get("window").width * 10) / 392.72 },
+                    {
+                      display: isTagging ? "flex" : "none",
+                      marginRight:
+                        (Dimensions.get("window").width * 10) / 392.72,
+                    },
                   ]}
                   onPress={() => stopTag()}
                 >
@@ -278,7 +336,7 @@ export default function Post({ navigation }) {
                   horizontal
                   data={tags}
                   style={{
-                    flex: 1
+                    flex: 1,
                   }}
                   renderItem={({ item, index }) => (
                     <TouchableOpacity
@@ -315,7 +373,7 @@ export default function Post({ navigation }) {
             />
             <SwiperFlatList
               ref={(component) => {
-                refFlatList.current = component
+                refFlatList.current = component;
               }}
               data={medias}
               showPagination={medias.length > 1 ? true : false}
@@ -385,20 +443,71 @@ export default function Post({ navigation }) {
               <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
                 <TouchableOpacity
                   style={{ marginRight: 5 }}
-                  onPress={() => (isVideoPicked ? toggleModal("Anexe até 4 images, ou então, 1 vídeo. Remova o vídeo adicionado para anexar outros arquivos.") : medias.length == 4 ? toggleModal("Anexe até 4 images, ou então, 1 vídeo. Remova uma das imagens adicionadas para anexar outras, ou então remova todas para anexar outros tipos de arquivos.") : pickMedia())}
+                  onPress={() =>
+                    isVideoPicked
+                      ? toggleInfoModal(
+                          "Anexe até 4 images, ou então, 1 vídeo. Remova o vídeo adicionado para anexar outros arquivos."
+                        )
+                      : medias.length == 4
+                      ? toggleInfoModal(
+                          "Anexe até 4 images, ou então, 1 vídeo. Remova uma das imagens adicionadas para anexar outras, ou então remova todas para anexar outros tipos de arquivos."
+                        )
+                      : pickMedia()
+                  }
                 >
                   <Feather
                     name="paperclip"
                     size={28}
-                    color={isVideoPicked ? "#292929" : medias.length == 4 ? "#292929" : "#FFF"}
+                    color={
+                      isVideoPicked
+                        ? "#292929"
+                        : medias.length == 4
+                        ? "#292929"
+                        : "#FFF"
+                    }
                   />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => toggleModal("Anexe até 4 images, ou então, 1 vídeo.")}>
+                <TouchableOpacity
+                  onPress={() =>
+                    toggleInfoModal("Anexe até 4 images, ou então, 1 vídeo.")
+                  }
+                >
                   <MaterialIcons name="info" size={22} color="#76767F" />
                 </TouchableOpacity>
               </View>
             </View>
           </View>
+          <Modal
+            isVisible={isInfoModalVisible}
+            onSwipeComplete={() => setInfoModalVisible(false)}
+            swipeDirection="down"
+            onSwipeThreshold={500}
+            onBackdropPress={toggleInfoModal}
+            style={{ margin: 0 }}
+          >
+            <View style={styles.infoModalArea}>
+              <View style={styles.infoModalContent}>
+                <TouchableOpacity
+                  style={{
+                    position: "relative",
+                    top: (Dimensions.get("window").width * -35) / 392.72,
+                    right: (Dimensions.get("window").width * -115) / 392.72,
+                  }}
+                  onPress={() => setInfoModalVisible(false)}
+                >
+                  <AntDesign name="closecircle" size={40} color="white" />
+                </TouchableOpacity>
+
+                <Text style={styles.errorMessage}>{message}</Text>
+                <TouchableOpacity
+                  style={styles.closeModal}
+                  onPress={() => setInfoModalVisible(false)}
+                >
+                  <Text style={styles.closeModalText}>OK</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
           <Modal
             isVisible={isModalVisible}
             onSwipeComplete={() => setModalVisible(false)}
@@ -409,26 +518,7 @@ export default function Post({ navigation }) {
           >
             <View style={styles.modalArea}>
               <View style={styles.modalContent}>
-                <TouchableOpacity
-                  style={{
-                    position: "relative",
-                    top: (Dimensions.get("window").width * -35) / 392.72,
-                    right: (Dimensions.get("window").width * -115) / 392.72,
-                  }}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <AntDesign name="closecircle" size={40} color="white" />
-                </TouchableOpacity>
-
-                <Text style={styles.errorMessage}>
-                  {message}
-                </Text>
-                <TouchableOpacity
-                  style={styles.closeModal}
-                  onPress={() => setModalVisible(false)}
-                >
-                  <Text style={styles.closeModalText}>OK</Text>
-                </TouchableOpacity>
+                <View style={styles.barra}></View>
               </View>
             </View>
           </Modal>

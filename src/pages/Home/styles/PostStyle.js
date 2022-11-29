@@ -1,6 +1,28 @@
 import { StyleSheet, Dimensions } from "react-native";
 
 const styles = StyleSheet.create({
+  modalArea: {
+    flex: 1,
+    justifyContent: "flex-end",
+    width: Dimensions.get("window").width,
+  },
+  modalContent: {
+    paddingHorizontal: 15,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    height: (Dimensions.get("window").height * 700) / 802.9,
+    width: Dimensions.get("window").width,
+    backgroundColor: "#292929",
+    alignItems: "center",
+    paddingTop: 15,
+  },
+  barra: {
+    height: 7.5,
+    width: 60,
+    borderRadius: 5,
+    backgroundColor: "#5C5C5C",
+    marginBottom: 30,
+  },
   closeButton: {
     position: "absolute",
     top: 0,
@@ -49,14 +71,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "Lato-Bold",
   },
-  modalArea: {
+  infoModalArea: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
   },
-  modalContent: {
+  infoModalContent: {
     paddingHorizontal: 15,
     borderRadius: 25,
     height: (Dimensions.get("window").width * 250) / 392.72,
