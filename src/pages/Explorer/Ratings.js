@@ -70,11 +70,14 @@ export default function Media({ navigation, route }) {
       setRatings((old) => [
         ...old,
         {
-          ratingId: doc.id,
           userName: doc.data().userName,
+          userProfilePictureURL: doc.data().userProfilePictureURL,
           ratingText: doc.data().ratingText,
           rating: doc.data().rating,
-          ratingDate: doc.data().ratingDate,
+          ratingDate: `${doc.data().ratingDate.toDate().getDate()}/${doc
+            .data()
+            .ratingDate.toDate()
+            .getMonth()}/${doc.data().ratingDate.toDate().getFullYear()}`,
         },
       ]);
     });
@@ -127,7 +130,7 @@ export default function Media({ navigation, route }) {
                           <ExpoFastImage
                             style={styles.userImage}
                             source={{
-                              uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
+                              uri: rating.userProfilePictureURL,
                             }}
                           />
                           <Text style={styles.userName}>{rating.userName}</Text>
@@ -193,7 +196,6 @@ const styles = StyleSheet.create({
     width: (Dimensions.get("window").width * 250) / 392.72,
   },
   avaliacoesArea: {
-    marginTop: 20,
   },
   avaliacoesTitulo: {
     fontFamily: "Lato-Regular",
@@ -489,7 +491,6 @@ const styles = StyleSheet.create({
     borderColor: "#9D0208",
     paddingBottom: (Dimensions.get("window").height * 5) / 802.9,
     marginBottom: (Dimensions.get("window").height * 20) / 802.9,
-    marginHorizontal: 5,
     color: "#FFF",
     fontSize:
       (Dimensions.get("window").height / Dimensions.get("window").width) * 10,

@@ -47,7 +47,8 @@ import {
   limit,
   serverTimestamp,
   addDoc,
-  orderBy
+  orderBy,
+  arrayUnion,
 } from "firebase/firestore";
 import styles from "./styles/PostStyle";
 import { AntDesign } from "@expo/vector-icons";
@@ -72,6 +73,7 @@ export default function Post({ navigation }) {
   const [isVideoPicked, setIsVideoPicked] = useState(false);
   const [isImagePicked, setIsImagePicked] = useState(false);
   const [message, setMessage] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -197,22 +199,76 @@ export default function Post({ navigation }) {
   };
 
   const submit = async () => {
-    await setDoc(doc(collection(db, "posts")), {
+    await addDoc(collection(db, "posts"), {
       userId: auth.currentUser.uid,
       userName: userInfos.name,
       userProfilePictureURL: userInfos.profilePictureURL,
       postDate: serverTimestamp(),
       postDescription: description,
+      postTags: tags,
       totalComments: 0,
       totalLikes: 0,
-    }).then(() => {
-      console.log("funfou");
-      requests();
+    }).then(async (post) => {
+      const postId = post.id;
+      console.log("post criado");
+      medias
+        .map(async (media, index) => {
+          const blob = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.onload = function () {
+              resolve(xhr.response);
+            };
+            xhr.onerror = function () {
+              reject(new TypeError("Network request failed"));
+            };
+            xhr.responseType = "blob";
+            xhr.open("GET", media, true);
+            xhr.send(null);
+          });
+          const ref = firebase
+            .storage()
+            .ref()
+            .child(`postMedias/${post.id}-${index}`);
+          const snapshot = ref.put(blob);
+          snapshot.on(
+            firebase.storage.TaskEvent.STATE_CHANGED,
+            () => {
+              setUploading(true);
+            },
+            (error) => {
+              setUploading(false);
+              console.log(error);
+              blob.close();
+              return;
+            },
+            () => {
+              console.log("media no storage");
+              snapshot.snapshot.ref.getDownloadURL().then(async (url) => {
+                setUploading(false);
+                console.log("Download URL: ", url);
+                blob.close();
+                await updateDoc(doc(collection(db, "posts"), `${post.id}`), {
+                  postMedias: arrayUnion(url),
+                }).then(() => {
+                  console.log("media foi para o firestore");
+                });
+                return url;
+              });
+            }
+          );
+        })
+    }).then(async (postId) => {
+      await updateDoc(doc(collection(db, "posts"), `${postId}`), {
+        postMediaType: isVideoPicked ? "video" : isImagePicked ? "image" : null,
+      }).then(() => {
+        console.log("mediaType definido");
+        navigation.navigate("Feed");
+      })
     });
   };
-  
+
   const sla = async () => {
-    const Ref = collection(db, 'userPreferences');
+    const Ref = collection(db, "userPreferences");
 
     /*setDoc(doc(collection(Ref, auth.currentUser.uid, 'favoriteTags'), 'teste5'), {
       tagName: 'GREEN LANTERN',
@@ -223,20 +279,22 @@ export default function Post({ navigation }) {
     console.log(e.code, ": ", e.message)
   })*/
 
-  const q = query(
-    collection(Ref, auth.currentUser.uid, 'favoriteTags'),
-    orderBy("likeCount", "desc"),
-    limit(2)
-  );
+    const q = query(
+      collection(Ref, auth.currentUser.uid, "favoriteTags"),
+      orderBy("likeCount", "desc"),
+      limit(2)
+    );
 
-    await getDocs(q).then((e)=>{
-      e.forEach((doc)=>{
-        console.log(doc.data())
+    await getDocs(q)
+      .then((e) => {
+        e.forEach((doc) => {
+          console.log(doc.data());
+        });
       })
-  }).catch((e)=> {
-    console.log(e.code, ": ", e.message)
-  })
-  }
+      .catch((e) => {
+        console.log(e.code, ": ", e.message);
+      });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -293,7 +351,7 @@ export default function Post({ navigation }) {
                       ? toggleInfoModal(
                           "Você já adicionou 10 tags, remova alguma tag para poder adicionar uma nova."
                         )
-                      : toggleModal()
+                      : doTag(newTag)
                   }
                 >
                   <AntDesign
@@ -505,20 +563,6 @@ export default function Post({ navigation }) {
                 >
                   <Text style={styles.closeModalText}>OK</Text>
                 </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-          <Modal
-            isVisible={isModalVisible}
-            onSwipeComplete={() => setModalVisible(false)}
-            swipeDirection="down"
-            onSwipeThreshold={500}
-            onBackdropPress={toggleModal}
-            style={{ margin: 0 }}
-          >
-            <View style={styles.modalArea}>
-              <View style={styles.modalContent}>
-                <View style={styles.barra}></View>
               </View>
             </View>
           </Modal>

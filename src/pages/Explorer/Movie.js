@@ -69,6 +69,7 @@ export default function Media({ navigation, route }) {
   const [ratingText, setRatingText] = useState("");
   const [rating, setRating] = useState(0);
   const [ratings, setRatings] = useState({});
+  const [userInfos, setUserInfos] = useState({});
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
@@ -167,36 +168,25 @@ export default function Media({ navigation, route }) {
     console.log(rating);
 
     const docRef = doc(db, "users", auth.currentUser.uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      setUserInfos({
-        username: data.username,
-        name: data.name,
-        profilePictureURL: null,
-      });
-    } else {
-      // doc.data() will be undefined in this case
-      console.log("No such document!");
-      setUserInfos({});
-    }
 
-    await setDoc(doc(collection(db, "ratings")), {
-      userId: auth.currentUser.uid,
-      mediaId: `M${details.id}`,
-      ratingText: ratingText,
-      rating: rating * 2,
-      userName: userInfos.name,
-      userProfilePictureURL: userInfos.userProfilePictureURL,
-      mediaName: details.title,
-      mediaPoster: details.poster_path,
-      timestamp: serverTimestamp(),
-    }).then(() => {
-      console.log("funfou");
-      setToggleRateModal(false);
-      setIsRateModalVisible(false);
-      requests();
-    });
+    await getDoc(docRef).then(async (user) => {
+      await setDoc(doc(collection(db, "ratings")), {
+        userId: auth.currentUser.uid,
+        mediaId: `M${details.id}`,
+        ratingText: ratingText,
+        rating: rating * 2,
+        userName: user.data().name,
+        userProfilePictureURL: user.data().profilePictureURL,
+        mediaName: details.title,
+        mediaPoster: details.poster_path,
+        ratingDate: serverTimestamp(),
+      }).then(() => {
+        console.log("funfou");
+        setToggleRateModal(false);
+        setIsRateModalVisible(false);
+        requests();
+      });
+    })
   };
 
   const tryYoutube = () => {
@@ -337,17 +327,22 @@ export default function Media({ navigation, route }) {
               <ExpoFastImage
                 style={styles.userImage}
                 source={{
-                  uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
+                  uri: ratings.userProfilePictureURL,
                 }}
               />
-              <Text style={styles.userName}>{ratings.userName}</Text>
+              <Text
+                onPress={() => console.log(ratings.userProfilePictureURL)}
+                style={styles.userName}
+              >
+                {ratings.userName}
+              </Text>
               <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
             </View>
             <View style={styles.avaliacao}>
               <View
                 style={[
                   styles.score,
-                  { width: (Dimensions.get("window").width * 250) / 392.72, },
+                  { width: (Dimensions.get("window").width * 250) / 392.72 },
                 ]}
               >
                 <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
@@ -359,11 +354,10 @@ export default function Media({ navigation, route }) {
                 <Star
                   score={(ratings.rating.toFixed(1) * 5) / 10}
                   style={{
-                      marginBottom:
-                        (Dimensions.get("window").height * 3) / 802.9,
-                      width: (Dimensions.get("window").width * 125) / 392.72,
-                      height: (Dimensions.get("window").width * 25) / 392.72,
-                    }}
+                    marginBottom: (Dimensions.get("window").height * 3) / 802.9,
+                    width: (Dimensions.get("window").width * 125) / 392.72,
+                    height: (Dimensions.get("window").width * 25) / 392.72,
+                  }}
                 />
               </View>
               <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
@@ -507,9 +501,13 @@ export default function Media({ navigation, route }) {
     querySnapshotRatings.forEach((doc) => {
       setRatings({
         userName: doc.data().userName,
+        userProfilePictureURL: doc.data().userProfilePictureURL,
         ratingText: doc.data().ratingText,
         rating: doc.data().rating,
-        ratingDate: doc.data().ratingDate,
+        ratingDate: `${doc.data().ratingDate.toDate().getDate()}/${doc
+          .data()
+          .ratingDate.toDate()
+          .getMonth()}/${doc.data().ratingDate.toDate().getFullYear()}`,
       });
     });
 
@@ -679,7 +677,7 @@ export default function Media({ navigation, route }) {
               onSwipeThreshold={500}
               onBackdropPress={handleToggleModal}
               propagateSwipe={true}
-              style={{margin: 0}}
+              style={{ margin: 0 }}
             >
               <View style={styles.modalArea}>
                 <View style={styles.modalContent}>
@@ -742,7 +740,7 @@ export default function Media({ navigation, route }) {
               backdropTransitionInTiming={600}
               backdropTransitionOutTiming={600}
               onBackdropPress={handleToggleInputModal}
-              style={{margin: 0}}
+              style={{ margin: 0 }}
             >
               <View style={styles.inputModalArea}>
                 <View style={styles.inputModalContent}>
@@ -779,7 +777,10 @@ export default function Media({ navigation, route }) {
                       <TextInput
                         placeholder="Digite o nome da sua nova pasta"
                         placeholderTextColor="#8F8F8F"
-                        style={[styles.changeInput, {borderBottomWidth: 1, borderColor: "#9D0208"}]}
+                        style={[
+                          styles.changeInput,
+                          { borderBottomWidth: 1, borderColor: "#9D0208" },
+                        ]}
                         onChangeText={(text) => setFolderName(text)}
                       />
                     </View>
@@ -796,7 +797,7 @@ export default function Media({ navigation, route }) {
               backdropTransitionInTiming={600}
               backdropTransitionOutTiming={600}
               onBackdropPress={handleToggleRateModal}
-              style={{margin: 0}}
+              style={{ margin: 0 }}
             >
               <View style={styles.inputModalArea}>
                 <View style={styles.inputModalContent}>

@@ -1,20 +1,57 @@
 import { StyleSheet, Dimensions } from "react-native";
 
 const styles = StyleSheet.create({
-  modalArea: {
+  chooseModalArea: {
     flex: 1,
     justifyContent: "flex-end",
     width: Dimensions.get("window").width,
+    paddingHorizontal: 20,
+  },
+  cancelArea: {
+    borderRadius: (Dimensions.get("window").width * 15) / 392.72,
+    backgroundColor: "#1F1F1F",
+    alignItems: "center",
+    padding: 20,
+    width: "100%",
+  },
+  optionsArea: {
+    borderRadius: (Dimensions.get("window").width * 15) / 392.72,
+    backgroundColor: "#1F1F1F",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: (Dimensions.get("window").width * 9) / 392.72,
+  },
+  option: {
+    alignItems: "center",
+    padding: 20,
+    width: "100%",
+    borderBottomWidth: 1,
+    borderColor: "#333333"
+  },
+  optionText: {
+    color: "#FFF",
+    fontSize: (Dimensions.get("window").width * 20) / 392.72,
+    fontFamily: "Lato-Regular",
   },
   modalContent: {
     paddingHorizontal: 15,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
-    height: (Dimensions.get("window").height * 700) / 802.9,
+    flex: 1,
     width: Dimensions.get("window").width,
     backgroundColor: "#292929",
     alignItems: "center",
     paddingTop: 15,
+  },
+  modalArea: {
+    flex: 1,
+    justifyContent: "flex-end",
+    width: Dimensions.get("window").width,
+  },
+  buttonsArea: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   barra: {
     height: 7.5,

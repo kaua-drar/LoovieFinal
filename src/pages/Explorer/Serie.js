@@ -69,6 +69,7 @@ export default function Media({ navigation, route }) {
   const [ratingText, setRatingText] = useState("");
   const [rating, setRating] = useState(0);
   const [ratings, setRatings] = useState({});
+  const [userInfos, setUserInfos] = useState({});
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
@@ -167,36 +168,25 @@ export default function Media({ navigation, route }) {
     console.log(rating);
 
     const docRef = doc(db, "users", auth.currentUser.uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      setUserInfos({
-        username: data.username,
-        name: data.name,
-        profilePictureURL: null,
-      });
-    } else {
-      // doc.data() will be undefined in this case
-      console.log("No such document!");
-      setUserInfos({});
-    }
 
-    await setDoc(doc(collection(db, "ratings")), {
-      userId: auth.currentUser.uid,
-      mediaId: `S${details.id}`,
-      ratingText: ratingText,
-      rating: rating * 2,
-      userName: userInfos.name,
-      userProfilePictureURL: userInfos.userProfilePictureURL,
-      mediaName: details.name,
-      mediaPoster: details.poster_path,
-      timestamp: serverTimestamp(),
-    }).then(() => {
-      console.log("funfou");
-      setToggleRateModal(false);
-      setIsRateModalVisible(false);
-      requests();
-    });
+    await getDoc(docRef).then(async (user) => {
+      await setDoc(doc(collection(db, "ratings")), {
+        userId: auth.currentUser.uid,
+        mediaId: `S${details.id}`,
+        ratingText: ratingText,
+        rating: rating * 2,
+        userName: user.data().name,
+        userProfilePictureURL: user.data().profilePictureURL,
+        mediaName: details.name,
+        mediaPoster: details.poster_path,
+        ratingDate: serverTimestamp(),
+      }).then(() => {
+        console.log("funfou");
+        setToggleRateModal(false);
+        setIsRateModalVisible(false);
+        requests();
+      });
+    })
   };
 
   const tryYoutube = () => {
@@ -332,10 +322,10 @@ export default function Media({ navigation, route }) {
               <ExpoFastImage
                 style={styles.userImage}
                 source={{
-                  uri: "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large",
+                  uri: ratings.userProfilePictureURL,
                 }}
               />
-              <Text style={styles.userName}>{ratings.userName}</Text>
+              <Text onPress={() => console.log(ratings.userProfilePictureURL)} style={styles.userName}>{ratings.userName}</Text>
               <Text style={styles.avaliacaoData}>{ratings.ratingDate}</Text>
             </View>
             <View style={styles.avaliacao}>
@@ -498,9 +488,13 @@ export default function Media({ navigation, route }) {
     querySnapshotRatings.forEach((doc) => {
       setRatings({
         userName: doc.data().userName,
+        userProfilePictureURL: doc.data().userProfilePictureURL,
         ratingText: doc.data().ratingText,
         rating: doc.data().rating,
-        ratingDate: doc.data().ratingDate,
+        ratingDate: `${doc.data().ratingDate.toDate().getDate()}/${doc
+          .data()
+          .ratingDate.toDate()
+          .getMonth()}/${doc.data().ratingDate.toDate().getFullYear()}`,
       });
     });
 

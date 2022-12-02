@@ -220,7 +220,7 @@ export default function ProfileScreen({navigation, route, props}) {
   }
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   errorMessage: {
     color: '#FFF',
     fontFamily: 'Lato-Regular',
