@@ -1,6 +1,6 @@
 import ExpoFastImage from "expo-fast-image";
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Entypo, Ionicons } from "@expo/vector-icons";
@@ -86,6 +86,7 @@ export default function Feed({ navigation }) {
           postTags: doc.data().postTags,
           totalLikes: doc.data().totalLikes,
           totalComments: doc.data().totalComments,
+          isLiked: false,
         },
       ]);
     });
@@ -144,6 +145,28 @@ export default function Feed({ navigation }) {
     toggleModal();
   };
 
+  const likePress = (isLiked, index) => {
+    if (isLiked == false) {
+      let oldPosts = [...posts];
+      oldPosts[index].isLiked = !oldPosts[index].isLiked;
+      setPosts(oldPosts);
+      console.log(posts[index]);
+    } else if (isLiked == true) {
+      let oldPosts = [...posts];
+      oldPosts[index].isLiked = !oldPosts[index].isLiked;
+      setPosts(oldPosts);
+      console.log(posts[index]);
+    }
+  };
+
+  const onViewCallBack = useCallback((viewableItems) => {
+    setTimeout(() => {
+      console.log(viewableItems.viewableItems[0]?.item.postId);
+    }, 1000)
+    
+    // Use viewable items in state or as intended
+  }, []);
+
   return (
     <View style={styles.container}>
       {loading && (
@@ -161,6 +184,11 @@ export default function Feed({ navigation }) {
             <Text style={styles.newButtonText}>+</Text>
           </TouchableOpacity>
           <FlatList
+            onViewableItemsChanged={onViewCallBack}
+            viewabilityConfig={{
+              itemVisiblePercentThreshold: 75,
+              minimumViewTime: 2000,
+            }}
             alignItems="center"
             data={posts}
             refreshControl={
@@ -168,6 +196,8 @@ export default function Feed({ navigation }) {
             }
             ListHeaderComponentStyle={{ marginTop: 25 }}
             ListHeaderComponent={<View></View>}
+            disableVirtualization={true}
+            windowSize={1}
             renderItem={({ item, index }) => {
               return (
                 <View
@@ -278,8 +308,14 @@ export default function Feed({ navigation }) {
                   ) : null}
 
                   <View style={styles.postOptions}>
-                    <TouchableOpacity>
-                      <AntDesign name="hearto" size={22} color="#FFF" />
+                    <TouchableOpacity
+                      onPress={() => likePress(item.isLiked, index)}
+                    >
+                      <AntDesign
+                        name={item.isLiked ? "heart" : "hearto"}
+                        size={22}
+                        color="#FFF"
+                      />
                     </TouchableOpacity>
                     <Text style={styles.postNumbers}>{item.totalLikes}</Text>
                     <TouchableOpacity style={{ marginLeft: 15 }}>

@@ -209,61 +209,65 @@ export default function Post({ navigation }) {
       totalComments: 0,
       totalLikes: 0,
     }).then(async (post) => {
-      const postId = post.id;
       console.log("post criado");
-      medias
-        .map(async (media, index) => {
-          const blob = await new Promise((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            xhr.onload = function () {
-              resolve(xhr.response);
-            };
-            xhr.onerror = function () {
-              reject(new TypeError("Network request failed"));
-            };
-            xhr.responseType = "blob";
-            xhr.open("GET", media, true);
-            xhr.send(null);
-          });
-          const ref = firebase
-            .storage()
-            .ref()
-            .child(`postMedias/${post.id}-${index}`);
-          const snapshot = ref.put(blob);
-          snapshot.on(
-            firebase.storage.TaskEvent.STATE_CHANGED,
-            () => {
-              setUploading(true);
-            },
-            (error) => {
+      medias.map(async (media, index) => {
+        const blob = await new Promise((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.onload = function () {
+            resolve(xhr.response);
+          };
+          xhr.onerror = function () {
+            reject(new TypeError("Network request failed"));
+          };
+          xhr.responseType = "blob";
+          xhr.open("GET", media, true);
+          xhr.send(null);
+        });
+        const ref = firebase
+          .storage()
+          .ref()
+          .child(`postMedias/${post.id}-${index}`);
+        const snapshot = ref.put(blob);
+        snapshot.on(
+          firebase.storage.TaskEvent.STATE_CHANGED,
+          () => {
+            setUploading(true);
+          },
+          (error) => {
+            setUploading(false);
+            console.log(error);
+            blob.close();
+            return;
+          },
+          () => {
+            console.log("media no storage");
+            snapshot.snapshot.ref.getDownloadURL().then(async (url) => {
               setUploading(false);
-              console.log(error);
+              console.log("Download URL: ", url);
               blob.close();
-              return;
-            },
-            () => {
-              console.log("media no storage");
-              snapshot.snapshot.ref.getDownloadURL().then(async (url) => {
-                setUploading(false);
-                console.log("Download URL: ", url);
-                blob.close();
-                await updateDoc(doc(collection(db, "posts"), `${post.id}`), {
-                  postMedias: arrayUnion(url),
-                }).then(() => {
-                  console.log("media foi para o firestore");
-                });
-                return url;
+              await updateDoc(doc(collection(db, "posts"), `${post.id}`), {
+                postMedias: arrayUnion(url),
+              }).then(() => {
+                console.log("media foi para o firestore");
               });
-            }
-          );
-        })
-    }).then(async (postId) => {
-      await updateDoc(doc(collection(db, "posts"), `${postId}`), {
-        postMediaType: isVideoPicked ? "video" : isImagePicked ? "image" : null,
-      }).then(() => {
-        console.log("mediaType definido");
-        navigation.navigate("Feed");
-      })
+              return url;
+            });
+          }
+        );
+
+        if (index === (medias.length - 1)) {
+          await updateDoc(doc(collection(db, "posts"), `${post.id}`), {
+            postMediaType: isVideoPicked
+              ? "video"
+              : isImagePicked
+              ? "image"
+              : null,
+          }).then(() => {
+            console.log("mediaType definido");
+            navigation.navigate("Feed");
+          });
+        }
+      });
     });
   };
 
