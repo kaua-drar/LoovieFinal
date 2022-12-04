@@ -27,12 +27,16 @@ import {
   getDocs,
   getFirestore,
   setDoc,
+  addDoc,
   doc,
   updateDoc,
   where,
   getDoc,
   limit,
   serverTimestamp,
+  arrayUnion,
+  arrayRemove,
+  increment,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -99,8 +103,16 @@ export default function Feed({ navigation }) {
   const checkDate = (postDate) => {
     let now = new Date();
     let difference = now - postDate;
-    console.log(now, " - ", postDate, " = ", (difference / 1000) / 60);
-    return difference / 1000 < 60 ? `${Math.ceil(difference / 1000)}s`: difference / 1000 < 3600 ? `${parseInt((difference / 1000) / 60)}min` : difference / 1000 < 86400 ? `${parseInt(((difference / 1000) / 60) / 60)}h` :  postDate.getFullYear() >= now.getFullYear() ? `${postDate.getDate()}/${postDate.getMonth()}` : `${postDate.getDate()}/${postDate.getMonth()}/${postDate.getFullYear()}`
+    console.log(now, " - ", postDate, " = ", difference / 1000 / 60);
+    return difference / 1000 < 60
+      ? `${Math.ceil(difference / 1000)}s`
+      : difference / 1000 < 3600
+      ? `${parseInt(difference / 1000 / 60)}min`
+      : difference / 1000 < 86400
+      ? `${parseInt(difference / 1000 / 60 / 60)}h`
+      : postDate.getFullYear() >= now.getFullYear()
+      ? `${postDate.getDate()}/${postDate.getMonth()}`
+      : `${postDate.getDate()}/${postDate.getMonth()}/${postDate.getFullYear()}`;
   };
 
   const toggleModal = () => {
@@ -149,31 +161,102 @@ export default function Feed({ navigation }) {
     toggleModal();
   };
 
-  const likePress = (isLiked, index) => {
+  const likePress = async (isLiked, index) => {
+    const Ref = collection(db, "userAnalytics");
     if (isLiked == false) {
       let oldPosts = [...posts];
       oldPosts[index].isLiked = !oldPosts[index].isLiked;
-      oldPosts[index].totalLikes = oldPosts[index].totalLikes+1;
+      oldPosts[index].totalLikes = oldPosts[index].totalLikes + 1;
       setPosts(oldPosts);
       console.log(posts[index]);
+
+      updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
+        likedPosts: arrayUnion(oldPosts[index].postId),
+      })
+        .then(() => {
+          console.log("tag adicionada");
+          posts[index].postTags.map(async (item) => {
+            console.log(item);
+
+            const Ref = collection(db, "userAnalytics");
+
+            const docSnap = await getDoc(
+              doc(
+                collection(Ref, auth.currentUser.uid, "favoriteTags"),
+                item.replace(" ", "_")
+              )
+            );
+
+            if (docSnap.exists()) {
+              await updateDoc(
+                doc(
+                  collection(Ref, auth.currentUser.uid, "favoriteTags"),
+                  item.replace(" ", "_")
+                ),
+                {
+                  likeCount: increment(1),
+                }
+              ).then(() => {
+                console.log("tag atualizada");
+              })
+            } else {
+              // doc.data() will be undefined in this case
+              await setDoc(
+                doc(
+                  collection(Ref, auth.currentUser.uid, "favoriteTags"),
+                  item.replace(" ", "_")
+                ),
+                {
+                  tagName: item,
+                  likeCount: 1
+                }
+              ).then(() => {
+                console.log("tag criada");
+              })
+            }
+          });
+        })
+        .catch((e) => {
+          console.log(e.code, ": ", e.message);
+        });
     } else if (isLiked == true) {
       let oldPosts = [...posts];
       oldPosts[index].isLiked = !oldPosts[index].isLiked;
-      oldPosts[index].totalLikes = oldPosts[index].totalLikes-1;
+      oldPosts[index].totalLikes = oldPosts[index].totalLikes - 1;
       setPosts(oldPosts);
       console.log(posts[index]);
+      updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
+        likedPosts: arrayRemove(oldPosts[index].postId),
+      })
+        .then(() => {
+          console.log("foi");
+        })
+        .catch((e) => {
+          console.log(e.code, ": ", e.message);
+        });
     }
   };
 
   const onViewCallBack = useCallback((viewableItems) => {
-    if(viewableItems.viewableItems[0]?.item.postId == undefined) {
-      console.log("ESTÁ INDEFINIDO: ", viewableItems.viewableItems[0]?.item.postId);
-    }
-    else {
+    if (viewableItems.viewableItems[0]?.item.postId == undefined) {
+      console.log(
+        "ESTÁ INDEFINIDO: ",
+        viewableItems.viewableItems[0]?.item.postId
+      );
+    } else {
       console.log("DEFINIDASSO: ", viewableItems.viewableItems[0]?.item.postId);
+
+      updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
+        viewedPosts: arrayUnion(viewableItems.viewableItems[0]?.item.postId),
+      })
+        .then(() => {
+          console.log("foi");
+        })
+        .catch((e) => {
+          console.log(e.code, ": ", e.message);
+        });
     }
-    
-    
+
     // Use viewable items in state or as intended
   }, []);
 
@@ -194,11 +277,11 @@ export default function Feed({ navigation }) {
             <Text style={styles.newButtonText}>+</Text>
           </TouchableOpacity>
           <FlatList
-            onViewableItemsChanged={onViewCallBack}
+            /*onViewableItemsChanged={onViewCallBack}
             viewabilityConfig={{
               itemVisiblePercentThreshold: 75,
               minimumViewTime: 2000,
-            }}
+            }}*/
             alignItems="center"
             data={posts}
             refreshControl={
