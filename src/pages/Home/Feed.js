@@ -76,10 +76,7 @@ export default function Feed({ navigation }) {
           userId: doc.data().userId,
           userName: doc.data().userName,
           userProfilePictureURL: doc.data().userProfilePictureURL,
-          postDate: `${doc.data().postDate.toDate().getDate()}/${doc
-            .data()
-            .postDate.toDate()
-            .getMonth()}/${doc.data().postDate.toDate().getFullYear()}`,
+          postDate: checkDate(doc.data().postDate.toDate()),
           postDescription: doc.data().postDescription,
           postMedias: doc.data().postMedias,
           postMediaType: doc.data().postMediaType,
@@ -98,6 +95,13 @@ export default function Feed({ navigation }) {
   useEffect(() => {
     requests();
   }, []);
+
+  const checkDate = (postDate) => {
+    let now = new Date();
+    let difference = now - postDate;
+    console.log(now, " - ", postDate, " = ", (difference / 1000) / 60);
+    return difference / 1000 < 60 ? `${Math.ceil(difference / 1000)}s`: difference / 1000 < 3600 ? `${parseInt((difference / 1000) / 60)}min` : difference / 1000 < 86400 ? `${parseInt(((difference / 1000) / 60) / 60)}h` :  postDate.getFullYear() >= now.getFullYear() ? `${postDate.getDate()}/${postDate.getMonth()}` : `${postDate.getDate()}/${postDate.getMonth()}/${postDate.getFullYear()}`
+  };
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -149,20 +153,26 @@ export default function Feed({ navigation }) {
     if (isLiked == false) {
       let oldPosts = [...posts];
       oldPosts[index].isLiked = !oldPosts[index].isLiked;
+      oldPosts[index].totalLikes = oldPosts[index].totalLikes+1;
       setPosts(oldPosts);
       console.log(posts[index]);
     } else if (isLiked == true) {
       let oldPosts = [...posts];
       oldPosts[index].isLiked = !oldPosts[index].isLiked;
+      oldPosts[index].totalLikes = oldPosts[index].totalLikes-1;
       setPosts(oldPosts);
       console.log(posts[index]);
     }
   };
 
   const onViewCallBack = useCallback((viewableItems) => {
-    setTimeout(() => {
-      console.log(viewableItems.viewableItems[0]?.item.postId);
-    }, 1000)
+    if(viewableItems.viewableItems[0]?.item.postId == undefined) {
+      console.log("ESTÁ INDEFINIDO: ", viewableItems.viewableItems[0]?.item.postId);
+    }
+    else {
+      console.log("DEFINIDASSO: ", viewableItems.viewableItems[0]?.item.postId);
+    }
+    
     
     // Use viewable items in state or as intended
   }, []);
@@ -223,7 +233,7 @@ export default function Feed({ navigation }) {
                         >
                           {item.userName}
                         </Text>
-                        <Text style={styles.postDate}>10 min</Text>
+                        <Text style={styles.postDate}>{item.postDate}</Text>
                         <View
                           style={{
                             flex: 1,
@@ -298,12 +308,12 @@ export default function Feed({ navigation }) {
                         uri: item.postMedias[0],
                       }}
                       useNativeControls
-                      volume={1.0}
                       resizeMode="contain"
                       isLooping
                       onPlaybackStatusUpdate={(status) =>
                         setStatus(() => status)
                       }
+                      volume={1.0}
                     />
                   ) : null}
 
