@@ -46,10 +46,12 @@ import {
 export default function EditProfile({ navigation, route, props }) {
   const [errorMessage, setErrorMessage] = useState("");
   const [username, setUsername] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [hasGalleryPermission, setHasGalleryPermission] = useState(null);
-  const [uploading, setUploading] = useState(false)
+  const [uploading, setUploading] = useState(false);
+  const [bio, setBio] = useState("");
 
   const [fontsLoaded] = useFonts({
     "Lato-Regular": require("../../../assets/fonts/Lato-Regular.ttf"),
@@ -79,6 +81,7 @@ export default function EditProfile({ navigation, route, props }) {
 
     if (
       username.length == 0 &&
+      name.length == 0 &&
       image != null &&
       image != undefined &&
       image != ""
@@ -90,8 +93,8 @@ export default function EditProfile({ navigation, route, props }) {
           <Text style={styles.errorMessage}>Imagem de perfil alterada!</Text>
         </View>
       );
-      setTimeout(()=>{
-        navigation.navigate("ProfileScreen")
+      setTimeout(() => {
+        navigation.navigate("ProfileScreen");
       }, 3000);
     } else if (
       (username.length < 4 || username.length > 20) &&
@@ -108,7 +111,8 @@ export default function EditProfile({ navigation, route, props }) {
     } else if (
       username.length > 3 &&
       username.length < 21 &&
-      (image == null || image == undefined || image == "")
+      (image == null || image == undefined || image == "") &&
+      name.length == 0
     ) {
       changeUsername();
       setErrorMessage(
@@ -117,8 +121,8 @@ export default function EditProfile({ navigation, route, props }) {
           <Text style={styles.errorMessage}>Nome de usuário alterado!</Text>
         </View>
       );
-      setTimeout(()=>{
-        navigation.navigate("ProfileScreen")
+      setTimeout(() => {
+        navigation.navigate("ProfileScreen");
       }, 2000);
     } else if (
       username.length > 3 &&
@@ -137,19 +141,64 @@ export default function EditProfile({ navigation, route, props }) {
       username.length < 21 &&
       image != null &&
       image != undefined &&
-      image != ""
+      image != "" &&
+      name.length <= 3
     ) {
       changeImage();
       changeUsername();
       setErrorMessage(
         <View style={styles.errorMessageArea}>
           <MaterialIcons name={"check"} size={24} color="#FFF" />
+          <Text style={styles.errorMessage}>
+            Imagem de perfil e nome de usuário alterados!
+          </Text>
+        </View>
+      );
+      setTimeout(() => {
+        navigation.navigate("ProfileScreen");
+      }, 2000);
+    } else if (
+      regexUser.test(username) == true &&
+      username.length > 3 &&
+      username.length < 21 &&
+      name.length > 3 &&
+      name.length < 21 &&
+      (image == null || image == undefined || image == "")
+    ) {
+      changeImage();
+      changeUsername();
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <MaterialIcons name={"check"} size={24} color="#FFF" />
+          <Text style={styles.errorMessage}>
+            Nome e nome de usuário alterados!
+          </Text>
+        </View>
+      );
+      setTimeout(() => {
+        navigation.navigate("ProfileScreen");
+      }, 2000);
+    } else if (
+      regexUser.test(username) == true &&
+      username.length > 3 &&
+      username.length < 21 &&
+      image != null &&
+      image != undefined &&
+      image != "" &&
+      name.length > 3 &&
+      name.length < 21 &&
+      bio.length > 0
+    ) {
+      changeImage();
+      changeUsername();
+      changeBio();
+      changeName();
+      setErrorMessage(
+        <View style={styles.errorMessageArea}>
+          <MaterialIcons name={"check"} size={24} color="#FFF" />
           <Text style={styles.errorMessage}>Alterações salvas!</Text>
         </View>
       );
-      setTimeout(()=>{
-        navigation.navigate("ProfileScreen")
-      }, 2000);
     }
   };
 
@@ -174,7 +223,10 @@ export default function EditProfile({ navigation, route, props }) {
       xhr.open("GET", image, true);
       xhr.send(null);
     });
-    const ref = firebase.storage().ref().child(`profilePictures/${auth.currentUser.uid}`);
+    const ref = firebase
+      .storage()
+      .ref()
+      .child(`profilePictures/${auth.currentUser.uid}`);
     const snapshot = ref.put(blob);
     snapshot.on(
       firebase.storage.TaskEvent.STATE_CHANGED,
@@ -188,16 +240,16 @@ export default function EditProfile({ navigation, route, props }) {
         return;
       },
       () => {
-        snapshot.snapshot.ref.getDownloadURL().then(async(url) => {
+        snapshot.snapshot.ref.getDownloadURL().then(async (url) => {
           setUploading(false);
           console.log("Download URL: ", url);
           blob.close();
           await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
             profilePictureURL: url,
-          })
-            .then(() => {
-              console.log("foto foi pro firebase");
-            })
+          }).then(() => {
+            console.log("foto foi pro firebase");
+            navigation.navigate("ProfileScreen");
+          });
           return url;
         });
       }
@@ -212,6 +264,26 @@ export default function EditProfile({ navigation, route, props }) {
         console.log("username foi");
       })
       .catch((error) => console.log("username não foi: ", error.code));
+  };
+
+  const changeName = async () => {
+    await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
+      name: name,
+    })
+      .then(() => {
+        console.log("name foi");
+      })
+      .catch((error) => console.log("name não foi: ", error.code));
+  };
+
+  const changeBio = async () => {
+    await updateDoc(doc(collection(db, "users"), auth.currentUser.uid), {
+      bio: bio,
+    })
+      .then(() => {
+        console.log("bio foi");
+      })
+      .catch((error) => console.log("bio não foi: ", error.code));
   };
 
   const pickImage = async () => {
@@ -248,10 +320,12 @@ export default function EditProfile({ navigation, route, props }) {
               <ExpoFastImage
                 style={styles.userImage}
                 source={{
-                  uri: image == null ?
-                    auth.currentUser.photoURL == null
-                      ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large"
-                      : auth.currentUser.photoURL : image,
+                  uri:
+                    image == null
+                      ? auth.currentUser.photoURL == null
+                        ? "https://pbs.twimg.com/media/Fdnl8v_XoAE2vQX?format=jpg&name=large"
+                        : auth.currentUser.photoURL
+                      : image,
                 }}
                 resizeMode="cover"
               ></ExpoFastImage>
@@ -266,7 +340,7 @@ export default function EditProfile({ navigation, route, props }) {
           </TouchableOpacity>
 
           <View style={styles.changesArea}>
-            <Text style={[styles.changeTitle, { marginTop: 40 }]}>
+            <Text style={[styles.changeTitle, { marginTop: 10 }]}>
               Nome de Usuário
             </Text>
             <View style={styles.changeItem}>
@@ -275,6 +349,32 @@ export default function EditProfile({ navigation, route, props }) {
                 placeholderTextColor="#8F8F8F"
                 style={styles.changeInput}
                 onChangeText={(text) => setUsername(text)}
+              />
+            </View>
+          </View>
+
+          <View style={styles.changesArea}>
+            <Text style={[styles.changeTitle, { marginTop: 5 }]}>Nome</Text>
+            <View style={styles.changeItem}>
+              <TextInput
+                placeholder="Digite seu novo nome"
+                placeholderTextColor="#8F8F8F"
+                style={styles.changeInput}
+                onChangeText={(text) => setName(text)}
+              />
+            </View>
+          </View>
+
+          <View style={styles.changesArea}>
+            <Text style={[styles.changeTitle, { marginTop: 5 }]}>
+              Biografia
+            </Text>
+            <View style={styles.changeItem}>
+              <TextInput
+                placeholder="Digite sua nova biografia"
+                placeholderTextColor="#8F8F8F"
+                style={styles.changeInput}
+                onChangeText={(text) => setBio(text)}
               />
             </View>
           </View>
@@ -378,7 +478,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingBottom: "15%",
+    marginTop: 30,
+    marginBottom: 20,
   },
   changesArea: {
     marginTop: 20,

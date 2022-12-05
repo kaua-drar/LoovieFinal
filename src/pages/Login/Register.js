@@ -12,7 +12,7 @@ import {
   Dimensions,
 } from "react-native";
 import { getAuth, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from "firebase/auth";
-import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
+import { getFirestore, collection, doc, setDoc, addDoc } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -145,13 +145,20 @@ export default function Register({ navigation, route, props }) {
             username: username,
             name: name,
             profilePictureURL: null,
+            following: 0,
+            followers: 0
           }).then(() => {
             updateProfile(userCredential.user, {
               displayName: username}).then(async () => {
-                await sendEmailVerification(userCredential.user).then(() => {
-                  console.log("e-mail enviado");
-                  navigation.navigate("VerifyEmail", {email: email, password: password});
-                });
+                await setDoc(doc(db, "userAnalytics", userCredential.user.uid), {
+                  likedPosts: []
+                }).then(async () => {
+                  console.log("userAnalytics criado");
+                  await sendEmailVerification(userCredential.user).then(() => {
+                    console.log("e-mail enviado");
+                    navigation.navigate("VerifyEmail", {email: email, password: password});
+                  });
+                })
               }).catch((error) => {
                 console.log(error.code, ": ", error.message)
               });

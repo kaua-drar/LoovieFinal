@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   backdrop: {
     width: Dimensions.get("window").width,
     height: (Dimensions.get("window").width * 140) / 392.72,
-    backgroundColor: "#9D0208",
+    backgroundColor: "#292929",
     marginBottom: (Dimensions.get("window").width * 30) / 392.72,
   },
   barsRow: {
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   profilePicture: {
     height: (Dimensions.get("window").width * 140) / 392.72,
     width: (Dimensions.get("window").width * 140) / 392.72,
-    bottom: (Dimensions.get("window").width * 10) / 392.72,
+    bottom: (Dimensions.get("window").width * -35) / 392.72,
     borderWidth: 2,
     borderColor: "#9D0208",
     borderRadius: (Dimensions.get("window").width * 70) / 392.72,
@@ -77,14 +77,12 @@ const styles = StyleSheet.create({
   profileButton: {
     paddingHorizontal: (Dimensions.get("window").width * 5) / 392.72,
     paddingVertical: (Dimensions.get("window").width * 8) / 392.72,
-    backgroundColor: "#9D0208",
     borderRadius: (Dimensions.get("window").width * 10) / 392.72,
-    marginLeft: (Dimensions.get("window").width * 5) / 392.72
   },
   text: {
     color: "#FFF",
     fontFamily: "Lato-Regular",
-    fontSize: (Dimensions.get("window").width * 15) / 392.72,
+    fontSize: (Dimensions.get("window").width * 18) / 392.72,
   },
   userTexts: {
     top: (Dimensions.get("window").width * -10) / 392.72,
@@ -120,7 +118,7 @@ const styles = StyleSheet.create({
   optionArea: {
     flex: 1,
     alignItems: "center",
-    paddingBottom: 5
+    paddingBottom: (Dimensions.get("window").width * 5) / 392.72
   },
   optionText: {
     fontSize: (Dimensions.get("window").width * 19) / 392.72,
@@ -132,10 +130,10 @@ const styles = StyleSheet.create({
     height: (Dimensions.get("window").width * 150) / 392.72,
     backgroundColor: "#292929",
     marginHorizontal: "2%",
-    borderRadius: (Dimensions.get("window").width * 5) / 392.72,
+    borderRadius: 5,
     justifyContent: "center",
-    paddingVertical: (Dimensions.get("window").width * 10) / 392.72,
-    paddingHorizontal: (Dimensions.get("window").width * 5) / 392.72,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
   },
   itemArea: {
     width: Dimensions.get("window").width,
@@ -208,42 +206,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: (Dimensions.get("window").width * 12) / 392.72,
     paddingVertical: (Dimensions.get("window").width * 10) / 392.72,
     borderRadius: (Dimensions.get("window").width * 10) / 392.72,
-  },
-  modalArea: {
-    flex: 1,
-    justifyContent: "flex-end",
-    width: Dimensions.get("window").width,
-  },
-  modalContent: {
-    paddingHorizontal: (Dimensions.get("window").width * 15) / 392.72,
-    borderTopLeftRadius: (Dimensions.get("window").width * 25) / 392.72,
-    borderTopRightRadius: (Dimensions.get("window").width * 25) / 392.72,
-    height: (Dimensions.get("window").width * 460) / 392.72,
-    width: Dimensions.get("window").width,
-    backgroundColor: "#292929",
-    alignItems: "center",
-    paddingTop: (Dimensions.get("window").width * 15) / 392.72,
-  },
-  barra: {
-    height: (Dimensions.get("window").width * 7.5) / 392.72,
-    width: (Dimensions.get("window").width * 60) / 392.72,
-    borderRadius: (Dimensions.get("window").width * 5) / 392.72,
-    backgroundColor: "#5C5C5C",
-    marginBottom: (Dimensions.get("window").width * 30) / 392.72,
-  },
-  buttonText: {
-    fontFamily: "Lato-Regular",
-    color: "#FFF",
-    fontSize: (Dimensions.get("window").width * 15) / 392.72,
-    marginLeft: (Dimensions.get("window").width * 15) / 392.72,
-  },
-  button: {
-    width: "100%",
-    flexDirection: "row",
-    paddingVertical: (Dimensions.get("window").width * 8) / 392.72,
-    borderBottomWidth: 2,
-    borderColor: "#5C5C5C",
-    alignItems: "center",
   },
 });
 

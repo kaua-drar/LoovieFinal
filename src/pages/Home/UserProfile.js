@@ -19,8 +19,8 @@ import {
   MaterialIcons,
 } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import styles from "./styles/ProfileScreenStyle";
-import stylesFeed from "../Home/styles/FeedStyle";
+import styles from "./styles/UserProfileStyle";
+import stylesFeed from "./styles/FeedStyle";
 import { useFocusEffect } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
 import {
@@ -34,6 +34,10 @@ import {
   limit,
   writeBatch,
   orderBy,
+  updateDoc,
+  increment,
+  arrayUnion,
+  arrayRemove,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -43,9 +47,8 @@ import ExpoFastImage from "expo-fast-image";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Constants from "../../components/utilities/Constants";
 import Star from "react-native-star-view";
-import Modal from "react-native-modal";
 
-export default function ProfileScreen({ navigation }) {
+export default function ProfileScreen({ navigation, route }) {
   const [loading, setLoading] = useState(true);
   const [isVisible, setIsVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(true);
@@ -56,7 +59,9 @@ export default function ProfileScreen({ navigation }) {
   const [ratings, setRatings] = useState({});
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState({});
-  const [isModalVisible, setModalVisible] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(null);
+
+  const uid = route.params.userId;
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -70,56 +75,52 @@ export default function ProfileScreen({ navigation }) {
     try {
       return (
         <View style={styles.avaliacoesArea}>
-              <TouchableOpacity>
-                <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
-              </TouchableOpacity>
-              <View style={styles.avaliacaoArea}>
-                <View style={styles.userInfo}>
-                  <ExpoFastImage
-                    style={styles.userImage}
-                    source={{
-                      uri:
-                        Constants.URL.IMAGE_URL_ORIGINAL + ratings.mediaPoster,
-                    }}
-                  />
-                  <Text style={styles.userName}>{ratings.mediaName}</Text>
-                  <Text
-                    style={styles.avaliacaoData}
-                  >{`${ratings.ratingDate}`}</Text>
-                </View>
-                <View style={styles.avaliacao}>
-                  <View
-                    style={[
-                      styles.score,
-                      {
-                        width: (Dimensions.get("window").width * 250) / 392.72,
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                      },
-                    ]}
-                  >
-                    <View
-                      style={{ flexDirection: "row", alignItems: "flex-end" }}
-                    >
-                      <Text style={[styles.note, { fontSize: 23 }]}>
-                        {ratings.rating.toFixed(1)}
-                      </Text>
-                      <Text style={[styles.noteof, { fontSize: 17 }]}>/10</Text>
-                    </View>
-                    <Star
-                      score={(ratings.rating.toFixed(1) * 5) / 10}
-                      style={{
-                        marginBottom:
-                          (Dimensions.get("window").height * 3) / 802.9,
-                        width: (Dimensions.get("window").width * 125) / 392.72,
-                        height: (Dimensions.get("window").width * 25) / 392.72,
-                      }}
-                    />
-                  </View>
-                  <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
-                </View>
-              </View>
+          <TouchableOpacity>
+            <Text style={styles.avaliacoesTitulo}>Avaliações {">"}</Text>
+          </TouchableOpacity>
+          <View style={styles.avaliacaoArea}>
+            <View style={styles.userInfo}>
+              <ExpoFastImage
+                style={styles.userImage}
+                source={{
+                  uri: Constants.URL.IMAGE_URL_ORIGINAL + ratings.mediaPoster,
+                }}
+              />
+              <Text style={styles.userName}>{ratings.mediaName}</Text>
+              <Text
+                style={styles.avaliacaoData}
+              >{`${ratings.ratingDate}`}</Text>
             </View>
+            <View style={styles.avaliacao}>
+              <View
+                style={[
+                  styles.score,
+                  {
+                    width: (Dimensions.get("window").width * 250) / 392.72,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                  },
+                ]}
+              >
+                <View style={{ flexDirection: "row", alignItems: "flex-end" }}>
+                  <Text style={[styles.note, { fontSize: 23 }]}>
+                    {ratings.rating.toFixed(1)}
+                  </Text>
+                  <Text style={[styles.noteof, { fontSize: 17 }]}>/10</Text>
+                </View>
+                <Star
+                  score={(ratings.rating.toFixed(1) * 5) / 10}
+                  style={{
+                    marginBottom: (Dimensions.get("window").height * 3) / 802.9,
+                    width: (Dimensions.get("window").width * 125) / 392.72,
+                    height: (Dimensions.get("window").width * 25) / 392.72,
+                  }}
+                />
+              </View>
+              <Text style={styles.avaliacaoText}>{ratings.ratingText}</Text>
+            </View>
+          </View>
+        </View>
       );
     } catch {
       return null;
@@ -138,8 +139,43 @@ export default function ProfileScreen({ navigation }) {
     }
   };
 
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
+  const pressedFollow = async () => {
+    if(!isFollowing) {
+      await updateDoc(doc(db, "users", uid), {
+        followers: increment(1),
+      }).then(async () => {
+        console.log("mais um pro perfil cara");
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+          following: increment(1),
+        }).then(async () => {
+          console.log("mais um pro seu perfil");
+          await updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
+            followingIds: arrayUnion(uid),
+          }).then(() => {
+            console.log("ta na sua lista");
+            requests();
+          })
+        });
+      });
+    } else if(isFollowing) {
+      await updateDoc(doc(db, "users", uid), {
+        followers: increment(-1),
+      }).then(async () => {
+        console.log("menos um pro perfil do cara");
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+          following: increment(-1),
+        }).then(async () => {
+          console.log("menos um pro seu perfil");
+          await updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
+            followingIds: arrayRemove(uid),
+          }).then(() => {
+            console.log("saiu da sua lista");
+            requests();
+          })
+        });
+      });
+    }
+    
   };
 
   useFocusEffect(
@@ -165,12 +201,22 @@ export default function ProfileScreen({ navigation }) {
     setRefreshing(true);
     setIsVisible(false);
 
+    await getDoc(doc(db, "userAnalytics", auth.currentUser.uid)).then((v) => {
+      console.log("PASSOOOOOOOOOOOOOOOOOUUUUUUUUUUUUUU");
+      try {
+        console.log(v.data().followingIds.some((e) => e == uid))
+        setIsFollowing(v.data().followingIds.some((e) => e == uid));
+      } catch {
+        setIsFollowing(false);
+      }
+    });
+
     const citiesRef = collection(db, "posts");
 
     const queryPosts = await getDocs(
       query(
         collection(db, "posts"),
-        where("userId", "==", `${auth.currentUser.uid}`),
+        where("userId", "==", `${uid}`),
         orderBy("postDate", "desc")
       )
     );
@@ -196,7 +242,7 @@ export default function ProfileScreen({ navigation }) {
       ]);
     });
 
-    const docRef = doc(db, "users", auth.currentUser.uid);
+    const docRef = doc(db, "users", uid);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
@@ -217,7 +263,7 @@ export default function ProfileScreen({ navigation }) {
 
     console.log(auth.currentUser.photoURL);
 
-    const docRefGenre = doc(db, "userPreferences", auth.currentUser.uid);
+    const docRefGenre = doc(db, "userPreferences", uid);
     const docSnapGenre = await getDoc(docRefGenre);
 
     if (docSnapGenre.exists()) {
@@ -229,10 +275,7 @@ export default function ProfileScreen({ navigation }) {
     const data = docSnapGenre.data();
     setFavoriteGenres(data.favoriteGenres);
 
-    const q = query(
-      collection(db, "folders"),
-      where("userId", "==", `${auth.currentUser.uid}`)
-    );
+    const q = query(collection(db, "folders"), where("userId", "==", `${uid}`));
 
     const querySnapshot = await getDocs(q);
 
@@ -261,7 +304,7 @@ export default function ProfileScreen({ navigation }) {
 
     const queryRatings = query(
       collection(db, "ratings"),
-      where("userId", "==", `${auth.currentUser.uid}`),
+      where("userId", "==", `${uid}`),
       limit(1)
     );
 
@@ -315,15 +358,13 @@ export default function ProfileScreen({ navigation }) {
       ListHeaderComponent={
         <View>
           <SafeAreaView style={styles.backdrop}>
-            <View style={styles.barsRow}>
-              <TouchableOpacity onPress={toggleModal}>
-                <FontAwesome5 name="bars" size={30} color="white" />
-              </TouchableOpacity>
-            </View>
             <Image
               style={styles.profilePicture}
               source={{
-                uri: userInfos.profilePictureURL == null ? "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg" : userInfos.profilePictureURL,
+                uri:
+                  userInfos.profilePictureURL == null
+                    ? "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg"
+                    : userInfos.profilePictureURL,
               }}
             />
           </SafeAreaView>
@@ -336,9 +377,22 @@ export default function ProfileScreen({ navigation }) {
               <Text style={styles.numberCount}>{userInfos.followers}</Text>
               <Text style={styles.numberDescription}>Seguidores</Text>
             </View>
-            <TouchableOpacity style={styles.profileButton} onPress={() => {navigation.navigate("EditProfile")}}>
-              <Text style={styles.text}>Editar Perfil</Text>
-            </TouchableOpacity>
+            {isFollowing != null && isFollowing && (
+              <TouchableOpacity
+                style={[styles.profileButton, {backgroundColor: "#292929", marginLeft: (Dimensions.get("window").width * 5) / 392.72}]}
+                onPress={() => pressedFollow()}
+              >
+                <Text style={styles.text}>Seguindo</Text>
+              </TouchableOpacity>
+            )}
+            {isFollowing != null && !isFollowing && (
+              <TouchableOpacity
+                style={[styles.profileButton, {backgroundColor: "#9D0208", marginLeft: (Dimensions.get("window").width * 15) / 392.72}]}
+                onPress={() => pressedFollow()}
+              >
+                <Text style={styles.text}>Seguir</Text>
+              </TouchableOpacity>
+            )}
           </View>
           <View style={styles.userTexts}>
             <View style={{ flexDirection: "row" }}>
@@ -349,9 +403,7 @@ export default function ProfileScreen({ navigation }) {
               <View style={{ flex: 1 }}></View>
             </View>
 
-            <Text style={styles.bio}>
-              {userInfos.bio}
-            </Text>
+            <Text style={styles.bio}>{userInfos.bio}</Text>
           </View>
           {!isVisible && (
             <View style={styles.loadingArea}>
@@ -387,58 +439,6 @@ export default function ProfileScreen({ navigation }) {
               </TouchableOpacity>
             </View>
           )}
-          <Modal
-            isVisible={isModalVisible}
-            onSwipeComplete={() => setModalVisible(false)}
-            swipeDirection="down"
-            onSwipeThreshold={500}
-            onBackdropPress={toggleModal}
-            style={{ margin: 0 }}
-          >
-            <View style={styles.modalArea}>
-              <View style={styles.modalContent}>
-                <View style={styles.barra}></View>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => {
-                    setModalVisible(false);
-                    navigation.navigate("Settings");
-                  }}
-                >
-                  <Feather name="settings" size={27.5} color="white" />
-                  <Text style={styles.buttonText}>Configurações Gerais</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  onPress={() => navigation.navigate("About")}
-                >
-                  <AntDesign name="infocirlceo" size={27.5} color="white" />
-                  <Text style={styles.buttonText}>Sobre</Text>
-                </TouchableOpacity>
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "flex-end",
-                    alignItems: "center",
-                    marginBottom: 30,
-                    width: "100%",
-                  }}
-                >
-                  <TouchableOpacity
-                    style={styles.button}
-                    onPress={() => handleSignOut()}
-                  >
-                    <MaterialIcons
-                      name="exit-to-app"
-                      size={27.5}
-                      color="white"
-                    />
-                    <Text style={styles.buttonText}>Sair</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </Modal>
         </View>
       }
       ListFooterComponent={
@@ -550,7 +550,7 @@ export default function ProfileScreen({ navigation }) {
                 </ScrollView>
               </View>
             </View>
-            <Avaliacoes/>
+            <Avaliacoes />
           </View>
         )
       }

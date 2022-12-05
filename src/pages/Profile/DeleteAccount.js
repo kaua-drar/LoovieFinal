@@ -52,7 +52,7 @@ export default function DeleteAccount({ navigation, route, props }) {
       setUserInfos({
         username: data.username,
         name: data.name,
-        profilePictureURL: null,
+        profilePictureURL: data.profilePictureURL,
       });
     } else {
       // doc.data() will be undefined in this case
@@ -149,7 +149,7 @@ export default function DeleteAccount({ navigation, route, props }) {
                 source={{
                   uri:
                     userInfos.profilePictureURL === null
-                      ? "https://pbs.twimg.com/media/Fdnl8v_XoAEazAe?format=jpg&name=large"
+                      ? "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg"
                       : userInfos.profilePictureURL,
                 }}
                 resizeMode="cover"

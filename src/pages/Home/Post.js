@@ -209,6 +209,10 @@ export default function Post({ navigation }) {
       totalComments: 0,
       totalLikes: 0,
     }).then(async (post) => {
+      await updateDoc(doc(collection(db, "posts"), post.id), {
+        postId: post.id
+      });
+      
       console.log("post criado");
       medias.map(async (media, index) => {
         const blob = await new Promise((resolve, reject) => {

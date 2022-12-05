@@ -29,8 +29,12 @@ import Ratings from "../pages/Explorer/Ratings";
 
 import Feed from "../pages/Home/Feed";
 import Post from "../pages/Home/Post";
+import UserProfile from "../pages/Home/UserProfile";
+import Comment from "../pages/Home/Comment";
 
 import Recomendations from "../pages/ForYou/Recomendations";
+import MovieRecomendation from "../pages/ForYou/MovieRecomendation";
+import SerieRecomendation from "../pages/ForYou/SerieRecomendation";
 
 import TabEmCartaz from "../pages/Cinema/TabEmCartaz";
 import HomeEmCartaz from "../pages/Cinema/HomeEmCartaz";
@@ -140,6 +144,47 @@ export function HomeStack() {
         <Stack.Screen name="Post" component={Post} options={({ route }) => ({
           headerShown: false,
         })}/>
+        <Stack.Screen name="UserProfile" component={UserProfile}/>
+        <Stack.Screen
+          name="Comment"
+          component={Comment}
+          options={({ navigation, route }) => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+            headerTitle: "Comentários",
+            headerShown: true,
+            headerRight: () => null,
+            headerTitleAlign: "center",
+            headerLeft: () => (
+              <TouchableHighlight
+                style={{
+                  borderRadius: 40,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  padding: 5,
+                  marginLeft: 22.5,
+                }}
+                onPress={() =>
+                  route.name === "Home" ? null : navigation.goBack()
+                }
+                activeOpacity={0.8}
+                underlayColor="#ba5256"
+                disabled={route.name === "Home" ? true : false}
+              >
+                <AntDesign
+                  name="close"
+                  size={32}
+                  color="#FFF"
+                  style={{
+                    display: "flex",
+                  }}
+                />
+              </TouchableHighlight>
+            ),
+          })}
+        />
       </Stack.Navigator>
     );
   }
@@ -429,6 +474,26 @@ export function ForYouStack() {
         })}
       >
         <Stack.Screen name="Recomendations" component={Recomendations} />
+        <Stack.Screen
+          name="MovieRecomendation"
+          component={MovieRecomendation}
+          options={() => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+          })}
+        />
+        <Stack.Screen
+          name="SerieRecomendation"
+          component={SerieRecomendation}
+          options={() => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+          })}
+        />
       </Stack.Navigator>
     );
   }

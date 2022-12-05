@@ -15,7 +15,6 @@ import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
 import { createStackNavigator } from "@react-navigation/stack";
-import Image from "react-native-scalable-image";
 import ExpoFastImage from "expo-fast-image";
 import { useFocusEffect } from "@react-navigation/native";
 import {

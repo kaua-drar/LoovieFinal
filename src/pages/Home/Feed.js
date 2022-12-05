@@ -43,6 +43,7 @@ import { firebaseConfig } from "../../../firebase-config";
 import { getAuth } from "firebase/auth";
 import { SwiperFlatList } from "react-native-swiper-flatlist";
 import { Video, AVPlaybackStatus } from "expo-av";
+import styles from "./styles/FeedStyle";
 
 export default function Feed({ navigation }) {
   const [loading, setLoading] = useState(true);
@@ -62,38 +63,42 @@ export default function Feed({ navigation }) {
     setLoading(true);
     setRefreshing(true);
 
-    const citiesRef = collection(db, "posts");
+    await getDoc(doc(db, "userAnalytics", auth.currentUser.uid)).then(
+      async (v) => {
+        console.log("data", v.data().likedPosts);
+        const citiesRef = collection(db, "posts");
 
-    const q = query(
-      citiesRef,
-      where("postTags", "array-contains-any", ["BATMAN"])
+        const q = query(
+          citiesRef,
+          where("postTags", 'array-contains-any', ["BATMAN", "DC"])
+        );
+
+        const querySnapshot = await getDocs(q);
+
+        setPosts([]);
+        querySnapshot.forEach((doc) => {
+          setPosts((old) => [
+            ...old,
+            {
+              postId: doc.id,
+              userId: doc.data().userId,
+              userName: doc.data().userName,
+              userProfilePictureURL: doc.data().userProfilePictureURL,
+              postDate: checkDate(doc.data().postDate.toDate()),
+              postDescription: doc.data().postDescription,
+              postMedias: doc.data().postMedias,
+              postMediaType: doc.data().postMediaType,
+              postTags: doc.data().postTags,
+              totalLikes: doc.data().totalLikes,
+              totalComments: doc.data().totalComments,
+              isLiked: v.data().likedPosts.some((e) => e == doc.id),
+            },
+          ]);
+        });
+        setLoading(false);
+        setRefreshing(false);
+      }
     );
-
-    const querySnapshot = await getDocs(q);
-
-    setPosts([]);
-    querySnapshot.forEach((doc) => {
-      setPosts((old) => [
-        ...old,
-        {
-          postId: doc.id,
-          userId: doc.data().userId,
-          userName: doc.data().userName,
-          userProfilePictureURL: doc.data().userProfilePictureURL,
-          postDate: checkDate(doc.data().postDate.toDate()),
-          postDescription: doc.data().postDescription,
-          postMedias: doc.data().postMedias,
-          postMediaType: doc.data().postMediaType,
-          postTags: doc.data().postTags,
-          totalLikes: doc.data().totalLikes,
-          totalComments: doc.data().totalComments,
-          isLiked: false,
-        },
-      ]);
-    });
-
-    setLoading(false);
-    setRefreshing(false);
   };
 
   useEffect(() => {
@@ -170,11 +175,76 @@ export default function Feed({ navigation }) {
       setPosts(oldPosts);
       console.log(posts[index]);
 
-      updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
-        likedPosts: arrayUnion(oldPosts[index].postId),
+
+      await updateDoc(doc(db, "posts", oldPosts[index].postId), {
+        totalLikes: increment(1),
+      }).then(async () => {
+        console.log("like adicionado")
+        await updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
+          likedPosts: arrayUnion(oldPosts[index].postId),
+        })
+          .then(() => {
+            console.log("tag adicionada");
+            posts[index].postTags.map(async (item) => {
+              console.log(item);
+  
+              const Ref = collection(db, "userAnalytics");
+  
+              const docSnap = await getDoc(
+                doc(
+                  collection(Ref, auth.currentUser.uid, "favoriteTags"),
+                  item.replace(" ", "_")
+                )
+              );
+  
+              if (docSnap.exists()) {
+                await updateDoc(
+                  doc(
+                    collection(Ref, auth.currentUser.uid, "favoriteTags"),
+                    item.replace(" ", "_")
+                  ),
+                  {
+                    likeCount: increment(1),
+                  }
+                ).then(() => {
+                  console.log("tag atualizada");
+                });
+              } else {
+                // doc.data() will be undefined in this case
+                await setDoc(
+                  doc(
+                    collection(Ref, auth.currentUser.uid, "favoriteTags"),
+                    item.replace(" ", "_")
+                  ),
+                  {
+                    tagName: item,
+                    likeCount: 1,
+                  }
+                ).then(() => {
+                  console.log("tag criada");
+                });
+              }
+            });
+          })
+          .catch((e) => {
+            console.log(e.code, ": ", e.message);
+          });
       })
+      
+    } else if (isLiked == true) {
+      let oldPosts = [...posts];
+      oldPosts[index].isLiked = !oldPosts[index].isLiked;
+      oldPosts[index].totalLikes = oldPosts[index].totalLikes - 1;
+      setPosts(oldPosts);
+      console.log(posts[index]);
+      await updateDoc(doc(db, "posts", oldPosts[index].postId), {
+        totalLikes: increment(-1),
+      }).then(async () => {
+        await updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
+          likedPosts: arrayRemove(oldPosts[index].postId),
+        })
         .then(() => {
-          console.log("tag adicionada");
+          console.log("tag removida");
           posts[index].postTags.map(async (item) => {
             console.log(item);
 
@@ -186,7 +256,6 @@ export default function Feed({ navigation }) {
                 item.replace(" ", "_")
               )
             );
-
             if (docSnap.exists()) {
               await updateDoc(
                 doc(
@@ -194,46 +263,17 @@ export default function Feed({ navigation }) {
                   item.replace(" ", "_")
                 ),
                 {
-                  likeCount: increment(1),
+                  likeCount: increment(-1),
                 }
               ).then(() => {
                 console.log("tag atualizada");
-              })
-            } else {
-              // doc.data() will be undefined in this case
-              await setDoc(
-                doc(
-                  collection(Ref, auth.currentUser.uid, "favoriteTags"),
-                  item.replace(" ", "_")
-                ),
-                {
-                  tagName: item,
-                  likeCount: 1
-                }
-              ).then(() => {
-                console.log("tag criada");
-              })
+              });
             }
           });
-        })
-        .catch((e) => {
+        }).catch((e) => {
           console.log(e.code, ": ", e.message);
         });
-    } else if (isLiked == true) {
-      let oldPosts = [...posts];
-      oldPosts[index].isLiked = !oldPosts[index].isLiked;
-      oldPosts[index].totalLikes = oldPosts[index].totalLikes - 1;
-      setPosts(oldPosts);
-      console.log(posts[index]);
-      updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
-        likedPosts: arrayRemove(oldPosts[index].postId),
       })
-        .then(() => {
-          console.log("foi");
-        })
-        .catch((e) => {
-          console.log(e.code, ": ", e.message);
-        });
     }
   };
 
@@ -300,10 +340,10 @@ export default function Feed({ navigation }) {
                   }}
                 >
                   <View style={styles.postHeader}>
-                    <TouchableOpacity style={{ marginRight: 8 }}>
+                    <TouchableOpacity style={{ marginRight: 8 }} onPress={() => item.userId === auth.currentUser.uid ? navigation.navigate("MainTab", {screen: "ProfileTab"}) : navigation.navigate("UserProfile", {userId: item.userId})}>
                       <ExpoFastImage
                         source={{
-                          uri: "https://static.wikia.nocookie.net/shingekinokyojin/images/b/b1/Levi_Ackermann_%28Anime%29_character_image.png/revision/latest?cb=20220227211605",
+                          uri: item.userName == null ? "https://static.wikia.nocookie.net/shingekinokyojin/images/b/b1/Levi_Ackermann_%28Anime%29_character_image.png/revision/latest?cb=20220227211605" : item.userProfilePictureURL,
                         }}
                         style={styles.userPicture}
                       />
@@ -411,7 +451,7 @@ export default function Feed({ navigation }) {
                       />
                     </TouchableOpacity>
                     <Text style={styles.postNumbers}>{item.totalLikes}</Text>
-                    <TouchableOpacity style={{ marginLeft: 15 }}>
+                    <TouchableOpacity style={{ marginLeft: 15 }} onPress={() => navigation.navigate("Comment", {item: item})}>
                       <FontAwesome5 name="comment" size={22} color="#FFF" />
                     </TouchableOpacity>
                     <Text style={styles.postNumbers}>{item.totalComments}</Text>
@@ -459,168 +499,3 @@ export default function Feed({ navigation }) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  newButtonArea: {
-    position: "absolute",
-    right: (Dimensions.get("window").width * 30) / 392.72,
-    bottom: (Dimensions.get("window").width * 30) / 392.72,
-    width: (Dimensions.get("window").width * 60) / 392.72,
-    height: (Dimensions.get("window").width * 60) / 392.72,
-    borderRadius: (Dimensions.get("window").width * 30) / 392.72,
-    backgroundColor: "#9D0208",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 5000,
-  },
-  newButtonText: {
-    fontSize: (Dimensions.get("window").width * 50) / 392.72,
-    fontFamily: "Lato-Regular",
-    color: "#FFF",
-  },
-  video: {
-    alignSelf: "center",
-    width: 320,
-    height: 200,
-  },
-  loadingArea: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    height: Dimensions.get("window").height,
-  },
-  loadingText: {
-    color: "#FFF",
-    fontFamily: "Lato-Regular",
-  },
-  imageCarousel: {
-    maxHeight: (Dimensions.get("window").width * 340) / 392.72,
-    width: (Dimensions.get("window").width * 340) / 392.72,
-    marginTop: 10,
-    marginBottom: 5,
-  },
-  dotsContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 10,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginHorizontal: 1,
-  },
-  images: {
-    width: (Dimensions.get("window").width * 340) / 392.72,
-    height: (Dimensions.get("window").width * 253.3) / 392.72,
-  },
-  imageButtons: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    zIndex: 1000000,
-    justifyContent: "center",
-    alignItems: "center",
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  imageViewer: {
-    flex: 1,
-    backgroundColor: "#000",
-    width: Dimensions.get("window").width,
-    height: Dimensions.get("window").height,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#0F0C0C",
-  },
-  postHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  postTexts: {
-    flex: 1,
-  },
-  postInfos: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 5,
-  },
-  userName: {
-    color: "#FFF",
-    fontFamily: "Lato-Regular",
-    fontSize: (Dimensions.get("window").width * 18) / 392.72,
-  },
-  postDate: {
-    color: "#474747",
-    fontFamily: "Lato-Regular",
-    fontSize: (Dimensions.get("window").width * 13) / 392.72,
-    marginLeft: 8,
-  },
-  chipArea: {
-    borderRadius: (Dimensions.get("window").width * 7) / 392.72,
-    padding: (Dimensions.get("window").width * 8) / 392.72,
-    margin: (Dimensions.get("window").width * 4) / 392.72,
-    backgroundColor: "#9D0208",
-  },
-  chipText: {
-    fontFamily: "Lato-Bold",
-    color: "#000",
-    fontSize: (Dimensions.get("window").width * 15) / 392.72,
-  },
-  badge: {
-    marginLeft: 5,
-    backgroundColor: "#9D0208",
-    width: 14,
-    height: 14,
-    textAlign: "center",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 7,
-    marginBottom: 2,
-  },
-  badgeText: {
-    fontFamily: "Lato-Bold",
-    color: "#FFF",
-    fontSize: 10,
-  },
-  postDescription: {
-    color: "#FFF",
-    fontFamily: "Lato-Regular",
-    fontSize: (Dimensions.get("window").width * 16) / 392.72,
-    width: (Dimensions.get("window").width * 340) / 392.72,
-    marginTop: 2,
-  },
-  userPicture: {
-    width: (Dimensions.get("window").width * 65) / 392.72,
-    height: (Dimensions.get("window").width * 65) / 392.72,
-    borderRadius: (Dimensions.get("window").width * 32.5) / 392.72,
-    borderWidth: 3,
-    borderColor: "#76767F",
-  },
-  postMedia: {
-    width: (Dimensions.get("window").width * 340) / 392.72,
-    height: (Dimensions.get("window").width * 253.3) / 392.72,
-    alignSelf: "center",
-    marginTop: 10,
-  },
-  postOptions: {
-    marginTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  postNumbers: {
-    fontFamily: "Lato-Regular",
-    fontSize: (Dimensions.get("window").width * 15) / 392.72,
-    color: "#474747",
-    marginLeft: 5,
-  },
-  text: {
-    fontSize: 28,
-    textAlign: "center",
-    color: "red",
-    paddingBottom: 10,
-  },
-});
