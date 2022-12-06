@@ -33,6 +33,7 @@ import {
   uploadBytesResumable,
   uploadBytes,
   getDownloadURL,
+  deleteObject
 } from "firebase/storage";
 import {
   query,
@@ -285,7 +286,7 @@ export default function Post({ navigation }) {
     console.log("foi")
   }).catch((e)=> {
     console.log(e.code, ": ", e.message)
-  })*/
+  })
 
     const q = query(
       collection(Ref, auth.currentUser.uid, "favoriteTags"),
@@ -301,6 +302,18 @@ export default function Post({ navigation }) {
       })
       .catch((e) => {
         console.log(e.code, ": ", e.message);
+      });
+      */
+
+      const desertRef = ref(storage, 'postMedias/2F4PZYyOTa9Y8NcQjfw1YP-0');
+
+      // Delete the file
+      deleteObject(desertRef).then(() => {
+        console.log("deletado");
+        // File deleted successfully
+      }).catch((error) => {
+        console.log("deu erro - ", error.code, ": ", error.message);
+        // Uh-oh, an error occurred!
       });
   };
 

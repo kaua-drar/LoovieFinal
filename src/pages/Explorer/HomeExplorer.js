@@ -255,38 +255,7 @@ export default function HomeExplorer({ navigation }) {
                 }
               })}
             </ScrollView>
-
-            <Text style={[styles.title, { marginTop: 20 }]}>Para você</Text>
-            <ScrollView
-              style={styles.scrollview}
-              horizontal={true}
-              alignItems="center"
-              showsHorizontalScrollIndicator={false}
-            >
-              {/*forYou.map((media, index) => {
-                return (
-                  <TouchableOpacity
-                    style={styles.movieItem}
-                    key={index}
-                    onPress={() =>
-                      navigation.navigate(
-                        media.mediaType === "Movie" ? "Movie" : "Serie",
-                        { mediaId: media.mediaId, mediaType: media.mediaType }
-                      )
-                    }
-                  >
-                    <ExpoFastImage
-                      source={{
-                        uri: `${media.poster_path}`,
-                      }}
-                      style={styles.moviePoster}
-                      resizeMode="cover"
-                    />
-                  </TouchableOpacity>
-                );
-              })*/}
-            </ScrollView>
-
+            
             <Text style={[styles.title, { marginTop: 20 }]}>Em Alta</Text>
             <TouchableOpacity
               style={[styles.movieItem, { marginBottom: 100 }]}

@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     fontSize: (Dimensions.get("window").width * 15) / 392.72,
   },
   userTexts: {
-    top: (Dimensions.get("window").width * -10) / 392.72,
+    top: (Dimensions.get("window").width * 0) / 392.72,
     marginLeft: (Dimensions.get("window").width * 30) / 392.72,
     marginBottom: (Dimensions.get("window").width * 20) / 392.72
   },

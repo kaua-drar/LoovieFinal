@@ -317,10 +317,10 @@ export default function ProfileScreen({ navigation }) {
           <SafeAreaView style={styles.backdrop}>
             <View style={styles.barsRow}>
               <TouchableOpacity onPress={toggleModal}>
-                <FontAwesome5 name="bars" size={30} color="white" />
+                <FontAwesome5 name="bars" size={(Dimensions.get("window").width * 30) / 392.72} color="white" />
               </TouchableOpacity>
             </View>
-            <Image
+            <ExpoFastImage
               style={styles.profilePicture}
               source={{
                 uri: userInfos.profilePictureURL == null ? "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg" : userInfos.profilePictureURL,
@@ -516,6 +516,7 @@ export default function ProfileScreen({ navigation }) {
                         onPress={() =>
                           navigation.navigate("ChoosedFolder", {
                             folderId: folder.folderId,
+                            folderName: folder.name
                           })
                         }
                       >
@@ -570,7 +571,7 @@ export default function ProfileScreen({ navigation }) {
               <TouchableOpacity style={{ marginRight: 8 }}>
                 <ExpoFastImage
                   source={{
-                    uri: item.userName == null ? "https://static.wikia.nocookie.net/shingekinokyojin/images/b/b1/Levi_Ackermann_%28Anime%29_character_image.png/revision/latest?cb=20220227211605" : item.userProfilePictureURL,
+                    uri: item.userProfilePictureURL == null ? "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg" : item.userProfilePictureURL,
                   }}
                   style={stylesFeed.userPicture}
                 />
@@ -584,21 +585,6 @@ export default function ProfileScreen({ navigation }) {
                     {item.userName}
                   </Text>
                   <Text style={stylesFeed.postDate}>{item.postDate}</Text>
-                  <View
-                    style={{
-                      flex: 1,
-                      flexDirection: "row",
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <TouchableOpacity>
-                      <Entypo
-                        name="dots-three-horizontal"
-                        size={22}
-                        color="#474747"
-                      />
-                    </TouchableOpacity>
-                  </View>
                 </View>
                 <FlatList
                   horizontal

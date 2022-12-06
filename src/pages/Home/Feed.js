@@ -312,7 +312,6 @@ export default function Feed({ navigation }) {
         <View>
           <TouchableOpacity
             style={styles.newButtonArea}
-            onPress={() => navigation.navigate("Post")}
           >
             <Text style={styles.newButtonText}>+</Text>
           </TouchableOpacity>
@@ -343,7 +342,7 @@ export default function Feed({ navigation }) {
                     <TouchableOpacity style={{ marginRight: 8 }} onPress={() => item.userId === auth.currentUser.uid ? navigation.navigate("MainTab", {screen: "ProfileTab"}) : navigation.navigate("UserProfile", {userId: item.userId})}>
                       <ExpoFastImage
                         source={{
-                          uri: item.userName == null ? "https://static.wikia.nocookie.net/shingekinokyojin/images/b/b1/Levi_Ackermann_%28Anime%29_character_image.png/revision/latest?cb=20220227211605" : item.userProfilePictureURL,
+                          uri: item.userProfilePictureURL == null ? "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg" : item.userProfilePictureURL,
                         }}
                         style={styles.userPicture}
                       />
@@ -357,21 +356,6 @@ export default function Feed({ navigation }) {
                           {item.userName}
                         </Text>
                         <Text style={styles.postDate}>{item.postDate}</Text>
-                        <View
-                          style={{
-                            flex: 1,
-                            flexDirection: "row",
-                            justifyContent: "flex-end",
-                          }}
-                        >
-                          <TouchableOpacity>
-                            <Entypo
-                              name="dots-three-horizontal"
-                              size={22}
-                              color="#474747"
-                            />
-                          </TouchableOpacity>
-                        </View>
                       </View>
                       <FlatList
                         horizontal

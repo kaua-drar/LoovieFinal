@@ -169,10 +169,10 @@ export default function MyLibrary({ navigation, route, props }) {
                   key={media.mediaId}
                   onPress={() =>
                     media.mediaId.charAt(0) == "M"
-                      ? navigation.navigate("Movie", {
+                      ? navigation.navigate("MovieProfile", {
                           mediaId: `${media.mediaId.substring(1)}`,
                         })
-                      : navigation.navigate("Serie", {
+                      : navigation.navigate("SerieProfile", {
                           mediaId: `${media.mediaId.substring(1)}`,
                         })
                   }

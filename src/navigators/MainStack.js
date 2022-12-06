@@ -50,6 +50,8 @@ import FavoriteGenres from "../pages/Profile/FavoriteGenres";
 import MyLibrary from "../pages/Profile/MyLibrary";
 import ChoosedFolder from "../pages/Profile/ChoosedFolder";
 import About from "../pages/Profile/About";
+import MovieProfile from "../pages/Profile/MovieProfile";
+import SerieProfile from "../pages/Profile/SerieProfile";
 
 const Stack = createStackNavigator();
 
@@ -130,14 +132,7 @@ export function HomeStack() {
             </View>
           ),
           headerTitle: "",
-          headerRight: () => (
-            <Ionicons
-              name="notifications"
-              size={35}
-              color="#FFF"
-              style={{ padding: 0, marginRight: 22.5 }}
-            />
-          ),
+          
         })}
       >
         <Stack.Screen name="Feed" component={Feed} />
@@ -267,14 +262,7 @@ export function ExplorerStack() {
             </View>
           ),
           headerTitle: "",
-          headerRight: () => (
-            <Ionicons
-              name="notifications"
-              size={35}
-              color="#FFF"
-              style={{ padding: 0, marginRight: 22.5 }}
-            />
-          ),
+          
           gestureEnabled: true,
           gestureDirection: "horizontal",
           ...TransitionPresets.ModalPresentationIOS,
@@ -460,14 +448,7 @@ export function ForYouStack() {
             </View>
           ),
           headerTitle: "",
-          headerRight: () => (
-            <Ionicons
-              name="notifications"
-              size={35}
-              color="#FFF"
-              style={{ padding: 0, marginRight: 22.5 }}
-            />
-          ),
+          
           gestureEnabled: true,
           gestureDirection: "horizontal",
           ...TransitionPresets.ModalPresentationIOS,
@@ -576,14 +557,7 @@ export function EmCartazStack() {
             </View>
           ),
           headerTitle: "",
-          headerRight: () => (
-            <Ionicons
-              name="notifications"
-              size={35}
-              color="#FFF"
-              style={{ padding: 0, marginRight: 22.5 }}
-            />
-          ),
+          
           gestureEnabled: true,
           gestureDirection: "horizontal",
           ...TransitionPresets.ModalPresentationIOS,
@@ -698,14 +672,7 @@ export function ProfileStack() {
             fontWeight: "bold",
           },
           headerTitle: "LOOVIE",
-          headerRight: () => (
-            <Ionicons
-              name="notifications"
-              size={35}
-              color="#FFF"
-              style={{ padding: 0, marginRight: 22.5 }}
-            />
-          ),
+          
         })}
       >
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
@@ -1064,6 +1031,26 @@ export function ProfileStack() {
                 />
               </TouchableHighlight>
             ),
+          })}
+        />
+        <Stack.Screen
+          name="MovieProfile"
+          component={MovieProfile}
+          options={() => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
+          })}
+        />
+        <Stack.Screen
+          name="SerieProfile"
+          component={SerieProfile}
+          options={() => ({
+            gestureEnabled: false,
+            gestureDirection: "vertical",
+            ...TransitionPresets.ModalSlideFromBottomIOS,
+            gestureVelocityImpact: 1,
           })}
         />
       </Stack.Navigator>
