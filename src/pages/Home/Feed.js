@@ -37,6 +37,7 @@ import {
   arrayUnion,
   arrayRemove,
   increment,
+  orderBy,
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -70,7 +71,8 @@ export default function Feed({ navigation }) {
 
         const q = query(
           citiesRef,
-          where("postTags", 'array-contains-any', ["BATMAN", "DC"])
+          /*where("postTags", "array-contains-any", ["BATMAN", "DC"]),*/
+          orderBy("postDate", "desc")
         );
 
         const querySnapshot = await getDocs(q);
@@ -175,11 +177,10 @@ export default function Feed({ navigation }) {
       setPosts(oldPosts);
       console.log(posts[index]);
 
-
       await updateDoc(doc(db, "posts", oldPosts[index].postId), {
         totalLikes: increment(1),
       }).then(async () => {
-        console.log("like adicionado")
+        console.log("like adicionado");
         await updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
           likedPosts: arrayUnion(oldPosts[index].postId),
         })
@@ -187,16 +188,16 @@ export default function Feed({ navigation }) {
             console.log("tag adicionada");
             posts[index].postTags.map(async (item) => {
               console.log(item);
-  
+
               const Ref = collection(db, "userAnalytics");
-  
+
               const docSnap = await getDoc(
                 doc(
                   collection(Ref, auth.currentUser.uid, "favoriteTags"),
                   item.replace(" ", "_")
                 )
               );
-  
+
               if (docSnap.exists()) {
                 await updateDoc(
                   doc(
@@ -229,8 +230,7 @@ export default function Feed({ navigation }) {
           .catch((e) => {
             console.log(e.code, ": ", e.message);
           });
-      })
-      
+      });
     } else if (isLiked == true) {
       let oldPosts = [...posts];
       oldPosts[index].isLiked = !oldPosts[index].isLiked;
@@ -243,37 +243,38 @@ export default function Feed({ navigation }) {
         await updateDoc(doc(db, "userAnalytics", auth.currentUser.uid), {
           likedPosts: arrayRemove(oldPosts[index].postId),
         })
-        .then(() => {
-          console.log("tag removida");
-          posts[index].postTags.map(async (item) => {
-            console.log(item);
+          .then(() => {
+            console.log("tag removida");
+            posts[index].postTags.map(async (item) => {
+              console.log(item);
 
-            const Ref = collection(db, "userAnalytics");
+              const Ref = collection(db, "userAnalytics");
 
-            const docSnap = await getDoc(
-              doc(
-                collection(Ref, auth.currentUser.uid, "favoriteTags"),
-                item.replace(" ", "_")
-              )
-            );
-            if (docSnap.exists()) {
-              await updateDoc(
+              const docSnap = await getDoc(
                 doc(
                   collection(Ref, auth.currentUser.uid, "favoriteTags"),
                   item.replace(" ", "_")
-                ),
-                {
-                  likeCount: increment(-1),
-                }
-              ).then(() => {
-                console.log("tag atualizada");
-              });
-            }
+                )
+              );
+              if (docSnap.exists()) {
+                await updateDoc(
+                  doc(
+                    collection(Ref, auth.currentUser.uid, "favoriteTags"),
+                    item.replace(" ", "_")
+                  ),
+                  {
+                    likeCount: increment(-1),
+                  }
+                ).then(() => {
+                  console.log("tag atualizada");
+                });
+              }
+            });
+          })
+          .catch((e) => {
+            console.log(e.code, ": ", e.message);
           });
-        }).catch((e) => {
-          console.log(e.code, ": ", e.message);
-        });
-      })
+      });
     }
   };
 
@@ -310,9 +311,7 @@ export default function Feed({ navigation }) {
       )}
       {!loading && (
         <View>
-          <TouchableOpacity
-            style={styles.newButtonArea}
-          >
+          <TouchableOpacity style={styles.newButtonArea} onPress={() => navigation.navigate("Post")}>
             <Text style={styles.newButtonText}>+</Text>
           </TouchableOpacity>
           <FlatList
@@ -339,22 +338,28 @@ export default function Feed({ navigation }) {
                   }}
                 >
                   <View style={styles.postHeader}>
-                    <TouchableOpacity style={{ marginRight: 8 }} onPress={() => item.userId === auth.currentUser.uid ? navigation.navigate("MainTab", {screen: "ProfileTab"}) : navigation.navigate("UserProfile", {userId: item.userId})}>
+                    <TouchableOpacity
+                      style={{ marginRight: 8 }}
+                      onPress={() =>
+                        item.userId === auth.currentUser.uid
+                          ? navigation.navigate("MainTab", {
+                              screen: "ProfileTab",
+                            })
+                          : navigation.navigate("UserProfile", {
+                              userId: item.userId,
+                            })
+                      }
+                    >
                       <ExpoFastImage
                         source={{
-                          uri: item.userProfilePictureURL == null ? "https://i.pinimg.com/originals/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg" : item.userProfilePictureURL,
+                          uri: `https://firebasestorage.googleapis.com/v0/b/thes-loovie.appspot.com/o/profilePictures%2F${item.userId}?alt=media&token=7b78a0ab-f999-41b1-aac7-81e0b4d688e6`,
                         }}
                         style={styles.userPicture}
                       />
                     </TouchableOpacity>
                     <View style={styles.postTexts}>
                       <View style={styles.postInfos}>
-                        <Text
-                          style={styles.userName}
-                          onPress={() => console.log(data)}
-                        >
-                          {item.userName}
-                        </Text>
+                        <Text style={styles.userName}>{item.userName}</Text>
                         <Text style={styles.postDate}>{item.postDate}</Text>
                       </View>
                       <FlatList
@@ -435,7 +440,12 @@ export default function Feed({ navigation }) {
                       />
                     </TouchableOpacity>
                     <Text style={styles.postNumbers}>{item.totalLikes}</Text>
-                    <TouchableOpacity style={{ marginLeft: 15 }} onPress={() => navigation.navigate("Comment", {item: item})}>
+                    <TouchableOpacity
+                      style={{ marginLeft: 15 }}
+                      onPress={() =>
+                        navigation.navigate("Comment", { item: item })
+                      }
+                    >
                       <FontAwesome5 name="comment" size={22} color="#FFF" />
                     </TouchableOpacity>
                     <Text style={styles.postNumbers}>{item.totalComments}</Text>

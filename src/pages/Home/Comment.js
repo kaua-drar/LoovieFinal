@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Keyboard,
 } from "react-native";
 import styles from "./styles/CommentStyle";
 import stylesFeed from "./styles/FeedStyle";
@@ -33,6 +34,7 @@ import {
   arrayUnion,
   arrayRemove,
   increment,
+  orderBy
 } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "../../../firebase-config";
@@ -91,6 +93,8 @@ export default function Comment({ navigation, route }) {
   };
 
   const requests = async () => {
+    Keyboard.dismiss();
+    setLoading(true);
     const docUserRef = doc(db, "users", auth.currentUser.uid);
     const docSnap = await getDoc(docUserRef);
 
@@ -111,7 +115,9 @@ export default function Comment({ navigation, route }) {
       const docRef = doc(db, "posts", item.postId);
       const colRef = collection(docRef, "comments");
 
-      getDocs(colRef).then((docSnap) => {
+      const q = query(colRef, orderBy("commentDate", "desc"))
+
+      getDocs(q).then((docSnap) => {
         console.log("comentários pegos");
         setComments([]);
         docSnap.forEach((doc) => {
@@ -336,7 +342,7 @@ export default function Comment({ navigation, route }) {
 
           <View style={styles.inputArea}>
             <TextInput
-              placeholder="Comentar como drar"
+              placeholder={`Comentar como ${userInfos.username}`}
               placeholderTextColor="#474747"
               style={styles.input}
               onChangeText={(text) => setComment(text)}
